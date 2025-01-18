@@ -4,7 +4,7 @@ import {
     GestureDetector,
     GestureHandlerRootView,
 } from 'react-native-gesture-handler';
-import { Dimensions, Image, StyleSheet, Text } from 'react-native';
+import { Dimensions, Image, Pressable, StyleSheet, Text } from 'react-native';
 import Animated, {
     Easing,
     interpolateColor,
@@ -17,7 +17,7 @@ const { width, height } = Dimensions.get('window');
 
 const EASING = Easing.bezier(1, -1, 0.3, 1.43);
 
-const TemplateItem = ({template}) => {
+const TemplateItem = ({ template, onSelectMeme }) => {
     const { img, name } = template;
 
     const translateX = useSharedValue(0);
@@ -71,9 +71,11 @@ const TemplateItem = ({template}) => {
     return (
         <GestureHandlerRootView style={styles.container}>
             <GestureDetector gesture={hover}>
-                <Animated.View style={[styles.box, boxAnimatedStyle]}>
-                    <Image src={img} source={img} name={name} style={styles.imageItem} resizeMode='stretch' />
-                </Animated.View>
+                <Pressable onPress={() => onSelectMeme(template)}>
+                    <Animated.View style={[styles.box, boxAnimatedStyle]}>
+                        <Image src={img} source={img} name={name} style={styles.imageItem} resizeMode='stretch' />
+                    </Animated.View>
+                </Pressable>
             </GestureDetector>
         </GestureHandlerRootView>
     );
@@ -90,9 +92,9 @@ const styles = StyleSheet.create({
         cursor: 'pointer',
     },
     imageItem: {
-      width: (width * 30) / 100,
-      aspectRatio: 3/2,
-      borderRadius: 10,
+        width: (width * 30) / 100,
+        aspectRatio: 3 / 2,
+        borderRadius: 10,
     },
 });
 

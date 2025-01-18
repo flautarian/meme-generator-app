@@ -1,65 +1,94 @@
+import { useCallback, useRef } from 'react';
 import { useEffect, useState } from 'react';
-import { Text, StyleSheet } from 'react-native';
+import { Text, StyleSheet, PanResponder, Platform } from 'react-native';
 import {
     GestureHandlerRootView,
-    PanGestureHandler,
+    TouchableWithoutFeedback,
 } from 'react-native-gesture-handler';
 import Animated, {
     useSharedValue,
     useAnimatedStyle,
     withSpring,
+    ReduceMotion,
 } from 'react-native-reanimated';
 
-const DRAG_LIMIT = 150;
-
-const DragableOption = ({ onArrange }) => {
+const DragableOption = ({ onArrangeEnd, onStartArrange, containerOffset, blockX = false, blockY = false, initialPosition }) => {
 
     const [activated, setActivated] = useState(true);
 
-    useEffect(() => {
-        if(!activated)
-            setTimeout(() => setActivated(true), 500);
-    }, [activated]);
+    const [initialPos, setInitialPos] = useState(initialPosition);
 
     const position = {
         x: useSharedValue(0),
         y: useSharedValue(0),
     };
 
-    const handlePan = (event) => {
-        let nativeEvent = event.nativeEvent;
-        const distance = Math.sqrt(
-            nativeEvent.translationX ** 2 + nativeEvent.translationY ** 2
-        );
+    const originOffset = useRef({ oX: 0, oY: 0 });
 
-        if (distance <= DRAG_LIMIT) {
-            position.x.value = nativeEvent.translationX;
-            position.y.value = nativeEvent.translationY;
-        }
-        else {
-            setActivated(false);
-            onArrange(nativeEvent.absoluteX, nativeEvent.absoluteY);
-            position.x.value = withSpring(0); // Reset position
-            position.y.value = withSpring(0);
-            return;
-        }
+    const dimensions = useRef({ width: 0, height: 0 });
+
+    const returnSpringConfig = {
+        duration: 1000,
+        dampingRatio: 0.7,
+        stiffness: 100,
+        overshootClamping: false,
+        restDisplacementThreshold: 0.01,
+        restSpeedThreshold: 2,
+        reduceMotion: ReduceMotion.System,
     };
 
-    const endPan = (event) => {
-        const finalX = event.translationX;
-        const finalY = event.translationY;
 
-        // Check if within the limit and execute external function
-        const distance = Math.sqrt(finalX ** 2 + finalY ** 2);
-        if (distance <= DRAG_LIMIT && typeof onArrange === 'function') {
-            onArrange({ x: finalX, y: finalY });
+    /* Pan responder and drag handlers */
+    const panResponder = useRef(
+        PanResponder.create({
+            onStartShouldSetPanResponder: () => true,
+            onMoveShouldSetPanResponder: () => true,
+            onPanResponderStart: (_) => {
+                onStartArrange();
+                setActivated(true);
+            },
+            onPanResponderMove: (_, gestureState) =>
+                handleDrag(gestureState),
+            onPanResponderRelease: (_, gestureState) => {
+                endPan(gestureState);
+            },
+        })
+    ).current;
+
+    const getNewPosition = useCallback((gestureState) => {
+        const { moveX, moveY } = gestureState;
+        const { width, height } = dimensions.current;
+        const { oX, oY } = originOffset.current;
+        if (Platform.OS === 'web')
+            return { x: moveX - oX + initialPos.x - width / 2, y: moveY - oY + initialPos.y - height / 2 };
+        return { x: moveX - initialPos.x - width / 2, y: moveY - initialPos.y - height / 2 };
+    }, [dimensions, containerOffset, initialPos]);
+
+    // handle drag function
+    const handleDrag = useCallback((gestureState) => {
+        if (activated) {
+            const newPos = getNewPosition(gestureState);
+            position.x.value = newPos.x;
+            position.y.value = newPos.y;
         }
+    }, [activated]);
+
+    // end drag function
+    const endPan = useCallback((gestureState) => {
+        // send signal to create new object in panel
+        const newPos = getNewPosition(gestureState);
+        onArrangeEnd(newPos.x + initialPos.x, newPos.y + initialPos.y);
 
         // Reset position
-        position.x.value = withSpring(0);
-        position.y.value = withSpring(0);
-    };
+        position.x.value = withSpring(0, returnSpringConfig);
+        position.y.value = withSpring(0, returnSpringConfig);
 
+        // create timeout to reset activated state
+        setActivated(false);
+        setTimeout(() => setActivated(true), 500);
+    }, [position, initialPos]);
+
+    // animated style
     const animatedStyle = useAnimatedStyle(() => ({
         transform: [
             { translateX: position.x.value },
@@ -68,12 +97,26 @@ const DragableOption = ({ onArrange }) => {
     }));
 
     return (
-        <GestureHandlerRootView style={styles.container}>
-            <PanGestureHandler onGestureEvent={handlePan} onEnded={endPan} enabled={activated} maxPointers={1}>
-                <Animated.View style={[styles.draggableBox, animatedStyle]}>
+        <GestureHandlerRootView
+            onLayout={(event) => {
+                const { width, height, x, y, top, left } = event.nativeEvent.layout;
+                originOffset.current = { oX: x + (left | 0) + width / 2, oY: y + (top | 0) + height / 2 };
+            }}
+            style={[styles.container, { top: initialPos.y, left: initialPos.x }]}>
+            <TouchableWithoutFeedback
+                onGestureEvent={handleDrag}
+                onEnded={endPan}
+                maxPointers={1}>
+                <Animated.View
+                    style={[styles.draggableBox, animatedStyle]}
+                    {...panResponder.panHandlers}
+                    onLayout={(event) => {
+                        const { width, height } = event.nativeEvent.layout;
+                        dimensions.current = { width, height };
+                    }}>
                     <Text style={styles.draggableText}>💬</Text>
                 </Animated.View>
-            </PanGestureHandler>
+            </TouchableWithoutFeedback>
         </GestureHandlerRootView>
     );
 }
@@ -81,11 +124,11 @@ const DragableOption = ({ onArrange }) => {
 const styles = StyleSheet.create({
     container: {
         backgroundColor: '#f5f5f5',
-        flex: 1,
+        position: 'absolute',
     },
     draggableBox: {
-        width: 100,
-        height: 100,
+        width: 75,
+        height: 75,
         backgroundColor: 'blue',
         justifyContent: 'center',
         alignItems: 'center',

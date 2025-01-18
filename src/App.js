@@ -1,9 +1,9 @@
-import TabsBase from "./screens/TabsBase";
+import AppRouterBase from "./screens/AppRouterBase";
 
 
 const App = () => {
   return (
-    <TabsBase />
+    <AppRouterBase />
   );
 };
 
