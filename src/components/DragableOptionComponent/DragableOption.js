@@ -12,11 +12,9 @@ import Animated, {
     ReduceMotion,
 } from 'react-native-reanimated';
 
-const DragableOption = ({ onArrangeEnd, onStartArrange, containerOffset, blockX = false, blockY = false, initialPosition }) => {
+const DragableOption = ({ onArrangeEnd, onStartArrange, blockX = false, blockY = false, initialPosition }) => {
 
     const [activated, setActivated] = useState(true);
-
-    const [initialPos, setInitialPos] = useState(initialPosition);
 
     const position = {
         x: useSharedValue(0),
@@ -59,10 +57,11 @@ const DragableOption = ({ onArrangeEnd, onStartArrange, containerOffset, blockX 
         const { moveX, moveY } = gestureState;
         const { width, height } = dimensions.current;
         const { oX, oY } = originOffset.current;
+        
         if (Platform.OS === 'web')
-            return { x: moveX - oX + initialPos.x - width / 2, y: moveY - oY + initialPos.y - height / 2 };
-        return { x: moveX - initialPos.x - width / 2, y: moveY - initialPos.y - height / 2 };
-    }, [dimensions, containerOffset, initialPos]);
+            return { x: moveX - oX + initialPosition.x - width / 2, y: moveY - oY + initialPosition.y - height / 2 };
+        return { x: moveX - initialPosition.x - width / 2, y: moveY - initialPosition.y - height / 2 };
+    }, [dimensions, initialPosition]);
 
     // handle drag function
     const handleDrag = useCallback((gestureState) => {
@@ -77,7 +76,7 @@ const DragableOption = ({ onArrangeEnd, onStartArrange, containerOffset, blockX 
     const endPan = useCallback((gestureState) => {
         // send signal to create new object in panel
         const newPos = getNewPosition(gestureState);
-        onArrangeEnd(newPos.x + initialPos.x, newPos.y + initialPos.y);
+        onArrangeEnd(newPos.x + initialPosition.x, newPos.y + initialPosition.y);
 
         // Reset position
         position.x.value = withSpring(0, returnSpringConfig);
@@ -86,7 +85,7 @@ const DragableOption = ({ onArrangeEnd, onStartArrange, containerOffset, blockX 
         // create timeout to reset activated state
         setActivated(false);
         setTimeout(() => setActivated(true), 500);
-    }, [position, initialPos]);
+    }, [position, initialPosition]);
 
     // animated style
     const animatedStyle = useAnimatedStyle(() => ({
@@ -94,6 +93,7 @@ const DragableOption = ({ onArrangeEnd, onStartArrange, containerOffset, blockX 
             { translateX: position.x.value },
             { translateY: position.y.value },
         ],
+        position: 'absolute',
     }));
 
     return (
@@ -102,7 +102,7 @@ const DragableOption = ({ onArrangeEnd, onStartArrange, containerOffset, blockX 
                 const { width, height, x, y, top, left } = event.nativeEvent.layout;
                 originOffset.current = { oX: x + (left | 0) + width / 2, oY: y + (top | 0) + height / 2 };
             }}
-            style={[styles.container, { top: initialPos.y, left: initialPos.x }]}>
+            style={[styles.container, { top: initialPosition.y, left: initialPosition.x }]}>
             <TouchableWithoutFeedback
                 onGestureEvent={handleDrag}
                 onEnded={endPan}
@@ -113,6 +113,7 @@ const DragableOption = ({ onArrangeEnd, onStartArrange, containerOffset, blockX 
                     onLayout={(event) => {
                         const { width, height } = event.nativeEvent.layout;
                         dimensions.current = { width, height };
+                        console.log("redraw dimensions");
                     }}>
                     <Text style={styles.draggableText}>💬</Text>
                 </Animated.View>
@@ -123,7 +124,6 @@ const DragableOption = ({ onArrangeEnd, onStartArrange, containerOffset, blockX 
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: '#f5f5f5',
         position: 'absolute',
     },
     draggableBox: {
@@ -132,8 +132,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'blue',
         justifyContent: 'center',
         alignItems: 'center',
-        borderRadius: 3,
-        position: 'absolute',
+        borderRadius: 50,
     },
     draggableText: {
         color: '#fff',

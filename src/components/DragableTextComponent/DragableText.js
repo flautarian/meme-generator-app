@@ -6,7 +6,7 @@ import { Crop, Move } from "react-native-feather";
 import { TapGestureHandler, GestureHandlerRootView, PanGestureHandler } from "react-native-gesture-handler";
 import Animated, { runOnJS, useAnimatedGestureHandler, useAnimatedStyle, useSharedValue } from "react-native-reanimated";
 
-const DraggableText = ({ text, initPosition, index, selected, containerOffset, onSelect, startDrag }) => {
+const DraggableText = ({ text, initPosition, index, selected, onSelect, startDrag }) => {
     const [value, setValue] = useState(text);
 
     const position = {
@@ -21,20 +21,9 @@ const DraggableText = ({ text, initPosition, index, selected, containerOffset, o
     const [isPanning, setIsPanning] = useState(false);
     const [fontSize, setFontSize] = useState(18);
     const contentView = { height: useSharedValue(50) };
-    const targetContentView = { height: useSharedValue(50) };
+    const initHeight = useSharedValue(contentView.height.value);
 
     const dimensions = useRef({ width: 0, height: 0 });
-
-    useEffect(() => {
-        if (targetContentView.height.value !== contentView.height.value) {
-            if (contentView.height.value < targetContentView.height.value)
-                contentView.height.value += 1;
-            else if (contentView.height.value > targetContentView.height.value)
-                contentView.height.value -= 1;
-            if (Math.abs(contentView.height.value - targetContentView.height.value) < 1)
-                contentView.height.value = targetContentView.height.value;
-        }
-    }, [targetContentView.height]);
 
     const getNewPosition = useCallback((gestureState) => {
         const { moveX, moveY } = gestureState;
@@ -61,21 +50,28 @@ const DraggableText = ({ text, initPosition, index, selected, containerOffset, o
         })
     ).current;
 
-    const resizePanGestureHandler = useAnimatedGestureHandler({
-        onStart: () => {
-            runOnJS(setIsPanning)(true)
-        },
-        onActive: (event) => {
-            const newHeight = Math.min(Math.max(event.y, 25), 100);
-            targetContentView.height.value = newHeight;
-            //setContentViewTextInputHeight(Math.min(Math.max(event.y, 25), 100));
-            /* const newFontSize = Math.max(Math.max(viewHeight, 18), 18);
-            runOnJS(setFontSize)(newFontSize); */
-        },
-        onEnd: () => {
-            runOnJS(setIsPanning)(false);
-        },
-    })
+
+    // handle resize function
+    const handleResize = useCallback((gestureState) => {
+        let newValue = gestureState.moveY - gestureState.y0;
+        const newHeight = Math.max(newValue + initHeight.value, 25);
+        contentView.height.value = newHeight;
+    }, [contentView]);
+
+    const resizeViewpanResponder = useRef(
+        PanResponder.create({
+            onStartShouldSetPanResponder: () => {
+                return true;
+            },
+            onMoveShouldSetPanResponder: () => true,
+            onPanResponderMove: (_, gestureState) =>
+                handleResize(gestureState),
+            onPanResponderRelease: (_, gestureState) => {
+                console.log(contentView.height.value);
+                initHeight.value = contentView.height.value;
+            },
+        })
+    ).current;
 
     // animated style
     const dragAnimationStyle = useAnimatedStyle(() => ({
@@ -86,16 +82,15 @@ const DraggableText = ({ text, initPosition, index, selected, containerOffset, o
         position: 'absolute',
     }));
 
-    const resizeAnimationStyle = useAnimatedStyle(() => {
-        return {
-            height: contentView.height.value,
-            width: contentView.height.value * 1.5,
-        }
-    })
+    const resizeAnimationStyle = useAnimatedStyle(() => ({
+        height: contentView.height.value,
+        width: contentView.height.value * 2,
+        fontSize: contentView.height.value * 0.5
+    }))
 
     return (
         <Animated.View
-            style={[dragAnimationStyle, { position: "absolute" }]}
+            style={[dragAnimationStyle]}
             onLayout={(event) => {
                 const { width, height, x, y, top, left } = event.nativeEvent.layout;
                 originOffset.current = { oX: x + (left | 0) + width / 2, oY: y + (top | 0) + height / 2 };
@@ -109,8 +104,7 @@ const DraggableText = ({ text, initPosition, index, selected, containerOffset, o
                 style={[
                     {
                         fontSize: fontSize,
-                        borderWidth: selected ? 2 : 0,
-                        borderColor: "red"
+                        borderWidth: selected ? 2 : 0
                     }
                 ]}
             >
@@ -120,11 +114,13 @@ const DraggableText = ({ text, initPosition, index, selected, containerOffset, o
                     onPress={() => onSelect(index)}
                 >
                     <Animated.View
-                        style={{ flex: 1, flexDirection: "column" }}>
+                        style={{ flex: 1, flexDirection: "column", alignContent: "center", justifyContent: "center" }}>
                         <View
                             {...dragViewpanResponder.panHandlers}
                             style={{ ...styles.moveIconContainer, visibility: selected ? 'visible' : 'hidden', opacity: selected ? 1 : 0 }}>
-                            <Text style={styles.positionIconView} selectable={false}><Move stroke="black" fill="#fff" width={32} height={32}  /></Text> 
+                            <Text style={styles.positionIconView} selectable={false}>
+                                <Move stroke="black" fill="#fff" width={32} height={32} />
+                            </Text>
                         </View>
 
                         <TapGestureHandler
@@ -136,29 +132,27 @@ const DraggableText = ({ text, initPosition, index, selected, containerOffset, o
                             }}
                             numberOfTaps={2}
                         >
-                            <Animated.View style={[{ backgroundColor: 'yellow' }, resizeAnimationStyle]}>
+                            <Animated.View style={[selected ? { backgroundColor: 'yellow' } : {}, resizeAnimationStyle]}>
                                 {isEditing ? (
                                     <TextInput
                                         aria-label={`text-input-${index}`}
-                                        style={[{ textAlign: 'center' }, resizeAnimationStyle]}
+                                        style={[{ textAlign: 'center' }, resizeAnimationStyle, styles.impact]}
                                         value={value}
                                         onChangeText={setValue}
                                         onBlur={() => setIsEditing(false)}
                                         autoFocus
                                     />
                                 ) : (
-                                    <Animated.Text style={[{ textAlign: 'center' }]} selectable={false}>
+                                    <Animated.Text style={[{ textAlign: 'center' }, resizeAnimationStyle, styles.impact]} selectable={false}>
                                         {value}
                                     </Animated.Text>
                                 )}
                             </Animated.View>
                         </TapGestureHandler>
 
-                        <PanGestureHandler onGestureEvent={resizePanGestureHandler} style={{ ...styles.moveIconContainer }}>
-                            <Animated.View style={{ ...styles.moveIconContainer, visibility: selected ? 'visible' : 'hidden', opacity: selected ? 1 : 0 }}>
-                                <Text style={styles.positionIconView} selectable={false}><Crop stroke="black" width={32} height={32}  /></Text> 
-                            </Animated.View>
-                        </PanGestureHandler>
+                        <Animated.View {...resizeViewpanResponder.panHandlers} style={{ ...styles.moveIconContainer, visibility: selected ? 'visible' : 'hidden', opacity: selected ? 1 : 0 }}>
+                            <Text style={styles.positionIconView} selectable={false}><Crop stroke="black" width={32} height={32} /></Text>
+                        </Animated.View>
                     </Animated.View>
                 </Pressable>
             </GestureHandlerRootView >
@@ -176,15 +170,24 @@ const styles = StyleSheet.create({
         width: "100%",
     },
     positionIconView: {
-        fontSize: 15,
         userSelect: "none",
     },
     moveIconContainer: {
-        height: 50,
         backgroundColor: "red",
+        borderRadius: 50,
         flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
+        justifySelf: "center",
+        alignSelf: "center",
+        textAlign: "center",
+    },
+    impact: {
+        fontFamily: 'Impact',
+        fontColor: 'white',
+        color: 'white',
+        webkitTextStroke: '2px black',
+        textShadowColor: 'black',
+        textShadowRadius: 4,
+        textShadowOffset: { width: 2, height: 2 },
     }
 });
 

@@ -13,7 +13,7 @@ export default function ZoomableImage({ source }) {
                 }}
             >
                 <View style={styles.container}>
-                    <Image source={source} style={[styles.image, { transform: [{ scale: scale.current }] }]} />
+                    <Image source={source} style={[StyleSheet.absoluteFillObject, styles.image, { transform: [{ scale: scale.current }] }]} />
                 </View>
             </PinchGestureHandler>
         </GestureHandlerRootView>
@@ -22,5 +22,5 @@ export default function ZoomableImage({ source }) {
 
 const styles = StyleSheet.create({
     container: { flex: 1, justifyContent: "center", alignItems: "center" },
-    image: { width: 300, height: 300, resizeMode: "contain" },
+    image: { resizeMode: "contain" },
 });

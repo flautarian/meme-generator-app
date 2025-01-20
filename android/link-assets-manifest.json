@@ -1,0 +1,17 @@
+{
+  "migIndex": 1,
+  "data": [
+    {
+      "path": "src/assets/fonts/impact.ttf",
+      "sha1": "1cc231f6ba7e2c141e28db4eac92b211d4033df6"
+    },
+    {
+      "path": "src/assets/fonts/Impacted.ttf",
+      "sha1": "c05ebf5724ee1e61d5f3d54c483df1f8a410e6b3"
+    },
+    {
+      "path": "src/assets/fonts/unicode.impact.ttf",
+      "sha1": "8e7e9949285fddeeebb03dfa2dfd0b2642e2d56e"
+    }
+  ]
+}

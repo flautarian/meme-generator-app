@@ -29,10 +29,6 @@ const MemeCreate = () => {
 
   const [selectedTextIndex, setSelectedTextIndex] = useState(-1);
 
-  const containerOffset = useRef({ offsetX: 0, offsetY: 0 });
-
-  const containerBounds = useRef({ x: 0, y: 0, width: 0, height: 0 });
-
   const memeContainerRef = useRef(null);
 
   const progress = useSharedValue(0);
@@ -66,18 +62,12 @@ const MemeCreate = () => {
 
   // Handles the random selection of the meme if case of no election from drawer
   useEffect(() => {
-    setTimeout(async () => {
-      if (!currentMeme) {
+    if (!currentMeme) {
+      setTimeout(async () => {
         const meme = await getRandomMeme();
         setCurrentMeme(meme);
-      }
-    }, 1);
-    // Measure the offset of the meme container
-    memeContainerRef.current?.measure((x, y, width, height, pageX, pageY) => {
-      containerOffset.current = { offsetX: pageX, offsetY: pageY };
-      containerBounds.current = { x, y, width, height };
-    });
-
+      }, 1);
+    }
     // random color background generation
     initColor.value = randomColor({ count: 1, luminosity: 'dark' })[0];
   }, []);
@@ -89,10 +79,10 @@ const MemeCreate = () => {
       {/* Meme Container */}
       <View style={styles.viewcontainer}>
         {/* Margin 1 */}
-        {Platform.OS === 'web' && <Text style={{ width: width * 0.33, height: height, textAlign: 'center' }}> TEST </Text>}
+        {Platform.OS === 'web' && <Text style={{ width: width * 0.25, height: height, textAlign: 'center' }}> TEST </Text>}
         {/* Meme Image */}
-        <View style={{ width: width * (Platform.OS === 'web' ? 0.33 : 1.0), height: height, textAlign: 'center' }} ref={memeContainerRef}>
-          <Pressable style={{ width: width * (Platform.OS === 'web' ? 0.33 : 1.0), height: height, textAlign: 'center' }} onPress={() => setSelectedTextIndex(-1)}>
+        <View style={{ width: width * (Platform.OS === 'web' ? 0.5 : 0.9), height: height, textAlign: 'center' }} ref={memeContainerRef}>
+          <Pressable style={{ height: height, textAlign: 'center' }} onPress={() => setSelectedTextIndex(-1)}>
             {currentMeme && <ZoomableImage source={{ uri: currentMeme.img }} />}
           </Pressable>
           {/* Draggable Texts */}
@@ -104,7 +94,6 @@ const MemeCreate = () => {
               index={index}
               selected={index === selectedTextIndex}
               onSelect={(i) => setSelectedTextIndex(i)}
-              containerOffset={containerOffset}
               startDrag={item.startDrag || false}
             />
           ))
@@ -113,7 +102,6 @@ const MemeCreate = () => {
           <DragableOption
             onArrangeEnd={(x, y) => handleArrange("text", x, y)}
             onStartArrange={() => setIsDragging(true)}
-            containerOffset={containerOffset}
             initialPosition={{ x: 0, y: 50 }}
             blockX={true}
             blockY={true} />
@@ -122,7 +110,7 @@ const MemeCreate = () => {
           </Pressable>
         </View>
         {/* Margin 2 */}
-        {Platform.OS === 'web' && <Text style={{ width: width * 0.33, height: height, textAlign: 'center' }}> TEST </Text>}
+        {Platform.OS === 'web' && <Text style={{ width: width * 0.25, height: height, textAlign: 'center' }}> TEST </Text>}
       </View>
     </SafeAreaView>
   );
