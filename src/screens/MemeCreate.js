@@ -25,8 +25,6 @@ const MemeCreate = () => {
 
   const [texts, setTexts] = useState([]);
 
-  const [isDragging, setIsDragging] = useState(false);
-
   const [selectedTextIndex, setSelectedTextIndex] = useState(-1);
 
   const memeContainerRef = useRef(null);
@@ -51,13 +49,12 @@ const MemeCreate = () => {
     (type, x, y) => {
       setTexts((prevTexts) => {
         let textLabel = "Label " + (prevTexts.length + 1);
-        const newText = { text: textLabel, x, y, startDrag: true };
+        const newText = { text: textLabel, x, y };
+        setSelectedTextIndex(prevTexts.length);
         return [...prevTexts, newText];
       });
-      setSelectedTextIndex((prevIndex) => prevIndex + 1);
-      setIsDragging(false);
     },
-    [texts, isDragging],
+    [texts],
   );
 
   // Handles the random selection of the meme if case of no election from drawer
@@ -94,17 +91,14 @@ const MemeCreate = () => {
               index={index}
               selected={index === selectedTextIndex}
               onSelect={(i) => setSelectedTextIndex(i)}
-              startDrag={item.startDrag || false}
             />
           ))
           }
           {/* Draggable Options */}
           <DragableOption
+            key={`dragable-text-option`}
             onArrangeEnd={(x, y) => handleArrange("text", x, y)}
-            onStartArrange={() => setIsDragging(true)}
-            initialPosition={{ x: 0, y: 50 }}
-            blockX={true}
-            blockY={true} />
+            initialPosition={{ x: 0, y: 50 }} />
           <Pressable style={styles.button} onPress={() => handleCapture}>
             <Text>📷</Text>
           </Pressable>

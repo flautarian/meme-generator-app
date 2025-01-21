@@ -12,9 +12,9 @@ import Animated, {
     ReduceMotion,
 } from 'react-native-reanimated';
 
-const DragableOption = ({ onArrangeEnd, onStartArrange, blockX = false, blockY = false, initialPosition }) => {
+const DragableOption = ({ onArrangeEnd, onStartArrange, initialPosition }) => {
 
-    const [activated, setActivated] = useState(true);
+    const activated = useSharedValue(true);
 
     const position = {
         x: useSharedValue(0),
@@ -42,8 +42,9 @@ const DragableOption = ({ onArrangeEnd, onStartArrange, blockX = false, blockY =
             onStartShouldSetPanResponder: () => true,
             onMoveShouldSetPanResponder: () => true,
             onPanResponderStart: (_) => {
-                onStartArrange();
-                setActivated(true);
+                if (!!onStartArrange)
+                    onStartArrange();
+                activated.value = true;
             },
             onPanResponderMove: (_, gestureState) =>
                 handleDrag(gestureState),
@@ -57,7 +58,7 @@ const DragableOption = ({ onArrangeEnd, onStartArrange, blockX = false, blockY =
         const { moveX, moveY } = gestureState;
         const { width, height } = dimensions.current;
         const { oX, oY } = originOffset.current;
-        
+
         if (Platform.OS === 'web')
             return { x: moveX - oX + initialPosition.x - width / 2, y: moveY - oY + initialPosition.y - height / 2 };
         return { x: moveX - initialPosition.x - width / 2, y: moveY - initialPosition.y - height / 2 };
@@ -65,7 +66,7 @@ const DragableOption = ({ onArrangeEnd, onStartArrange, blockX = false, blockY =
 
     // handle drag function
     const handleDrag = useCallback((gestureState) => {
-        if (activated) {
+        if (activated.value) {
             const newPos = getNewPosition(gestureState);
             position.x.value = newPos.x;
             position.y.value = newPos.y;
@@ -83,9 +84,9 @@ const DragableOption = ({ onArrangeEnd, onStartArrange, blockX = false, blockY =
         position.y.value = withSpring(0, returnSpringConfig);
 
         // create timeout to reset activated state
-        setActivated(false);
-        setTimeout(() => setActivated(true), 500);
-    }, [position, initialPosition]);
+        activated.value = false;
+        setTimeout(() => activated.value = true, 500);
+    }, [position, initialPosition, activated]);
 
     // animated style
     const animatedStyle = useAnimatedStyle(() => ({
@@ -113,7 +114,6 @@ const DragableOption = ({ onArrangeEnd, onStartArrange, blockX = false, blockY =
                     onLayout={(event) => {
                         const { width, height } = event.nativeEvent.layout;
                         dimensions.current = { width, height };
-                        console.log("redraw dimensions");
                     }}>
                     <Text style={styles.draggableText}>💬</Text>
                 </Animated.View>
