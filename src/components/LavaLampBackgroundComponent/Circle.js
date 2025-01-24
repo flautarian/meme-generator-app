@@ -16,7 +16,7 @@ export const Circle = ({ circle }) => {
         rotation.value = withRepeat(
             withSequence(
                 withTiming(randRotation, { duration: 0, easing: Easing.linear }),
-                withTiming(randRotation + 360, { duration: 50000, easing: Easing.linear })
+                withTiming(randRotation + 360, { duration: 7500, easing: Easing.linear })
             ),
             -1, // infinity
             false // no reverse
@@ -27,6 +27,7 @@ export const Circle = ({ circle }) => {
         transform: [
             { rotate: rotation.value + 'deg' },
         ],
+        zIndex: -2,
     }));
 
     return (

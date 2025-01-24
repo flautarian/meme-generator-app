@@ -33,10 +33,6 @@ const MemeCreate = () => {
 
   const initColor = useSharedValue("");
 
-  // Trigger the gradient animation
-  useEffect(() => {
-    progress.value = withTiming(1, { duration: 3000 }); // Animate from 0 to 1 in 3 seconds
-  }, []);
 
   // Handles the capture of the img meme to share it
   const handleCapture = async () => {
@@ -57,8 +53,10 @@ const MemeCreate = () => {
     [texts],
   );
 
+  // Trigger the gradient animation
   // Handles the random selection of the meme if case of no election from drawer
   useEffect(() => {
+    progress.value = withTiming(1, { duration: 3000 });
     if (!currentMeme) {
       setTimeout(async () => {
         const meme = await getRandomMeme();
@@ -78,8 +76,15 @@ const MemeCreate = () => {
         {/* Margin 1 */}
         {Platform.OS === 'web' && <Text style={{ width: width * 0.25, height: height, textAlign: 'center' }}> TEST </Text>}
         {/* Meme Image */}
-        <View style={{ width: width * (Platform.OS === 'web' ? 0.5 : 0.9), height: height, textAlign: 'center' }} ref={memeContainerRef}>
-          <Pressable style={{ height: height, textAlign: 'center' }} onPress={() => setSelectedTextIndex(-1)}>
+        <View style={{ width: width * (Platform.OS === 'web' ? 0.5 : 0.9), height: height, zIndex: 1 }} ref={memeContainerRef}>
+          {/* Draggable Options */}
+          <DragableOption
+            key={`dragable-text-option`}
+            onArrangeEnd={(x, y) => handleArrange("text", x, y)}
+            initialPosition={{ x: 0, y: 100 }} />
+          <Pressable maxPointers={1} style={{ height: height, textAlign: 'center', zIndex: 1 }} onPress={() => {
+            setSelectedTextIndex(-1);
+          }}>
             {currentMeme && <ZoomableImage source={{ uri: currentMeme.img }} />}
           </Pressable>
           {/* Draggable Texts */}
@@ -94,14 +99,7 @@ const MemeCreate = () => {
             />
           ))
           }
-          {/* Draggable Options */}
-          <DragableOption
-            key={`dragable-text-option`}
-            onArrangeEnd={(x, y) => handleArrange("text", x, y)}
-            initialPosition={{ x: 0, y: 50 }} />
-          <Pressable style={styles.button} onPress={() => handleCapture}>
-            <Text>📷</Text>
-          </Pressable>
+          
         </View>
         {/* Margin 2 */}
         {Platform.OS === 'web' && <Text style={{ width: width * 0.25, height: height, textAlign: 'center' }}> TEST </Text>}
@@ -113,18 +111,7 @@ const MemeCreate = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 10,
-  },
-  gradientBackground: {
-    ...StyleSheet.absoluteFillObject, // Makes the gradient cover the entire screen
-    zIndex: -1, // Places the gradient below the navigation content
-  },
-  input: {
-    height: 40,
-    borderColor: "gray",
-    borderWidth: 1,
-    marginVertical: 10,
-    paddingHorizontal: 10,
+    zIndex: 0,
   },
   viewcontainer: {
     flex: 1,

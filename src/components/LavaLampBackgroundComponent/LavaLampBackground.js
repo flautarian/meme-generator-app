@@ -7,16 +7,9 @@ import { BlurView } from 'expo-blur';
 
 const LavaLampBackground = ({ count = 10, hue = 'green'}) => {
 
-    const progress = useSharedValue(0);
-
     const { width, height } = useWindowDimensions();
 
     const getRandomNumber = (min, max) => Math.floor(Math.random() * (max - min + 1) + min);
-
-    // Trigger the gradient animation
-    useEffect(() => {
-        progress.value = withTiming(1, { duration: 3000 }); // Animate from 0 to 1 in 3 seconds
-    }, []);
 
     const circles = useMemo(() => {
         const colors = randomColor({ count: count, luminosity: 'light', hue: hue });
@@ -38,7 +31,7 @@ const LavaLampBackground = ({ count = 10, hue = 'green'}) => {
 
     return (
 
-        <Animated.View style={[StyleSheet.absoluteFillObject, {backgroundColor: hue}]}>
+        <Animated.View style={[StyleSheet.absoluteFillObject, {backgroundColor: hue, zIndex: -1}]}>
             {circles.map((circle, index) => (
                 <Circle key={`circle-color-${circle.color}-index-${index}`} circle={circle} />
             ))}

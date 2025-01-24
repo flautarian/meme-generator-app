@@ -4,7 +4,7 @@ import { useRef, useState } from "react";
 import { PanResponder, Platform, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { ArrowDown, ArrowRight, Crop, Move, RotateCcw } from "react-native-feather";
 import { TapGestureHandler, GestureHandlerRootView } from "react-native-gesture-handler";
-import Animated, { useAnimatedStyle, useSharedValue } from "react-native-reanimated";
+import Animated, { Easing, Keyframe, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from "react-native-reanimated";
 
 const DraggableText = ({ text, initPosition, index, selected, onSelect }) => {
     const [value, setValue] = useState(text);
@@ -23,7 +23,7 @@ const DraggableText = ({ text, initPosition, index, selected, onSelect }) => {
     const contentView = { height: useSharedValue(50), width: useSharedValue(150), rotation: useSharedValue(0) };
 
     const initHeight = useSharedValue(contentView.height.value);
-    
+
     const initWidth = useSharedValue(contentView.width.value);
 
     const initRotation = useSharedValue(contentView.rotation.value);
@@ -37,14 +37,6 @@ const DraggableText = ({ text, initPosition, index, selected, onSelect }) => {
         if (Platform.OS === 'web')
             return { x: moveX - oX, y: moveY - oY + height / 2 - 10 };
         return { x: moveX - width / 2, y: moveY - 50 };
-    }, []);
-
-    // init position set
-    useEffect(() => {
-        if (position.x.value < 0) {
-            position.x.value = initPosition.x;
-            position.y.value = initPosition.y;
-        }
     }, []);
 
     // handle drag function
@@ -85,7 +77,7 @@ const DraggableText = ({ text, initPosition, index, selected, onSelect }) => {
         })
     ).current;
 
-    
+
 
     // handle resize function
     const handleResizeX = useCallback((gestureState) => {
@@ -136,17 +128,26 @@ const DraggableText = ({ text, initPosition, index, selected, onSelect }) => {
             { translateY: position.y.value },
         ],
         position: 'absolute',
+        zIndex: 3,
     }));
 
     const resizeAnimationStyle = useAnimatedStyle(() => ({
         height: contentView.height.value,
         width: contentView.width.value,
-        fontSize: (contentView.height.value + contentView.width.value) / 2 * 0.5
+        fontSize: (contentView.height.value + contentView.width.value / 2) / 2 * 0.5
     }))
 
     const rotationAnimationStyle = useAnimatedStyle(() => ({
         transform: [{ rotate: contentView.rotation.value + 'deg' }],
     }))
+
+    useEffect(() => {
+        // init position set
+        if (position.x.value < 0) {
+            position.x.value = initPosition.x;
+            position.y.value = initPosition.y;
+        }
+    }, []);
 
     return (
         <Animated.View
@@ -172,7 +173,7 @@ const DraggableText = ({ text, initPosition, index, selected, onSelect }) => {
                             </Text>
                         </View>
 
-                        <Animated.View style={ { flex: 1, flexDirection: "row", alignContent: "center", justifyContent: "center" }}>
+                        <Animated.View style={{ flex: 1, flexDirection: "row", alignContent: "center", justifyContent: "center" }}>
                             <TapGestureHandler
                                 onHandlerStateChange={({ nativeEvent }) => {
                                     if (nativeEvent.state === 4) {
@@ -182,18 +183,22 @@ const DraggableText = ({ text, initPosition, index, selected, onSelect }) => {
                                 }}
                                 numberOfTaps={2}
                             >
-                                <Animated.View style={[selected ? { backgroundColor: 'yellow' } : {}, resizeAnimationStyle, rotationAnimationStyle]}>
-                                    {isEditing ? (
+                                <Animated.View style={[resizeAnimationStyle, rotationAnimationStyle]}>
+                                    {isEditing && selected ? (
                                         <TextInput
                                             aria-label={`text-input-${index}`}
-                                            style={[{ textAlign: 'center' }, resizeAnimationStyle, styles.impact]}
+                                            style={[{ ...styles.impact, textAlign: 'center', fontSize: (contentView.height.value + contentView.width.value / 2) / 2 * 0.5 }, 
+                                                resizeAnimationStyle,
+                                                StyleSheet.absoluteFill]}
                                             value={value}
                                             onChangeText={setValue}
                                             onBlur={() => setIsEditing(false)}
                                             autoFocus
                                         />
                                     ) : (
-                                        <Animated.Text style={[{ textAlign: 'center' }, resizeAnimationStyle, styles.impact]} selectable={false}>
+                                        <Animated.Text
+                                            style={[{ textAlign: 'center', verticalAlign: 'center' }, resizeAnimationStyle, styles.impact]}
+                                            selectable={false}>
                                             {value}
                                         </Animated.Text>
                                     )}
@@ -207,13 +212,17 @@ const DraggableText = ({ text, initPosition, index, selected, onSelect }) => {
 
                         <View style={[{ visibility: selected ? 'visible' : 'hidden', opacity: selected ? 1 : 0 }]}>
                             <Animated.View {...resizeYViewpanResponder.panHandlers} style={{ ...styles.moveIconContainer }}>
-                                <Text style={styles.positionIconView} selectable={false}><ArrowDown stroke="black" width={32} height={32} /></Text>
+                                <Text style={styles.positionIconView} selectable={false}>
+                                    <ArrowDown stroke="black" width={32} height={32} />
+                                </Text>
                             </Animated.View>
                         </View>
 
                         <View style={[{ visibility: selected ? 'visible' : 'hidden', opacity: selected ? 1 : 0 }]}>
                             <Animated.View {...rotateViewpanResponder.panHandlers} style={{ ...styles.moveIconContainerCircle }}>
-                                <Text style={styles.positionIconView} selectable={false}><RotateCcw stroke="black" width={32} height={32} /></Text>
+                                <Text style={styles.positionIconView} selectable={false}>
+                                    <RotateCcw stroke="black" width={32} height={32} />
+                                </Text>
                             </Animated.View>
                         </View>
 
@@ -243,12 +252,10 @@ const styles = StyleSheet.create({
         justifySelf: "center",
         alignSelf: "center",
         textAlign: "center",
-        zIndex: 10,
     },
     moveIconContainer: {
         backgroundColor: "red",
         borderRadius: 50,
-        zIndex: 10,
     },
     impact: {
         fontFamily: 'Impact',

@@ -1,9 +1,8 @@
 import { useCallback, useRef } from 'react';
-import { useEffect, useState } from 'react';
-import { Text, StyleSheet, PanResponder, Platform } from 'react-native';
+import { Text, StyleSheet, PanResponder, Platform, View } from 'react-native';
 import {
     GestureHandlerRootView,
-    TouchableWithoutFeedback,
+    Pressable,
 } from 'react-native-gesture-handler';
 import Animated, {
     useSharedValue,
@@ -89,7 +88,7 @@ const DragableOption = ({ onArrangeEnd, onStartArrange, initialPosition }) => {
     }, [position, initialPosition, activated]);
 
     // animated style
-    const animatedStyle = useAnimatedStyle(() => ({
+    const dragAnimatedStyle = useAnimatedStyle(() => ({
         transform: [
             { translateX: position.x.value },
             { translateY: position.y.value },
@@ -98,27 +97,24 @@ const DragableOption = ({ onArrangeEnd, onStartArrange, initialPosition }) => {
     }));
 
     return (
-        <GestureHandlerRootView
+        <View
             onLayout={(event) => {
                 const { width, height, x, y, top, left } = event.nativeEvent.layout;
                 originOffset.current = { oX: x + (left | 0) + width / 2, oY: y + (top | 0) + height / 2 };
             }}
-            style={[styles.container, { top: initialPosition.y, left: initialPosition.x }]}>
-            <TouchableWithoutFeedback
-                onGestureEvent={handleDrag}
-                onEnded={endPan}
-                maxPointers={1}>
-                <Animated.View
-                    style={[styles.draggableBox, animatedStyle]}
-                    {...panResponder.panHandlers}
-                    onLayout={(event) => {
-                        const { width, height } = event.nativeEvent.layout;
-                        dimensions.current = { width, height };
-                    }}>
+            style={[styles.container, { top: initialPosition.y, left: initialPosition.x, zIndex: 11 }]}>
+            <Animated.View
+                style={[styles.draggableBox, dragAnimatedStyle]}
+                {...panResponder.panHandlers}
+                onLayout={(event) => {
+                    const { width, height } = event.nativeEvent.layout;
+                    dimensions.current = { width, height };
+                }}>
+                <Pressable maxPointers={1}>
                     <Text style={styles.draggableText}>💬</Text>
-                </Animated.View>
-            </TouchableWithoutFeedback>
-        </GestureHandlerRootView>
+                </Pressable>
+            </Animated.View>
+        </View>
     );
 }
 
@@ -130,9 +126,11 @@ const styles = StyleSheet.create({
         width: 75,
         height: 75,
         backgroundColor: 'blue',
+        flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 50,
+        zIndex: 10,
     },
     draggableText: {
         color: '#fff',
