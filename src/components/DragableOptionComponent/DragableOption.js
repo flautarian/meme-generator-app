@@ -21,6 +21,8 @@ const DragableOption = ({ onArrangeEnd, initialPosition }) => {
         y: useSharedValue(0),
     };
 
+    const scale = useSharedValue(1);
+
     const originOffset = useRef({ oX: 0, oY: 0 });
 
     const dimensions = useRef({ width: 0, height: 0 });
@@ -35,19 +37,25 @@ const DragableOption = ({ onArrangeEnd, initialPosition }) => {
         reduceMotion: ReduceMotion.System,
     };
 
+    const scaleSpringConfig = {
+        duration: 150,
+        dampingRatio: 0.7,
+        stiffness: 100,
+    };
 
     /* Pan responder and drag handlers */
     const panResponder = useRef(
         PanResponder.create({
             onStartShouldSetPanResponder: () => true,
             onMoveShouldSetPanResponder: () => true,
-            onPanResponderStart: (_) => {
+            onPanResponderStart: (_, gestureState) => {
+                onDragStart(gestureState);
                 activated.value = true;
             },
             onPanResponderMove: (_, gestureState) =>
                 onDrag(gestureState),
             onPanResponderRelease: (_, gestureState) => {
-                onRelease(gestureState);
+                onDragRelease(gestureState);
             },
         })
     ).current;
@@ -71,8 +79,15 @@ const DragableOption = ({ onArrangeEnd, initialPosition }) => {
         }
     }, [activated]);
 
+    // start drag function
+    const onDragStart = useCallback((gestureState) => {
+        // Scale the component
+        scale.value = withSpring(1.5, scaleSpringConfig);
+    }, [scale]);
+
+
     // end drag function
-    const onRelease = useCallback((gestureState) => {
+    const onDragRelease = useCallback((gestureState) => {
         // send signal to create new object in panel
         const newPos = getNewPosition(gestureState);
         onArrangeEnd(newPos.x + initialPosition.x, newPos.y + initialPosition.y);
@@ -80,6 +95,9 @@ const DragableOption = ({ onArrangeEnd, initialPosition }) => {
         // Reset position
         position.x.value = withSpring(0, returnSpringConfig);
         position.y.value = withSpring(0, returnSpringConfig);
+
+        // Reset scale
+        scale.value = withSpring(1, scaleSpringConfig);
 
         // create timeout to reset activated state
         activated.value = false;
@@ -91,6 +109,8 @@ const DragableOption = ({ onArrangeEnd, initialPosition }) => {
         transform: [
             { translateX: position.x.value },
             { translateY: position.y.value },
+            { scaleX: scale.value },
+            { scaleY: scale.value },
         ],
         position: 'absolute',
     }));

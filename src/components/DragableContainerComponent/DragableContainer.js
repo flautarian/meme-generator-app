@@ -1,15 +1,11 @@
-import { useEffect } from "react";
+import { Children, cloneElement, useEffect } from "react";
 import { useCallback } from "react";
 import { useRef, useState } from "react";
-import { PanResponder, Platform, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
-import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Move, RotateCcw, Square, Trash2 } from "react-native-feather";
-import { TapGestureHandler } from "react-native-gesture-handler";
+import { PanResponder, Platform, Pressable, StyleSheet, Text, View } from "react-native";
+import { Move, RotateCcw, Square, Trash2 } from "react-native-feather";
 import Animated, { useAnimatedStyle, useSharedValue } from "react-native-reanimated";
 
-const DraggableText = ({ text, initPosition, index, selected, onSelect, onDelete }) => {
-
-    // Text of the component
-    const [value, setValue] = useState(text);
+const DraggableContainer = ({ item, index, selected, onSelect, onDelete, children }) => {
 
     // Position of the component (position absoulte)
     const position = {
@@ -24,7 +20,7 @@ const DraggableText = ({ text, initPosition, index, selected, onSelect, onDelete
     const [isEditing, setIsEditing] = useState(false);
 
     // Used to keep track of the inner component changes
-    const contentView = { height: useSharedValue(50), width: useSharedValue(150), rotation: useSharedValue(0) };
+    const contentView = { height: useSharedValue(item.height), width: useSharedValue(item.width), rotation: useSharedValue(item.rotation) };
 
     // Init height of the component
     const initHeight = useSharedValue(contentView.height.value);
@@ -40,6 +36,10 @@ const DraggableText = ({ text, initPosition, index, selected, onSelect, onDelete
 
     // Used to force re-render of the component because IOS doesn't make a re render when size of the component changes
     const [layoutKey, setLayoutKey] = useState(0);
+
+    const childrenWithProps = useRef(Children.map(children, (child) =>
+        cloneElement(child, { item: item, index: index, height: contentView.height, width: contentView.width, rotation: contentView.rotation })
+    ));
 
     // Dimensions of the component
     const dimensions = { width: useSharedValue(0), height: useSharedValue(0) };
@@ -60,6 +60,10 @@ const DraggableText = ({ text, initPosition, index, selected, onSelect, onDelete
         const { x, y } = getNewPosition(gestureState);
         position.x.value = x;
         position.y.value = y;
+        if(!!item){
+            item.x = x;
+            item.y = y;
+        }
     }, [position, selected]);
 
     // Pan responder for the drag
@@ -80,6 +84,9 @@ const DraggableText = ({ text, initPosition, index, selected, onSelect, onDelete
         contentView.height.value = newHeight;
         if (newHeight > 25 && y0)
             position.y.value = gestureState.moveY - buttonsSize;
+        // update object height
+        if(!!item)
+            item.height = newHeight;
     }, [contentView, selected, dimensions]);
 
     // Pan responder for the resize Y (final Y)
@@ -118,6 +125,9 @@ const DraggableText = ({ text, initPosition, index, selected, onSelect, onDelete
         contentView.width.value = newWidth;
         if (newWidth > 25 && x0)
             position.x.value = gestureState.moveX - buttonsSize;
+        // update object width
+        if(!!item)
+            item.width = newWidth;
     }, [contentView, selected]);
 
     // Pan responder for the resize X (final X)
@@ -154,6 +164,9 @@ const DraggableText = ({ text, initPosition, index, selected, onSelect, onDelete
         let newValue = gestureState.x0 - gestureState.moveX;
         const newRotation = newValue + initRotation.value;
         contentView.rotation.value = newRotation;
+        // update object rotation
+        if(!!item)
+            item.rotation = newRotation;
     }, [contentView, selected]);
 
     // Pan responder for the rotate
@@ -181,24 +194,12 @@ const DraggableText = ({ text, initPosition, index, selected, onSelect, onDelete
         zIndex: 3,
     }));
 
-    // animated size style for the inner component shown
-    const resizeAnimationStyle = useAnimatedStyle(() => ({
-        height: contentView.height.value,
-        width: contentView.width.value,
-        fontSize: (contentView.height.value + contentView.width.value / 2) / 2 * 0.5
-    }))
-
-    // animated rotation style for the inner component shown
-    const rotationAnimationStyle = useAnimatedStyle(() => ({
-        transform: [{ rotate: contentView.rotation.value + 'deg' }],
-    }))
-
     // Init position of the component
     useEffect(() => {
         // init position set
         if (position.x.value < 0) {
-            position.x.value = initPosition.x;
-            position.y.value = initPosition.y;
+            position.x.value = item.x;
+            position.y.value = item.y;
         }
     }, []);
 
@@ -246,38 +247,8 @@ const DraggableText = ({ text, initPosition, index, selected, onSelect, onDelete
                             </Text>
                         </View>
 
-                        {/* Tap Gesture Handler */}
-                        <TapGestureHandler
-                            onHandlerStateChange={({ nativeEvent }) => {
-                                if (nativeEvent.state === 4) {
-                                    // handle double tap
-                                    setIsEditing(true);
-                                }
-                            }}
-                            numberOfTaps={2}
-                        >
-                            {/* Label/Input View */}
-                            <Animated.View style={[resizeAnimationStyle, rotationAnimationStyle]}>
-                                {isEditing && selected ? (
-                                    <TextInput
-                                        aria-label={`text-input-${index}`}
-                                        style={[{ ...styles.impact, textAlign: 'center', fontSize: (contentView.height.value + contentView.width.value / 2) / 2 * 0.5 },
-                                            resizeAnimationStyle,
-                                        StyleSheet.absoluteFill]}
-                                        value={value}
-                                        onChangeText={setValue}
-                                        onBlur={() => setIsEditing(false)}
-                                        autoFocus
-                                    />
-                                ) : (
-                                    <Animated.Text
-                                        style={[{ textAlign: 'center', verticalAlign: 'center', flex: 1, alignContent: 'center' }, StyleSheet.absoluteFill, resizeAnimationStyle, styles.impact]}
-                                        selectable={false}>
-                                        {value}
-                                    </Animated.Text>
-                                )}
-                            </Animated.View>
-                        </TapGestureHandler>
+                        {/* Children element to render in editable object */}
+                        {!!childrenWithProps.current && childrenWithProps.current}
 
                         {/* Resize Icon X max */}
                         <View {...resizeXViewpanResponder.panHandlers}
@@ -337,7 +308,7 @@ const DraggableText = ({ text, initPosition, index, selected, onSelect, onDelete
                             opacity: selected ? 1 : 0,
                         }}>
                         <Pressable
-                            onPress={() => onDelete(index)}
+                            onPress={() => onDelete()}
                             style={styles.positionIconView} selectable={false}>
                             <Trash2 stroke="black" fill={"#fff"} width={32} height={32} />
                         </Pressable>
@@ -372,4 +343,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default DraggableText;
+export default DraggableContainer;

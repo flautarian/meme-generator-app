@@ -9,16 +9,16 @@ import {
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { captureRef } from "react-native-view-shot";
 import ZoomableImage from 'src/components/ZoomableImageComponent/ZoomableImage';
-import DraggableText from 'src/components/DragableTextComponent/DragableText';
-import DragableOption from 'src/components/DragableOptionComponent/DragableOption';
 import { Platform } from 'react-native';
 import { getRandomMeme } from 'src/hooks/useTemplates';
 import { useSharedValue, withTiming } from 'react-native-reanimated';
 import LavaLampBackground from 'src/components/LavaLampBackgroundComponent/LavaLampBackground';
 import randomColor from 'randomcolor';
 import CaptureOption from 'src/components/CaptureOptionComponent/CaptureOption';
-import * as Clipboard from "expo-clipboard";
 import domtoimage from 'dom-to-image';
+import EditableText from 'src/components/EditableTextComponent/EditableText';
+import DragableOption from 'src/components/DragableOptionComponent/DragableOption';
+import DraggableContainer from 'src/components/DragableContainerComponent/DragableContainer';
 
 const MemeCreate = () => {
 
@@ -35,15 +35,16 @@ const MemeCreate = () => {
   const progress = useSharedValue(0);
 
   const initColor = useSharedValue("");
-  
+
   // Deletes the text element
-  const deleteText = (index) => {
+  const deleteText = useCallback((index) => {
     setTexts((prevTexts) => {
-      let newTexts = [...prevTexts];
-      newTexts.splice(index, 1);
+      const newTexts = [...prevTexts];
+      newTexts.splice(index, 1); // Delete the specific element
       return newTexts;
     });
-  };
+    setSelectedTextIndex(-1);
+  }, [texts]);
 
   // Handles the capture of the img meme to share it
   const handleCapture = async () => {
@@ -84,9 +85,17 @@ const MemeCreate = () => {
       if (type === "text") {
         setTexts((prevTexts) => {
           let textLabel = "Label " + (prevTexts.length + 1);
-          const newText = { text: textLabel, x: x - 75, y: y - 50 };
+          const newItem = {
+            value: textLabel,
+            type: "text",
+            x: x - 75,
+            y: y - 50,
+            width: 150,
+            height: 50,
+            rotation: 0
+          };
           setSelectedTextIndex(prevTexts.length);
-          return [...prevTexts, newText];
+          return [...prevTexts, newItem];
         });
       }
     },
@@ -141,15 +150,17 @@ const MemeCreate = () => {
             {currentMeme && <ZoomableImage source={{ uri: currentMeme.img }} />}
             {/* Draggable Texts */}
             {texts.map((item, index) => (
-              <DraggableText
-                key={`dragable-text-${index}`}
-                text={item.text}
-                initPosition={{ x: item.x, y: item.y }}
+              item.type === "text" &&
+              <DraggableContainer
+                key={`dragable-container-${index} - ${item.x} - ${item.y}`}
+                item={item}
                 index={index}
                 selected={index === selectedTextIndex}
                 onSelect={(i) => setSelectedTextIndex(i)}
-                onDelete={(i) => deleteText(i)}
-              />
+                onDelete={() => deleteText(index)}
+              >
+                <EditableText />
+              </DraggableContainer>
             ))
             }
           </Pressable>
