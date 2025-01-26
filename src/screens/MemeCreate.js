@@ -13,9 +13,12 @@ import DraggableText from 'src/components/DragableTextComponent/DragableText';
 import DragableOption from 'src/components/DragableOptionComponent/DragableOption';
 import { Platform } from 'react-native';
 import { getRandomMeme } from 'src/hooks/useTemplates';
-import { interpolateColor, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import { useSharedValue, withTiming } from 'react-native-reanimated';
 import LavaLampBackground from 'src/components/LavaLampBackgroundComponent/LavaLampBackground';
 import randomColor from 'randomcolor';
+import CaptureOption from 'src/components/CaptureOptionComponent/CaptureOption';
+import * as Clipboard from "expo-clipboard";
+import domtoimage from 'dom-to-image';
 
 const MemeCreate = () => {
 
@@ -32,23 +35,60 @@ const MemeCreate = () => {
   const progress = useSharedValue(0);
 
   const initColor = useSharedValue("");
-
+  
+  // Deletes the text element
+  const deleteText = (index) => {
+    setTexts((prevTexts) => {
+      let newTexts = [...prevTexts];
+      newTexts.splice(index, 1);
+      return newTexts;
+    });
+  };
 
   // Handles the capture of the img meme to share it
   const handleCapture = async () => {
-    const uri = await captureRef(memeContainerRef, { format: "png", quality: 0.8 });
-    console.log("Saved meme:", uri);
+    try {
+      // Add a slight delay to ensure rendering is complete
+      setTimeout(async () => {
+        let uri = "";
+        if (Platform.OS === "web") {
+          uri = await domtoimage.toPng(memeContainerRef.current, {
+            quality: 0.95
+          });
+        }
+        else {
+          uri = await captureRef(memeContainerRef, {
+            format: "png",
+            quality: 0.9,
+            result: "tmpfile",
+            useRenderInContext: (Platform.OS === "ios"),
+            snapshotContentContainer: true,
+            handleGLSurfaceViewOnAndroid: true,
+          });
+        }
+
+        console.log("Saved meme:", uri);
+
+        // Ensure the captured URI is valid before copying to clipboard
+        //await Clipboard.setImageAsync(uri);
+        alert("Meme copied to clipboard!");
+      }, 100); // 100ms delay
+    } catch (error) {
+      console.error("Error capturing or copying image:", error);
+    }
   };
 
   // Handles the arrangement of the text elements
-  const handleArrange = useCallback(
+  const onArrangeEnd = useCallback(
     (type, x, y) => {
-      setTexts((prevTexts) => {
-        let textLabel = "Label " + (prevTexts.length + 1);
-        const newText = { text: textLabel, x, y };
-        setSelectedTextIndex(prevTexts.length);
-        return [...prevTexts, newText];
-      });
+      if (type === "text") {
+        setTexts((prevTexts) => {
+          let textLabel = "Label " + (prevTexts.length + 1);
+          const newText = { text: textLabel, x: x - 75, y: y - 50 };
+          setSelectedTextIndex(prevTexts.length);
+          return [...prevTexts, newText];
+        });
+      }
     },
     [texts],
   );
@@ -76,30 +116,44 @@ const MemeCreate = () => {
         {/* Margin 1 */}
         {Platform.OS === 'web' && <Text style={{ width: width * 0.25, height: height, textAlign: 'center' }}> TEST </Text>}
         {/* Meme Image */}
-        <View style={{ width: width * (Platform.OS === 'web' ? 0.5 : 0.9), height: height, zIndex: 1 }} ref={memeContainerRef}>
+        <View
+          style={{ width: width * (Platform.OS === 'web' ? 0.5 : 0.9), height: height, zIndex: 1 }}
+          collapsable={false}
+          ref={memeContainerRef}>
           {/* Draggable Options */}
           <DragableOption
             key={`dragable-text-option`}
-            onArrangeEnd={(x, y) => handleArrange("text", x, y)}
-            initialPosition={{ x: 0, y: 100 }} />
-          <Pressable maxPointers={1} style={{ height: height, textAlign: 'center', zIndex: 1 }} onPress={() => {
-            setSelectedTextIndex(-1);
-          }}>
+            onArrangeEnd={(x, y) => onArrangeEnd("text", x, y)}
+            initialPosition={{ x: (width * (Platform.OS === 'web' ? 0.5 : 0.8)) * 0.9, y: height * 0.3 }} />
+
+          {/* Capture/Share Button */}
+          <CaptureOption onCapture={handleCapture} initialPosition={{ x: (width * (Platform.OS === 'web' ? 0.5 : 0.8)) * 0.9, y: height * 0.4 }} />
+
+
+          <Pressable
+            maxPointers={1}
+            style={
+              { marginTop: height * (Platform.OS === 'web' ? 0.05 : 0), height: height, textAlign: 'center' }}
+            onPress={() => {
+              setSelectedTextIndex(-1);
+            }}>
+            {/* Meme Image display */}
             {currentMeme && <ZoomableImage source={{ uri: currentMeme.img }} />}
+            {/* Draggable Texts */}
+            {texts.map((item, index) => (
+              <DraggableText
+                key={`dragable-text-${index}`}
+                text={item.text}
+                initPosition={{ x: item.x, y: item.y }}
+                index={index}
+                selected={index === selectedTextIndex}
+                onSelect={(i) => setSelectedTextIndex(i)}
+                onDelete={(i) => deleteText(i)}
+              />
+            ))
+            }
           </Pressable>
-          {/* Draggable Texts */}
-          {texts.map((item, index) => (
-            <DraggableText
-              key={`dragable-text-${index}`}
-              text={item.text}
-              initPosition={{ x: item.x, y: item.y }}
-              index={index}
-              selected={index === selectedTextIndex}
-              onSelect={(i) => setSelectedTextIndex(i)}
-            />
-          ))
-          }
-          
+
         </View>
         {/* Margin 2 */}
         {Platform.OS === 'web' && <Text style={{ width: width * 0.25, height: height, textAlign: 'center' }}> TEST </Text>}
@@ -119,6 +173,15 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     alignItems: 'center',
   },
+  captureButton: {
+    width: 60,
+    height: 60,
+    borderRadius: 40,
+    backgroundColor: "red",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 10,
+  }
 });
 
 export default MemeCreate;

@@ -1,5 +1,6 @@
 import { useCallback, useRef } from 'react';
 import { Text, StyleSheet, PanResponder, Platform, View } from 'react-native';
+import { MessageSquare } from 'react-native-feather';
 import {
     GestureHandlerRootView,
     Pressable,
@@ -11,7 +12,7 @@ import Animated, {
     ReduceMotion,
 } from 'react-native-reanimated';
 
-const DragableOption = ({ onArrangeEnd, onStartArrange, initialPosition }) => {
+const DragableOption = ({ onArrangeEnd, initialPosition }) => {
 
     const activated = useSharedValue(true);
 
@@ -41,14 +42,12 @@ const DragableOption = ({ onArrangeEnd, onStartArrange, initialPosition }) => {
             onStartShouldSetPanResponder: () => true,
             onMoveShouldSetPanResponder: () => true,
             onPanResponderStart: (_) => {
-                if (!!onStartArrange)
-                    onStartArrange();
                 activated.value = true;
             },
             onPanResponderMove: (_, gestureState) =>
-                handleDrag(gestureState),
+                onDrag(gestureState),
             onPanResponderRelease: (_, gestureState) => {
-                endPan(gestureState);
+                onRelease(gestureState);
             },
         })
     ).current;
@@ -64,7 +63,7 @@ const DragableOption = ({ onArrangeEnd, onStartArrange, initialPosition }) => {
     }, [dimensions, initialPosition]);
 
     // handle drag function
-    const handleDrag = useCallback((gestureState) => {
+    const onDrag = useCallback((gestureState) => {
         if (activated.value) {
             const newPos = getNewPosition(gestureState);
             position.x.value = newPos.x;
@@ -73,7 +72,7 @@ const DragableOption = ({ onArrangeEnd, onStartArrange, initialPosition }) => {
     }, [activated]);
 
     // end drag function
-    const endPan = useCallback((gestureState) => {
+    const onRelease = useCallback((gestureState) => {
         // send signal to create new object in panel
         const newPos = getNewPosition(gestureState);
         onArrangeEnd(newPos.x + initialPosition.x, newPos.y + initialPosition.y);
@@ -102,7 +101,7 @@ const DragableOption = ({ onArrangeEnd, onStartArrange, initialPosition }) => {
                 const { width, height, x, y, top, left } = event.nativeEvent.layout;
                 originOffset.current = { oX: x + (left | 0) + width / 2, oY: y + (top | 0) + height / 2 };
             }}
-            style={[styles.container, { top: initialPosition.y, left: initialPosition.x, zIndex: 11 }]}>
+            style={[styles.container, { top: initialPosition.y, left: initialPosition.x }]}>
             <Animated.View
                 style={[styles.draggableBox, dragAnimatedStyle]}
                 {...panResponder.panHandlers}
@@ -111,7 +110,7 @@ const DragableOption = ({ onArrangeEnd, onStartArrange, initialPosition }) => {
                     dimensions.current = { width, height };
                 }}>
                 <Pressable maxPointers={1}>
-                    <Text style={styles.draggableText}>💬</Text>
+                    <MessageSquare stroke="black" fill="#fff" width={40} height={40} />
                 </Pressable>
             </Animated.View>
         </View>
@@ -121,20 +120,17 @@ const DragableOption = ({ onArrangeEnd, onStartArrange, initialPosition }) => {
 const styles = StyleSheet.create({
     container: {
         position: 'absolute',
+        zIndex: 10,
     },
     draggableBox: {
-        width: 75,
-        height: 75,
+        width: 60,
+        height: 60,
         backgroundColor: 'blue',
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 50,
         zIndex: 10,
-    },
-    draggableText: {
-        color: '#fff',
-        fontWeight: 'bold',
     },
 });
 

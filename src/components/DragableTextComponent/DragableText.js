@@ -2,50 +2,67 @@ import { useEffect } from "react";
 import { useCallback } from "react";
 import { useRef, useState } from "react";
 import { PanResponder, Platform, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
-import { ArrowDown, ArrowRight, Crop, Move, RotateCcw } from "react-native-feather";
-import { TapGestureHandler, GestureHandlerRootView } from "react-native-gesture-handler";
-import Animated, { Easing, Keyframe, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from "react-native-reanimated";
+import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Move, RotateCcw, Square, Trash2 } from "react-native-feather";
+import { TapGestureHandler } from "react-native-gesture-handler";
+import Animated, { useAnimatedStyle, useSharedValue } from "react-native-reanimated";
 
-const DraggableText = ({ text, initPosition, index, selected, onSelect }) => {
+const DraggableText = ({ text, initPosition, index, selected, onSelect, onDelete }) => {
+
+    // Text of the component
     const [value, setValue] = useState(text);
 
+    // Position of the component (position absoulte)
     const position = {
         x: useSharedValue(-1000),
         y: useSharedValue(-1000),
     };
 
+    // Used to keep track of the origin offset of the component
     const originOffset = useRef({ oX: 0, oY: 0 });
 
+    // Flag to check if the component is being edited
     const [isEditing, setIsEditing] = useState(false);
 
-    const [isPanning, setIsPanning] = useState(false);
-    const [fontSize, setFontSize] = useState(18);
+    // Used to keep track of the inner component changes
     const contentView = { height: useSharedValue(50), width: useSharedValue(150), rotation: useSharedValue(0) };
 
+    // Init height of the component
     const initHeight = useSharedValue(contentView.height.value);
 
+    // Init width of the component
     const initWidth = useSharedValue(contentView.width.value);
 
+    // Rotation of the component
     const initRotation = useSharedValue(contentView.rotation.value);
 
-    const dimensions = useRef({ width: 0, height: 0 });
+    // Size of the buttons
+    const buttonsSize = 50;
 
+    // Used to force re-render of the component because IOS doesn't make a re render when size of the component changes
+    const [layoutKey, setLayoutKey] = useState(0);
+
+    // Dimensions of the component
+    const dimensions = { width: useSharedValue(0), height: useSharedValue(0) };
+
+    // Get new position of the component
     const getNewPosition = useCallback((gestureState) => {
         const { moveX, moveY } = gestureState;
-        const { width, height } = dimensions.current;
+        const { width, height } = dimensions;
         const { oX, oY } = originOffset.current;
         if (Platform.OS === 'web')
-            return { x: moveX - oX, y: moveY - oY + height / 2 - 10 };
-        return { x: moveX - width / 2, y: moveY - 50 };
-    }, []);
+            return { x: moveX - oX, y: moveY - oY - height.value / 2 };
+        return { x: moveX - oX, y: moveY - oY - height.value / 2 };
+    }, [dimensions, originOffset]);
 
     // handle drag function
     const handleDrag = useCallback((gestureState) => {
+        if (!selected) return;
         const { x, y } = getNewPosition(gestureState);
         position.x.value = x;
         position.y.value = y;
-    }, [position]);
+    }, [position, selected]);
 
+    // Pan responder for the drag
     const dragViewpanResponder = useRef(
         PanResponder.create({
             onStartShouldSetPanResponder: () => true,
@@ -55,58 +72,91 @@ const DraggableText = ({ text, initPosition, index, selected, onSelect }) => {
         })
     ).current;
 
-
     // handle resize function
-    const handleResizeY = useCallback((gestureState) => {
-        let newValue = gestureState.moveY - gestureState.y0;
+    const handleResizeY = useCallback((gestureState, y0) => {
+        if (!selected) return;
+        let newValue = y0 ? gestureState.y0 - gestureState.moveY : gestureState.moveY - gestureState.y0;
         const newHeight = Math.max(newValue + initHeight.value, 25);
         contentView.height.value = newHeight;
-    }, [contentView, selected]);
+        if (newHeight > 25 && y0)
+            position.y.value = gestureState.moveY - buttonsSize;
+    }, [contentView, selected, dimensions]);
 
+    // Pan responder for the resize Y (final Y)
     const resizeYViewpanResponder = useRef(
         PanResponder.create({
-            onStartShouldSetPanResponder: () => {
-                return true;
-            },
+            onStartShouldSetPanResponder: () => true,
             onMoveShouldSetPanResponder: () => true,
             onPanResponderMove: (_, gestureState) =>
-                handleResizeY(gestureState),
+                handleResizeY(gestureState, false),
             onPanResponderRelease: (_, gestureState) => {
                 initHeight.value = contentView.height.value;
+                setLayoutKey((prevKey) => prevKey + 1);
             },
         })
     ).current;
 
-
-
-    // handle resize function
-    const handleResizeX = useCallback((gestureState) => {
-        let newValue = gestureState.moveX - gestureState.x0;
-        const newWidth = Math.max(newValue + initWidth.value, 25);
-        contentView.width.value = newWidth;
-    }, [contentView, selected]);
-
-    const resizeXViewpanResponder = useRef(
+    // Pan responder for the resize Y0 (initial Y)
+    const resizeY0ViewpanResponder = useRef(
         PanResponder.create({
-            onStartShouldSetPanResponder: () => {
-                return true;
-            },
+            onStartShouldSetPanResponder: () => true,
             onMoveShouldSetPanResponder: () => true,
             onPanResponderMove: (_, gestureState) =>
-                handleResizeX(gestureState),
+                handleResizeY(gestureState, true),
+            onPanResponderRelease: (_, gestureState) => {
+                initHeight.value = contentView.height.value;
+                setLayoutKey((prevKey) => prevKey + 1);
+            },
+        })
+    ).current;
+
+    // handle resize function
+    const handleResizeX = useCallback((gestureState, x0) => {
+        if (!selected) return;
+        let newValue = x0 ? gestureState.x0 - gestureState.moveX : gestureState.moveX - gestureState.x0;
+        const newWidth = Math.max(newValue + initWidth.value, 25);
+        contentView.width.value = newWidth;
+        if (newWidth > 25 && x0)
+            position.x.value = gestureState.moveX - buttonsSize;
+    }, [contentView, selected]);
+
+    // Pan responder for the resize X (final X)
+    const resizeXViewpanResponder = useRef(
+        PanResponder.create({
+            onStartShouldSetPanResponder: () => true,
+            onMoveShouldSetPanResponder: () => true,
+            onPanResponderMove: (_, gestureState) =>
+                handleResizeX(gestureState, false),
             onPanResponderRelease: (_, gestureState) => {
                 initWidth.value = contentView.width.value;
+                setLayoutKey((prevKey) => prevKey + 1);
+            },
+        })
+    ).current;
+
+    // Pan responder for the resize X0 (initial X)
+    const resizeX0ViewpanResponder = useRef(
+        PanResponder.create({
+            onStartShouldSetPanResponder: () => true,
+            onMoveShouldSetPanResponder: () => true,
+            onPanResponderMove: (_, gestureState) =>
+                handleResizeX(gestureState, true),
+            onPanResponderRelease: (_, gestureState) => {
+                initWidth.value = contentView.width.value;
+                setLayoutKey((prevKey) => prevKey + 1);
             },
         })
     ).current;
 
     // handle rotate function
-    const handleRotate = useCallback((gestureState) => {
+    const onRotate = useCallback((gestureState) => {
+        if (!selected) return;
         let newValue = gestureState.x0 - gestureState.moveX;
         const newRotation = newValue + initRotation.value;
         contentView.rotation.value = newRotation;
-    }, [contentView]);
+    }, [contentView, selected]);
 
+    // Pan responder for the rotate
     const rotateViewpanResponder = useRef(
         PanResponder.create({
             onStartShouldSetPanResponder: () => {
@@ -114,14 +164,14 @@ const DraggableText = ({ text, initPosition, index, selected, onSelect }) => {
             },
             onMoveShouldSetPanResponder: () => true,
             onPanResponderMove: (_, gestureState) =>
-                handleRotate(gestureState),
+                onRotate(gestureState),
             onPanResponderRelease: (_, gestureState) => {
                 initRotation.value = contentView.rotation.value;
             },
         })
     ).current;
 
-    // animated style
+    // animated translation style for main Animated.View
     const dragAnimationStyle = useAnimatedStyle(() => ({
         transform: [
             { translateX: position.x.value },
@@ -131,16 +181,19 @@ const DraggableText = ({ text, initPosition, index, selected, onSelect }) => {
         zIndex: 3,
     }));
 
+    // animated size style for the inner component shown
     const resizeAnimationStyle = useAnimatedStyle(() => ({
         height: contentView.height.value,
         width: contentView.width.value,
         fontSize: (contentView.height.value + contentView.width.value / 2) / 2 * 0.5
     }))
 
+    // animated rotation style for the inner component shown
     const rotationAnimationStyle = useAnimatedStyle(() => ({
         transform: [{ rotate: contentView.rotation.value + 'deg' }],
     }))
 
+    // Init position of the component
     useEffect(() => {
         // init position set
         if (position.x.value < 0) {
@@ -149,86 +202,148 @@ const DraggableText = ({ text, initPosition, index, selected, onSelect }) => {
         }
     }, []);
 
+    // Get the layout of the component
+    const onComponentLayout = useCallback((event) => {
+        const { width, height, x, y, top, left } = event.nativeEvent.layout;
+        originOffset.current = { oX: x + (left | 0) + width / 2, oY: y + (top | 0) + height / 2 };
+        dimensions.width.value = width;
+        dimensions.height.value = height;
+    }, [dimensions, originOffset]);
+
     return (
         <Animated.View
             style={[dragAnimationStyle]}
-            onLayout={(event) => {
-                const { width, height, x, y, top, left } = event.nativeEvent.layout;
-                originOffset.current = { oX: x + (left | 0) + width / 2, oY: y + (top | 0) + height / 2 };
-                dimensions.current = { width, height };
-            }}>
-            <GestureHandlerRootView>
+            key={`dragable-text-${index}-${layoutKey}`}
+            onLayout={onComponentLayout}>
+            <Pressable
+                onPress={() => onSelect(index)}
+            >
+                <Animated.View
+                    style={{ flex: 1, flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
 
-                <Pressable
-                    key={`pressable-image-${index}`}
-                    onPress={() => onSelect(index)}
-                >
-                    <Animated.View
-                        style={{ flex: 1, flexDirection: "column", alignContent: "center", justifyContent: "center" }}>
-                        <View
-                            {...dragViewpanResponder.panHandlers}
-                            style={{ ...styles.moveIconContainerCircle, visibility: selected ? 'visible' : 'hidden', opacity: selected ? 1 : 0 }}>
+                    {/* Resize Icon Y0*/}
+                    <View style={[{ visibility: selected ? 'visible' : 'hidden', opacity: selected ? 1 : 0 }]}>
+                        <Animated.View {...resizeY0ViewpanResponder.panHandlers}>
                             <Text style={styles.positionIconView} selectable={false}>
-                                <Move stroke="black" fill="#fff" width={32} height={32} />
+                                <Square fill={"#fff"} stroke="black" width={32} height={32} />
+                            </Text>
+                        </Animated.View>
+                    </View>
+
+                    {/* Main View */}
+                    <Animated.View style={{ flex: 1, flexDirection: "row", alignContent: "center", justifyContent: "center" }}>
+
+                        {/* Resize Icon X0 */}
+                        <View {...resizeX0ViewpanResponder.panHandlers}
+                            style={[{
+                                visibility: selected ? 'visible' : 'hidden',
+                                opacity: selected ? 1 : 0,
+                                justifyContent: "center",
+                                alignItems: "center"
+                            }]}>
+                            <Text style={styles.positionIconView} selectable={false}>
+                                <Square fill={"#fff"} stroke="black" width={32} height={32} />
                             </Text>
                         </View>
 
-                        <Animated.View style={{ flex: 1, flexDirection: "row", alignContent: "center", justifyContent: "center" }}>
-                            <TapGestureHandler
-                                onHandlerStateChange={({ nativeEvent }) => {
-                                    if (nativeEvent.state === 4) {
-                                        // handle double tap
-                                        setIsEditing(true);
-                                    }
-                                }}
-                                numberOfTaps={2}
-                            >
-                                <Animated.View style={[resizeAnimationStyle, rotationAnimationStyle]}>
-                                    {isEditing && selected ? (
-                                        <TextInput
-                                            aria-label={`text-input-${index}`}
-                                            style={[{ ...styles.impact, textAlign: 'center', fontSize: (contentView.height.value + contentView.width.value / 2) / 2 * 0.5 }, 
-                                                resizeAnimationStyle,
-                                                StyleSheet.absoluteFill]}
-                                            value={value}
-                                            onChangeText={setValue}
-                                            onBlur={() => setIsEditing(false)}
-                                            autoFocus
-                                        />
-                                    ) : (
-                                        <Animated.Text
-                                            style={[{ textAlign: 'center', verticalAlign: 'center' }, resizeAnimationStyle, styles.impact]}
-                                            selectable={false}>
-                                            {value}
-                                        </Animated.Text>
-                                    )}
-                                </Animated.View>
-                            </TapGestureHandler>
-
-                            <Animated.View {...resizeXViewpanResponder.panHandlers} style={[{ visibility: selected ? 'visible' : 'hidden', opacity: selected ? 1 : 0 }, { ...styles.moveIconContainer }]}>
-                                <Text style={styles.positionIconView} selectable={false}><ArrowRight stroke="black" width={32} height={32} /></Text>
+                        {/* Tap Gesture Handler */}
+                        <TapGestureHandler
+                            onHandlerStateChange={({ nativeEvent }) => {
+                                if (nativeEvent.state === 4) {
+                                    // handle double tap
+                                    setIsEditing(true);
+                                }
+                            }}
+                            numberOfTaps={2}
+                        >
+                            {/* Label/Input View */}
+                            <Animated.View style={[resizeAnimationStyle, rotationAnimationStyle]}>
+                                {isEditing && selected ? (
+                                    <TextInput
+                                        aria-label={`text-input-${index}`}
+                                        style={[{ ...styles.impact, textAlign: 'center', fontSize: (contentView.height.value + contentView.width.value / 2) / 2 * 0.5 },
+                                            resizeAnimationStyle,
+                                        StyleSheet.absoluteFill]}
+                                        value={value}
+                                        onChangeText={setValue}
+                                        onBlur={() => setIsEditing(false)}
+                                        autoFocus
+                                    />
+                                ) : (
+                                    <Animated.Text
+                                        style={[{ textAlign: 'center', verticalAlign: 'center', flex: 1, alignContent: 'center' }, StyleSheet.absoluteFill, resizeAnimationStyle, styles.impact]}
+                                        selectable={false}>
+                                        {value}
+                                    </Animated.Text>
+                                )}
                             </Animated.View>
-                        </Animated.View>
+                        </TapGestureHandler>
 
-                        <View style={[{ visibility: selected ? 'visible' : 'hidden', opacity: selected ? 1 : 0 }]}>
-                            <Animated.View {...resizeYViewpanResponder.panHandlers} style={{ ...styles.moveIconContainer }}>
-                                <Text style={styles.positionIconView} selectable={false}>
-                                    <ArrowDown stroke="black" width={32} height={32} />
-                                </Text>
-                            </Animated.View>
+                        {/* Resize Icon X max */}
+                        <View {...resizeXViewpanResponder.panHandlers}
+                            style={[{
+                                visibility: selected ? 'visible' : 'hidden',
+                                opacity: selected ? 1 : 0,
+                                justifyContent: "center",
+                                alignItems: "center"
+                            }]}>
+                            <Text style={styles.positionIconView} selectable={false}>
+                                <Square fill={"#fff"} stroke="black" width={32} height={32} />
+                            </Text>
                         </View>
-
-                        <View style={[{ visibility: selected ? 'visible' : 'hidden', opacity: selected ? 1 : 0 }]}>
-                            <Animated.View {...rotateViewpanResponder.panHandlers} style={{ ...styles.moveIconContainerCircle }}>
-                                <Text style={styles.positionIconView} selectable={false}>
-                                    <RotateCcw stroke="black" width={32} height={32} />
-                                </Text>
-                            </Animated.View>
-                        </View>
-
                     </Animated.View>
-                </Pressable>
-            </GestureHandlerRootView >
+
+                    {/* Resize Icon Y max */}
+                    <Animated.View {...resizeYViewpanResponder.panHandlers}
+                        style={{
+                            visibility: selected ? 'visible' : 'hidden',
+                            opacity: selected ? 1 : 0
+                        }}>
+                        <Text style={styles.positionIconView} selectable={false}>
+                            <Square fill={"#fff"} width={32} height={32} />
+                        </Text>
+                    </Animated.View>
+                </Animated.View>
+                <View style={[{ flex: 1, flexDirection: "row", justifyContent: "space-between", alignItems: "center" }]}>
+                    {/* Rotate Icon*/}
+                    <View
+                        {...rotateViewpanResponder.panHandlers}
+                        style={{
+                            visibility: selected ? 'visible' : 'hidden', opacity: selected ? 1 : 0,
+                            maxWidth: buttonsSize, maxHeight: buttonsSize
+                        }}>
+                        <Text style={styles.positionIconView} selectable={false}>
+                            <RotateCcw stroke="black" width={32} height={32} />
+                        </Text>
+                    </View>
+
+                    {/* Drag Icon*/}
+                    <View
+                        {...dragViewpanResponder.panHandlers}
+                        style={{
+                            visibility: selected ? 'visible' : 'hidden',
+                            opacity: selected ? 1 : 0,
+                            maxWidth: buttonsSize, maxHeight: buttonsSize
+                        }}>
+                        <Text style={styles.positionIconView} selectable={false}>
+                            <Move stroke="black" width={32} height={32} />
+                        </Text>
+                    </View>
+
+                    {/* Erase Icon */}
+                    <View
+                        style={{
+                            visibility: selected ? 'visible' : 'hidden',
+                            opacity: selected ? 1 : 0,
+                        }}>
+                        <Pressable
+                            onPress={() => onDelete(index)}
+                            style={styles.positionIconView} selectable={false}>
+                            <Trash2 stroke="black" fill={"#fff"} width={32} height={32} />
+                        </Pressable>
+                    </View>
+                </View>
+            </Pressable>
         </Animated.View>
     );
 };
@@ -245,19 +360,8 @@ const styles = StyleSheet.create({
     positionIconView: {
         userSelect: "none",
     },
-    moveIconContainerCircle: {
-        backgroundColor: "red",
-        borderRadius: 50,
-        flex: 1,
-        justifySelf: "center",
-        alignSelf: "center",
-        textAlign: "center",
-    },
-    moveIconContainer: {
-        backgroundColor: "red",
-        borderRadius: 50,
-    },
     impact: {
+        textTransform: "uppercase",
         fontFamily: 'Impact',
         fontColor: 'white',
         color: 'white',
