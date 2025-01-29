@@ -1,10 +1,7 @@
 import { useCallback, useRef } from 'react';
-import { Text, StyleSheet, PanResponder, Platform, View } from 'react-native';
+import { StyleSheet, PanResponder, Platform, View } from 'react-native';
 import { MessageSquare } from 'react-native-feather';
-import {
-    GestureHandlerRootView,
-    Pressable,
-} from 'react-native-gesture-handler';
+import { Pressable } from 'react-native-gesture-handler';
 import Animated, {
     useSharedValue,
     useAnimatedStyle,
@@ -12,9 +9,7 @@ import Animated, {
     ReduceMotion,
 } from 'react-native-reanimated';
 
-const DragableOption = ({ onArrangeEnd, initialPosition }) => {
-
-    const activated = useSharedValue(true);
+const DragableOption = ({ onArrangeEnd, onDoubleTap, initialPosition, children, canMove = true }) => {
 
     const position = {
         x: useSharedValue(0),
@@ -50,7 +45,6 @@ const DragableOption = ({ onArrangeEnd, initialPosition }) => {
             onMoveShouldSetPanResponder: () => true,
             onPanResponderStart: (_, gestureState) => {
                 onDragStart(gestureState);
-                activated.value = true;
             },
             onPanResponderMove: (_, gestureState) =>
                 onDrag(gestureState),
@@ -67,17 +61,19 @@ const DragableOption = ({ onArrangeEnd, initialPosition }) => {
 
         if (Platform.OS === 'web')
             return { x: moveX - oX + initialPosition.x - width / 2, y: moveY - oY + initialPosition.y - height / 2 };
+        // IOS
         return { x: moveX - initialPosition.x - width / 2, y: moveY - initialPosition.y - height / 2 };
     }, [dimensions, initialPosition]);
 
     // handle drag function
     const onDrag = useCallback((gestureState) => {
-        if (activated.value) {
-            const newPos = getNewPosition(gestureState);
-            position.x.value = newPos.x;
-            position.y.value = newPos.y;
-        }
-    }, [activated]);
+        if (scale.value == 1.0)
+            scale.value = withSpring(1.5, scaleSpringConfig)
+
+        const newPos = getNewPosition(gestureState);
+        position.x.value = newPos.x;
+        position.y.value = newPos.y;
+    }, []);
 
     // start drag function
     const onDragStart = useCallback((gestureState) => {
@@ -90,7 +86,8 @@ const DragableOption = ({ onArrangeEnd, initialPosition }) => {
     const onDragRelease = useCallback((gestureState) => {
         // send signal to create new object in panel
         const newPos = getNewPosition(gestureState);
-        onArrangeEnd(newPos.x + initialPosition.x, newPos.y + initialPosition.y);
+        if(!!onArrangeEnd)
+            onArrangeEnd(newPos.x + initialPosition.x, newPos.y + initialPosition.y);
 
         // Reset position
         position.x.value = withSpring(0, returnSpringConfig);
@@ -98,11 +95,7 @@ const DragableOption = ({ onArrangeEnd, initialPosition }) => {
 
         // Reset scale
         scale.value = withSpring(1, scaleSpringConfig);
-
-        // create timeout to reset activated state
-        activated.value = false;
-        setTimeout(() => activated.value = true, 500);
-    }, [position, initialPosition, activated]);
+    }, [position, initialPosition]);
 
     // animated style
     const dragAnimatedStyle = useAnimatedStyle(() => ({
@@ -123,15 +116,13 @@ const DragableOption = ({ onArrangeEnd, initialPosition }) => {
             }}
             style={[styles.container, { top: initialPosition.y, left: initialPosition.x }]}>
             <Animated.View
-                style={[styles.draggableBox, dragAnimatedStyle]}
+                style={[styles.draggableBox, canMove && dragAnimatedStyle]}
                 {...panResponder.panHandlers}
                 onLayout={(event) => {
                     const { width, height } = event.nativeEvent.layout;
                     dimensions.current = { width, height };
                 }}>
-                <Pressable maxPointers={1}>
-                    <MessageSquare stroke="black" fill="#fff" width={40} height={40} />
-                </Pressable>
+                {children}
             </Animated.View>
         </View>
     );

@@ -13,11 +13,10 @@ const DraggableContainer = ({ item, index, selected, onSelect, onDelete, childre
         y: useSharedValue(-1000),
     };
 
+    const selectedContainer = useSharedValue(selected);
+
     // Used to keep track of the origin offset of the component
     const originOffset = useRef({ oX: 0, oY: 0 });
-
-    // Flag to check if the component is being edited
-    const [isEditing, setIsEditing] = useState(false);
 
     // Used to keep track of the inner component changes
     const contentView = { height: useSharedValue(item.height), width: useSharedValue(item.width), rotation: useSharedValue(item.rotation) };
@@ -56,7 +55,7 @@ const DraggableContainer = ({ item, index, selected, onSelect, onDelete, childre
 
     // handle drag function
     const handleDrag = useCallback((gestureState) => {
-        if (!selected) return;
+        if (!selectedContainer.value) return;
         const { x, y } = getNewPosition(gestureState);
         position.x.value = x;
         position.y.value = y;
@@ -64,7 +63,7 @@ const DraggableContainer = ({ item, index, selected, onSelect, onDelete, childre
             item.x = x;
             item.y = y;
         }
-    }, [position, selected]);
+    }, [position, selectedContainer]);
 
     // Pan responder for the drag
     const dragViewpanResponder = useRef(
@@ -78,7 +77,7 @@ const DraggableContainer = ({ item, index, selected, onSelect, onDelete, childre
 
     // handle resize function
     const handleResizeY = useCallback((gestureState, y0) => {
-        if (!selected) return;
+        if (!selectedContainer.value) return;
         let newValue = y0 ? gestureState.y0 - gestureState.moveY : gestureState.moveY - gestureState.y0;
         const newHeight = Math.max(newValue + initHeight.value, 25);
         contentView.height.value = newHeight;
@@ -87,7 +86,7 @@ const DraggableContainer = ({ item, index, selected, onSelect, onDelete, childre
         // update object height
         if(!!item)
             item.height = newHeight;
-    }, [contentView, selected, dimensions]);
+    }, [contentView, selectedContainer, dimensions]);
 
     // Pan responder for the resize Y (final Y)
     const resizeYViewpanResponder = useRef(
@@ -119,7 +118,7 @@ const DraggableContainer = ({ item, index, selected, onSelect, onDelete, childre
 
     // handle resize function
     const handleResizeX = useCallback((gestureState, x0) => {
-        if (!selected) return;
+        if (!selectedContainer.value) return;
         let newValue = x0 ? gestureState.x0 - gestureState.moveX : gestureState.moveX - gestureState.x0;
         const newWidth = Math.max(newValue + initWidth.value, 25);
         contentView.width.value = newWidth;
@@ -128,7 +127,7 @@ const DraggableContainer = ({ item, index, selected, onSelect, onDelete, childre
         // update object width
         if(!!item)
             item.width = newWidth;
-    }, [contentView, selected]);
+    }, [contentView, selectedContainer]);
 
     // Pan responder for the resize X (final X)
     const resizeXViewpanResponder = useRef(
@@ -160,14 +159,14 @@ const DraggableContainer = ({ item, index, selected, onSelect, onDelete, childre
 
     // handle rotate function
     const onRotate = useCallback((gestureState) => {
-        if (!selected) return;
+        if (!selectedContainer.value) return;
         let newValue = gestureState.x0 - gestureState.moveX;
         const newRotation = newValue + initRotation.value;
         contentView.rotation.value = newRotation;
         // update object rotation
         if(!!item)
             item.rotation = newRotation;
-    }, [contentView, selected]);
+    }, [contentView, selectedContainer]);
 
     // Pan responder for the rotate
     const rotateViewpanResponder = useRef(
@@ -191,7 +190,6 @@ const DraggableContainer = ({ item, index, selected, onSelect, onDelete, childre
             { translateY: position.y.value },
         ],
         position: 'absolute',
-        zIndex: 3,
     }));
 
     // Init position of the component
@@ -202,6 +200,12 @@ const DraggableContainer = ({ item, index, selected, onSelect, onDelete, childre
             position.y.value = item.y;
         }
     }, []);
+    
+    // refresh selected of the component
+    useEffect(() => {
+        // init position set
+        selectedContainer.value = selected;
+    }, [selected]);
 
     // Get the layout of the component
     const onComponentLayout = useCallback((event) => {
@@ -213,7 +217,7 @@ const DraggableContainer = ({ item, index, selected, onSelect, onDelete, childre
 
     return (
         <Animated.View
-            style={[dragAnimationStyle]}
+            style={[dragAnimationStyle, {zIndex: selected ? 15 : 3}]} // high zIdex to priorize this selected component
             key={`dragable-text-${index}-${layoutKey}`}
             onLayout={onComponentLayout}>
             <Pressable
@@ -223,7 +227,7 @@ const DraggableContainer = ({ item, index, selected, onSelect, onDelete, childre
                     style={{ flex: 1, flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
 
                     {/* Resize Icon Y0*/}
-                    <View style={[{ visibility: selected ? 'visible' : 'hidden', opacity: selected ? 1 : 0 }]}>
+                    <View style={[{ visibility: selected ? 'visible' : 'hidden', opacity: selected ? 1 : 0, zIndex: 5 }]}>
                         <Animated.View {...resizeY0ViewpanResponder.panHandlers}>
                             <Text style={styles.positionIconView} selectable={false}>
                                 <Square fill={"#fff"} stroke="black" width={32} height={32} />
@@ -240,7 +244,8 @@ const DraggableContainer = ({ item, index, selected, onSelect, onDelete, childre
                                 visibility: selected ? 'visible' : 'hidden',
                                 opacity: selected ? 1 : 0,
                                 justifyContent: "center",
-                                alignItems: "center"
+                                alignItems: "center",
+                                zIndex: 5
                             }]}>
                             <Text style={styles.positionIconView} selectable={false}>
                                 <Square fill={"#fff"} stroke="black" width={32} height={32} />
@@ -256,7 +261,8 @@ const DraggableContainer = ({ item, index, selected, onSelect, onDelete, childre
                                 visibility: selected ? 'visible' : 'hidden',
                                 opacity: selected ? 1 : 0,
                                 justifyContent: "center",
-                                alignItems: "center"
+                                alignItems: "center",
+                                zIndex: 5
                             }]}>
                             <Text style={styles.positionIconView} selectable={false}>
                                 <Square fill={"#fff"} stroke="black" width={32} height={32} />
@@ -268,7 +274,8 @@ const DraggableContainer = ({ item, index, selected, onSelect, onDelete, childre
                     <Animated.View {...resizeYViewpanResponder.panHandlers}
                         style={{
                             visibility: selected ? 'visible' : 'hidden',
-                            opacity: selected ? 1 : 0
+                            opacity: selected ? 1 : 0,
+                            zIndex: 5
                         }}>
                         <Text style={styles.positionIconView} selectable={false}>
                             <Square fill={"#fff"} width={32} height={32} />

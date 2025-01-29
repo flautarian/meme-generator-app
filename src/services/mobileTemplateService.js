@@ -1,11 +1,11 @@
 import db from './database'; // SQLite database instance
 
 const SQLiteTemplatesService = {
-  addTemplate(img, name) {
+  addTemplate(blob, name) {
     return new Promise((resolve, reject) => {
       const results = db.getAllSync(
-        'INSERT INTO templates (img, name) VALUES (?, ?);',
-        [img, name]);
+        'INSERT INTO templates (blob, name) VALUES (?, ?);',
+        [blob, name]);
       resolve(results);
     });
   },
@@ -38,11 +38,11 @@ const SQLiteTemplatesService = {
   },
 
   updateTemplate(id, updatedData) {
-    const { img, name } = updatedData;
+    const { blob, name } = updatedData;
     return new Promise((resolve, reject) => {
       const results = db.getAllSync(
-        'UPDATE templates SET img = ?, name = ? WHERE id = ?;',
-        [img, name, id]);
+        'UPDATE templates SET blob = ?, name = ? WHERE id = ?;',
+        [blob, name, id]);
       resolve(results);
     });
   },

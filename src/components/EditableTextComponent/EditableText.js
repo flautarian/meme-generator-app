@@ -19,7 +19,8 @@ const EditableText = ({ item, index, height, width, rotation }) => {
     const resizeAnimationStyle = useAnimatedStyle(() => ({
         height: height.value,
         width: width.value,
-        fontSize: (height.value + width.value / 2) / 2 * 0.5
+        fontSize: (height.value + width.value / 2) / 2 * 0.5,
+        zIndex: 3,
     }))
 
     // animated rotation style for the inner component shown
@@ -79,7 +80,7 @@ const styles = StyleSheet.create({
         fontFamily: 'Impact',
         fontColor: 'white',
         color: 'white',
-        webkitTextStroke: '2px black',
+        WebkitTextStroke: '2px black',
         textShadowColor: 'black',
         textShadowRadius: 4,
         textShadowOffset: { width: 2, height: 2 },

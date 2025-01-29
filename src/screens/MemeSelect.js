@@ -5,7 +5,7 @@ import TemplateItem from 'src/components/TemplateItemComponent/TemplateItem';
 
 const { width, height } = Dimensions.get('window');
 
-const MemeSelect = ({ navigation }) => {
+const MemeSelect = ({ onSelectMeme }) => {
   const [templates, setTemplates] = useState([]);
   const [name, setName] = useState("");
 
@@ -36,7 +36,7 @@ const MemeSelect = ({ navigation }) => {
               <TemplateItem
                 template={item}
                 key={index}
-                onSelectMeme={(item) => navigation.navigate('MemeCreate', { template: item })} />
+                onSelect={(item) => onSelectMeme(item)} />
             )}
           />
         }

@@ -19,6 +19,8 @@ import domtoimage from 'dom-to-image';
 import EditableText from 'src/components/EditableTextComponent/EditableText';
 import DragableOption from 'src/components/DragableOptionComponent/DragableOption';
 import DraggableContainer from 'src/components/DragableContainerComponent/DragableContainer';
+import DragableTemplate from 'src/components/DragableTemplateComponent/DragableTemplate';
+import { Image, MessageSquare } from 'react-native-feather';
 
 const MemeCreate = () => {
 
@@ -133,7 +135,16 @@ const MemeCreate = () => {
           <DragableOption
             key={`dragable-text-option`}
             onArrangeEnd={(x, y) => onArrangeEnd("text", x, y)}
-            initialPosition={{ x: (width * (Platform.OS === 'web' ? 0.5 : 0.8)) * 0.9, y: height * 0.3 }} />
+            initialPosition={{ x: (width * (Platform.OS === 'web' ? 0.5 : 0.8)) * 0.9, y: height * 0.3 }}>
+            <Pressable maxPointers={1}>
+              <MessageSquare stroke="black" fill="#fff" width={40} height={40} />
+            </Pressable>
+          </DragableOption>
+
+          <DragableTemplate
+            onArrangeEnd={(template, x, y) => onArrangeEnd(template, x, y)}
+            initialPosition={{ x: (width * (Platform.OS === 'web' ? 0.5 : 0.8)) * 0.9, y: height * 0.5 }}
+            parentDimensions={{ width: width * (Platform.OS === 'web' ? 0.5 : 0.9), height: height }} />
 
           {/* Capture/Share Button */}
           <CaptureOption onCapture={handleCapture} initialPosition={{ x: (width * (Platform.OS === 'web' ? 0.5 : 0.8)) * 0.9, y: height * 0.4 }} />
@@ -147,7 +158,7 @@ const MemeCreate = () => {
               setSelectedTextIndex(-1);
             }}>
             {/* Meme Image display */}
-            {currentMeme && <ZoomableImage source={{ uri: currentMeme.img }} />}
+            {currentMeme && <ZoomableImage source={currentMeme.blob} />}
             {/* Draggable Texts */}
             {texts.map((item, index) => (
               item.type === "text" &&

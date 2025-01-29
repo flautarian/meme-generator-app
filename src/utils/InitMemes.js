@@ -1,163 +1,194 @@
 export default initMemes =[
-    {
-      "name": "Drake Hotline Bling",
-      "img": "https://i.imgflip.com/30b1gx.jpg"
-    },
-    {
-      "name": "Distracted Boyfriend",
-      "img": "https://i.imgflip.com/1ur9b0.jpg"
-    },
-    {
-      "name": "Two Buttons",
-      "img": "https://i.imgflip.com/1g8my4.jpg"
-    },
-    {
-      "name": "Left Exit 12 Off Ramp",
-      "img": "https://i.imgflip.com/22bdq6.jpg"
-    },
-    {
-      "name": "Change My Mind",
-      "img": "https://i.imgflip.com/24y43o.jpg"
-    },
-    {
-      "name": "Batman Slapping Robin",
-      "img": "https://i.imgflip.com/9ehk.jpg"
-    },
-    {
-      "name": "UNO Draw 25 Cards",
-      "img": "https://i.imgflip.com/3lmzyx.jpg"
-    },
-    {
-      "name": "Running Away Balloon",
-      "img": "https://i.imgflip.com/261o3j.jpg"
-    },
-    {
-      "name": "One Does Not Simply",
-      "img": "https://i.imgflip.com/1bij.jpg"
-    },
-    {
-      "name": "Expanding Brain",
-      "img": "https://i.imgflip.com/1jwhww.jpg"
-    },
-    {
-      "name": "Waiting Skeleton",
-      "img": "https://i.imgflip.com/2fm6x.jpg"
-    },
-    {
-      "name": "Mocking Spongebob",
-      "img": "https://i.imgflip.com/1otk96.jpg"
-    },
-    {
-      "name": "Boardroom Meeting Suggestion",
-      "img": "https://i.imgflip.com/m78d.jpg"
-    },
-    {
-      "name": "Disaster Girl",
-      "img": "https://i.imgflip.com/23ls.jpg"
-    },
-    {
-      "name": "Woman Yelling At Cat",
-      "img": "https://i.imgflip.com/345v97.jpg"
-    },
-    {
-      "name": "X, X Everywhere",
-      "img": "https://i.imgflip.com/1ihzfe.jpg"
-    },
-    {
-      "name": "Ancient Aliens",
-      "img": "https://i.imgflip.com/26am.jpg"
-    },
-    {
-      "name": "Buff Doge vs. Cheems",
-      "img": "https://i.imgflip.com/43a45p.png"
-    },
-    {
-      "name": "Gru's Plan",
-      "img": "https://i.imgflip.com/26jxvz.jpg"
-    },
-    {
-      "name": "Roll Safe Think About It",
-      "img": "https://i.imgflip.com/1h7in3.jpg"
-    },
-    {
-      "name": "Bernie I Am Once Again Asking For Your Support",
-      "img": "https://i.imgflip.com/3oevdk.jpg"
-    },
-    {
-      "name": "Blank Nut Button",
-      "img": "https://i.imgflip.com/1yxkcp.jpg"
-    },
-    {
-      "name": "Futurama Fry",
-      "img": "https://i.imgflip.com/1bgw.jpg"
-    },
-    {
-      "name": "Tuxedo Winnie The Pooh",
-      "img": "https://i.imgflip.com/2ybua0.jpg"
-    },
-    {
-      "name": "Surprised Pikachu",
-      "img": "https://i.imgflip.com/2kbn1e.jpg"
-    },
-    {
-      "name": "Inhaling Seagull",
-      "img": "https://i.imgflip.com/1w7ygt.jpg"
-    },
-    {
-      "name": "Leonardo Dicaprio Cheers",
-      "img": "https://i.imgflip.com/39t1o.jpg"
-    },
-    {
-      "name": "Epic Handshake",
-      "img": "https://i.imgflip.com/1w18yq.jpg"
-    },
-    {
-      "name": "Hide the Pain Harold",
-      "img": "https://i.imgflip.com/gk5el.jpg"
-    },
-    {
-      "name": "The Scroll Of Truth",
-      "img": "https://i.imgflip.com/21tqf4.jpg"
-    },
-    {
-      "name": "Is This A Pigeon",
-      "img": "https://i.imgflip.com/1o00in.jpg"
-    },
-    {
-      "name": "Sad Pablo Escobar",
-      "img": "https://i.imgflip.com/1c1uej.jpg"
-    },
-    {
-      "name": "The Rock Driving",
-      "img": "https://i.imgflip.com/grr.jpg"
-    },
-    {
-      "name": "The Most Interesting Man In The World",
-      "img": "https://i.imgflip.com/1bh8.jpg"
-    },
-    {
-      "name": "Panik Kalm Panik",
-      "img": "https://i.imgflip.com/3qqcim.png"
-    },
-    {
-      "name": "Monkey Puppet",
-      "img": "https://i.imgflip.com/2gnnjh.jpg"
-    },
-    {
-      "name": "Y'all Got Any More Of That",
-      "img": "https://i.imgflip.com/21uy0f.jpg"
-    },
-    {
-      "name": "Oprah You Get A",
-      "img": "https://i.imgflip.com/gtj5t.jpg"
-    },
-    {
-      "name": "Always Has Been",
-      "img": "https://i.imgflip.com/3g95hb.jpg"
-    },
-    {
-      "name": "Doge",
-      "img": "https://i.imgflip.com/4t0m5.jpg"
-    }
-  ]
-  
+  {
+    "name": "Drake Hotline Bling",
+    "blob": require("src/assets/templateImages/drake.jpg")
+  },
+  {
+    "name": "Distracted Boyfriend",
+    "blob": require("src/assets/templateImages/boyfriend.jpg")
+  },
+  {
+    "name": "Two Buttons",
+    "blob": require("src/assets/templateImages/2buttons.jpg")
+  },
+  {
+    "name": "Left Exit 12 Off Ramp",
+    "blob": require("src/assets/templateImages/ramp.jpg")
+  },
+  {
+    "name": "Change My Mind",
+    "blob": require("src/assets/templateImages/myMind.jpg")
+  },
+  {
+    "name": "Batman Slapping Robin",
+    "blob": require("src/assets/templateImages/batman.jpg")
+  },
+  {
+    "name": "UNO Draw 25 Cards",
+    "blob": require("src/assets/templateImages/draw25.jpg")
+  },
+  {
+    "name": "Running Away Balloon",
+    "blob": require("src/assets/templateImages/runningAwayBaloon.jpg")
+  },
+  {
+    "name": "One Does Not Simply",
+    "blob": require("src/assets/templateImages/doesNotSimply.jpg")
+  },
+  {
+    "name": "Expanding Brain",
+    "blob": require("src/assets/templateImages/expandingBrain4.jpg")
+  },
+  {
+    "name": "Waiting Skeleton",
+    "blob": require("src/assets/templateImages/waitingSkeleton.jpg")
+  },
+  {
+    "name": "Mocking Spongebob",
+    "blob": require("src/assets/templateImages/mockingSpongebob.jpg")
+  },
+  {
+    "name": "Boardroom Meeting Suggestion",
+    "blob": require("src/assets/templateImages/meetingRoom.jpg")
+  },
+  {
+    "name": "Disaster Girl",
+    "blob": require("src/assets/templateImages/disasterGirl.jpg")
+  },
+  {
+    "name": "Woman Yelling At Cat",
+    "blob": require("src/assets/templateImages/womenYellingCat.jpg")
+  },
+  {
+    "name": "X, X Everywhere",
+    "blob": require("src/assets/templateImages/XXAnywhere.jpg")
+  },
+  {
+    "name": "Ancient Aliens",
+    "blob": require("src/assets/templateImages/ancientAliens.jpg")
+  },
+  {
+    "name": "Buff Doge vs. Cheems",
+    "blob": require("src/assets/templateImages/buffDogeVsCheems.png")
+  },
+  {
+    "name": "Gru's Plan",
+    "blob": require("src/assets/templateImages/grusPlan.jpg")
+  },
+  {
+    "name": "Roll Safe Think About It",
+    "blob": require("src/assets/templateImages/thinkAboutIt.jpg")
+  },
+  {
+    "name": "Bernie I Am Once Again Asking For Your Support",
+    "blob": require("src/assets/templateImages/onceAgain.jpg")
+  },
+  {
+    "name": "Blank Nut Button",
+    "blob": require("src/assets/templateImages/blankNutButton.jpg")
+  },
+  {
+    "name": "Futurama Fry",
+    "blob": require("src/assets/templateImages/futuramaFry.jpg")
+  },
+  {
+    "name": "Tuxedo Winnie The Pooh",
+    "blob": require("src/assets/templateImages/winnie-the-poo-tuxedo.png")
+  },
+  {
+    "name": "Surprised Pikachu",
+    "blob": require("src/assets/templateImages/surprisedPikachu.jpg")
+  },
+  {
+    "name": "Inhaling Seagull",
+    "blob": require("src/assets/templateImages/InhalingSeagull.jpg")
+  },
+  {
+    "name": "Leonardo Dicaprio Cheers",
+    "blob": require("src/assets/templateImages/dicaprioCheers.jpg")
+  },
+  {
+    "name": "Epic Handshake",
+    "blob": require("src/assets/templateImages/epic-handshake.png")
+  },
+  {
+    "name": "Hide the Pain Harold",
+    "blob": require("src/assets/templateImages/hideThePainHarold.jpg")
+  },
+  {
+    "name": "The Scroll Of Truth",
+    "blob": require("src/assets/templateImages/scrollOfTruth.jpg")
+  },
+  {
+    "name": "Is This A Pigeon",
+    "blob": require("src/assets/templateImages/isThisAPigeon.jpg")
+  },
+  {
+    "name": "Sad Pablo Escobar",
+    "blob": require("src/assets/templateImages/sadPabloEscobar.jpg")
+  },
+  {
+    "name": "The Rock Driving",
+    "blob": require("src/assets/templateImages/rockDriving.jpg")
+  },
+  {
+    "name": "The Most Interesting Man In The World",
+    "blob": require("src/assets/templateImages/mostInterestingMan.jpg")
+  },
+  {
+    "name": "Panik Kalm Panik",
+    "blob": require("src/assets/templateImages/PanikCalmPanik.png")
+  },
+  {
+    "name": "Monkey Puppet",
+    "blob": require("src/assets/templateImages/monkeyPuppet.jpg")
+  },
+  {
+    "name": "Y'all Got Any More Of That",
+    "blob": require("src/assets/templateImages/gotAnyMoreOfThat.jpg")
+  },
+  {
+    "name": "Oprah You Get A",
+    "blob": require("src/assets/templateImages/OprahYouGetA.jpg")
+  },
+  {
+    "name": "Always Has Been",
+    "blob": require("src/assets/templateImages/always-has-been.png")
+  },
+  {
+    "name": "Doge",
+    "blob": require("src/assets/templateImages/doge.jpg")
+  },
+  {
+    "name": "Trump sign",
+    "blob": require("src/assets/templateImages/trumpSign.png")
+  },
+  {
+    "name": "Couple sospicious bed",
+    "blob": require("src/assets/templateImages/coupleSospiciousBed.png")
+  },
+  {
+    "name": "Success kid",
+    "blob": require("src/assets/templateImages/successKid.png")
+  },
+  {
+    "name": "Bycycle stick",
+    "blob": require("src/assets/templateImages/cycleStick.png")
+  },
+  {
+    "name": "The office same picture",
+    "blob": require("src/assets/templateImages/theOfficeSamePicture.png")
+  },
+  {
+    "name": "Clown process",
+    "blob": require("src/assets/templateImages/clownProcess.png")
+  },
+  {
+    "name": "Sleeping Shaq",
+    "blob": require("src/assets/templateImages/sleepingShaq.png")
+  },
+  {
+    "name": "This is where I'd put it if I had one",
+    "blob": require("src/assets/templateImages/thisIsWhereIdPut.png")
+  }
+];

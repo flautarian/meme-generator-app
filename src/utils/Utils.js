@@ -1,3 +1,4 @@
+import initMemeDecorations from "./initMemeDecorations";
 import InitMemes from "./InitMemes";
 
 export const Utils = {
@@ -6,5 +7,8 @@ export const Utils = {
     },
     getInitMemes: () => {
         return InitMemes;
+    },
+    getInitMemeDecorations: () => {
+        return initMemeDecorations;
     }
 }

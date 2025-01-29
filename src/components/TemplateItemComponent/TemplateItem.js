@@ -17,7 +17,7 @@ const { width, height } = Dimensions.get('window');
 
 const EASING = Easing.bezier(1, -1, 0.3, 1.43);
 
-const TemplateItem = ({ template, onSelectMeme }) => {
+const TemplateItem = ({ template, onSelect, imgSize }) => {
     const { img, name } = template;
 
     const translateX = useSharedValue(0);
@@ -71,9 +71,11 @@ const TemplateItem = ({ template, onSelectMeme }) => {
     return (
         <GestureHandlerRootView style={styles.container}>
             <GestureDetector gesture={hover}>
-                <Pressable onPress={() => onSelectMeme(template)}>
+                <Pressable onPress={() => onSelect(template)}>
                     <Animated.View style={[styles.box, boxAnimatedStyle]}>
-                        <Image src={img} source={img} name={name} style={styles.imageItem} resizeMode='stretch' />
+                        { !!img &&
+                            <Image src={{uri: `file://${img}`}} source={{uri: `file://${img}`}} name={name} style={[styles.imageItem, { width: imgSize || (width * 30) / 100 }]} resizeMode='stretch' /> 
+                        }
                     </Animated.View>
                 </Pressable>
             </GestureDetector>
@@ -87,12 +89,10 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     box: {
-        width: (width * 30) / 100,
         borderRadius: 20,
         cursor: 'pointer',
     },
     imageItem: {
-        width: (width * 30) / 100,
         aspectRatio: 3 / 2,
         borderRadius: 10,
     },

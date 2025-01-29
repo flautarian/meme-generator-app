@@ -13,6 +13,18 @@ else {
   SQLite = require('expo-sqlite');
 }
 
+// Helper function to convert image to base64
+const getBase64Image = async (imagePath) => {
+  const response = await fetch(imagePath);
+  const blob = await response.blob();
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+};
+
 // Define a function-based Dexie instance
 
 function createDatabase(name) {
@@ -30,13 +42,32 @@ const createWebWorkerDb = () => {
   const db = new Dexie(name);
   // Define tables and their schemas
   db.version(1).stores({
-    templates: '++id, img, name', // Auto-incrementing ID, image path, and name
+    templates: '++id, name, blob', // Auto-incrementing ID, image path, and name
+    decorations: '++id, name, blob', // Auto-incrementing ID, image path, and name
     inputs: '++id, templateId, xAxis, yAxis, value', // Auto-incrementing ID, FK, coordinates, and value
   });
-  // check if db is empty to fill with initMemes data
+  // check if templates table is empty to fill with initMemes data
   db.templates.count().then((count) => {
     if (count === 0) {
-      db.templates.bulkAdd(Utils.getInitMemes()).catch((err) => {
+      let c = Utils.getInitMemes();
+      c.forEach(async (meme) => {
+        // process each image to convert it to base64 to save in db
+        meme.blob = await getBase64Image(meme.blob);
+      });
+      db.templates.bulkAdd(c).catch((err) => {
+        console.error('Failed to insert initial memes:', err);
+      });
+    }
+  });
+  // check if decorations table is empty to fill with initMemeDecorations data
+  db.decorations.count().then((count) => {
+    if (count === 0) {
+      let c = Utils.getInitMemeDecorations();
+      c.forEach(async (decoration) => {
+        // process each image to convert it to base64 to save in db
+        decoration.blob = await getBase64Image(decoration.blob);
+      });
+      db.decorations.bulkAdd(c).catch((err) => {
         console.error('Failed to insert initial memes:', err);
       });
     }
@@ -51,14 +82,28 @@ const createMobileDb = () => {
     return;
 
   console.log('Creating/Opening Sqlite database...');
-  const db = SQLite.openDatabaseSync('meme-generator.db');
+  const db = SQLite.openDatabaseSync('meme-factory.db');
 
   try {
+    const dropTablesQuery = `
+        DROP TABLE IF EXISTS templates;
+        DROP TABLE IF EXISTS decorations;
+        DROP TABLE IF EXISTS inputs;
+      `;
+
     const createTemplatesTableQuery = `
           CREATE TABLE IF NOT EXISTS templates (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            img TEXT NOT NULL,
-            name TEXT NOT NULL
+            name TEXT NOT NULL,
+            blob TEXT NOT NULL  -- Base64-encoded image string
+          );
+        `;
+
+    const createDecorationsTableQuery = `
+          CREATE TABLE IF NOT EXISTS decorations (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            blob TEXT NOT NULL  -- Base64-encoded image string
           );
         `;
 
@@ -74,23 +119,43 @@ const createMobileDb = () => {
         `;
 
     const insertTemplateQuery = `
-          INSERT INTO templates (img, name) VALUES (?, ?);
-        `;
+        INSERT INTO templates (blob, name) VALUES (?, ?);
+      `;
+
+    const insertDecorationQuery = `
+        INSERT INTO decorations (blob, name) VALUES (?, ?);
+      `;
 
     // creating if case, templates and inputs tables
+    //db.runSync(dropTablesQuery);
     db.runSync(createTemplatesTableQuery);
+    db.runSync(createDecorationsTableQuery);
     db.runSync(createInputsTableQuery);
 
     console.log('Database initialized with schema!');
 
     // Initialize with default data if empty
     const initialTemplates = db.getAllSync('SELECT COUNT(*) AS count FROM templates;');
-    const result = initialTemplates[0];
+    let result = initialTemplates[0];
 
     if (result.count == 0) {
-      for (let i = 0; i < initMemes.length; i++) {
-        const meme = initMemes[i];
-        db.runSync(insertTemplateQuery, [meme.img, meme.name]);
+      for (let i = 0; i < Utils.getInitMemes().length; i++) {
+        const meme = Utils.getInitMemes()[i];
+        db.runSync(insertTemplateQuery, [meme.blob, meme.name]);
+      }
+    }
+    const createdTemplates = db.getAllSync('SELECT COUNT(*) AS count FROM templates;');
+    let resultCreatedTemplates = createdTemplates[0];
+    console.log("Created templates:", resultCreatedTemplates.count);
+
+
+    const initialDecorations = db.getAllSync('SELECT COUNT(*) AS count FROM decorations;');
+    result = initialDecorations[0];
+
+    if (result.count == 0) {
+      for (let i = 0; i < Utils.getInitMemeDecorations().length; i++) {
+        const decoration = Utils.getInitMemeDecorations()[i];
+        db.runSync(insertDecorationQuery, [decoration.blob, decoration.name]);
       }
     }
   } catch (error) {
