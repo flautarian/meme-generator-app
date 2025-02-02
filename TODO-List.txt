@@ -3,7 +3,6 @@ TODO List:
 Scroll on big images
 Copy to clipboard the image instead of base64 image code
 Border line in draggable texts
-Extrapolate DragableTexts to convert it into DragableContainer with EditableText component as children
 Create the meme library sidebar
 Try to introduce draggable meme sidebar results, to set main meme when user drags a tempalte into the main screen
 Introduce de Dragable image complements

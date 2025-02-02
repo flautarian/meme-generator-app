@@ -12,13 +12,11 @@ import Animated, {
 const DragableOption = ({ onArrangeEnd, onDoubleTap, initialPosition, children, canMove = true }) => {
 
     const position = {
-        x: useSharedValue(0),
-        y: useSharedValue(0),
+        x: useSharedValue(initialPosition.x),
+        y: useSharedValue(initialPosition.y),
     };
 
     const scale = useSharedValue(1);
-
-    const originOffset = useRef({ oX: 0, oY: 0 });
 
     const dimensions = useRef({ width: 0, height: 0 });
 
@@ -43,9 +41,6 @@ const DragableOption = ({ onArrangeEnd, onDoubleTap, initialPosition, children, 
         PanResponder.create({
             onStartShouldSetPanResponder: () => true,
             onMoveShouldSetPanResponder: () => true,
-            onPanResponderStart: (_, gestureState) => {
-                onDragStart(gestureState);
-            },
             onPanResponderMove: (_, gestureState) =>
                 onDrag(gestureState),
             onPanResponderRelease: (_, gestureState) => {
@@ -57,13 +52,8 @@ const DragableOption = ({ onArrangeEnd, onDoubleTap, initialPosition, children, 
     const getNewPosition = useCallback((gestureState) => {
         const { moveX, moveY } = gestureState;
         const { width, height } = dimensions.current;
-        const { oX, oY } = originOffset.current;
-
-        if (Platform.OS === 'web')
-            return { x: moveX - oX + initialPosition.x - width / 2, y: moveY - oY + initialPosition.y - height / 2 };
-        // IOS
-        return { x: moveX - initialPosition.x - width / 2, y: moveY - initialPosition.y - height / 2 };
-    }, [dimensions, initialPosition]);
+        return { x: moveX - (width * scale.value) / 2, y: moveY - (height * scale.value) / 2 };
+    }, [dimensions]);
 
     // handle drag function
     const onDrag = useCallback((gestureState) => {
@@ -75,27 +65,20 @@ const DragableOption = ({ onArrangeEnd, onDoubleTap, initialPosition, children, 
         position.y.value = newPos.y;
     }, []);
 
-    // start drag function
-    const onDragStart = useCallback((gestureState) => {
-        // Scale the component
-        scale.value = withSpring(1.5, scaleSpringConfig);
-    }, [scale]);
-
-
     // end drag function
     const onDragRelease = useCallback((gestureState) => {
         // send signal to create new object in panel
         const newPos = getNewPosition(gestureState);
-        if(!!onArrangeEnd)
-            onArrangeEnd(newPos.x + initialPosition.x, newPos.y + initialPosition.y);
+        if (!!onArrangeEnd)
+            onArrangeEnd(newPos.x, newPos.y);
 
         // Reset position
-        position.x.value = withSpring(0, returnSpringConfig);
-        position.y.value = withSpring(0, returnSpringConfig);
+        position.x.value = withSpring(initialPosition.x, returnSpringConfig);
+        position.y.value = withSpring(initialPosition.y, returnSpringConfig);
 
         // Reset scale
         scale.value = withSpring(1, scaleSpringConfig);
-    }, [position, initialPosition]);
+    }, [position]);
 
     // animated style
     const dragAnimatedStyle = useAnimatedStyle(() => ({
@@ -109,31 +92,22 @@ const DragableOption = ({ onArrangeEnd, onDoubleTap, initialPosition, children, 
     }));
 
     return (
-        <View
+        <Animated.View
+            style={[styles.draggableBox, canMove && dragAnimatedStyle]}
+            {...panResponder.panHandlers}
             onLayout={(event) => {
-                const { width, height, x, y, top, left } = event.nativeEvent.layout;
-                originOffset.current = { oX: x + (left | 0) + width / 2, oY: y + (top | 0) + height / 2 };
-            }}
-            style={[styles.container, { top: initialPosition.y, left: initialPosition.x }]}>
-            <Animated.View
-                style={[styles.draggableBox, canMove && dragAnimatedStyle]}
-                {...panResponder.panHandlers}
-                onLayout={(event) => {
-                    const { width, height } = event.nativeEvent.layout;
-                    dimensions.current = { width, height };
-                }}>
-                {children}
-            </Animated.View>
-        </View>
+                const { width, height } = event.nativeEvent.layout;
+                dimensions.current = { width, height };
+            }}>
+            {children}
+        </Animated.View>
     );
 }
 
 const styles = StyleSheet.create({
-    container: {
-        position: 'absolute',
-        zIndex: 10,
-    },
     draggableBox: {
+        transformOrigin: '0% 0%',
+        zIndex: 10,
         width: 60,
         height: 60,
         backgroundColor: 'blue',
@@ -141,7 +115,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 50,
-        zIndex: 10,
     },
 });
 

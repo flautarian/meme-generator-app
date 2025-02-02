@@ -10,20 +10,15 @@ const AppRouterBase = () => {
     const Drawer = createDrawerNavigator();
 
     return (
-        <Animated.View style={styles.container}>
-            {/* Gradient Background */}
-            
-                        {/* <MemeSelect /> */}
-            <NavigationContainer>
-                <Drawer.Navigator
-                    drawerContent={() => (
-                        <Text>TEST</Text>
-                    )}
-                >
-                    <Drawer.Screen name="MemeCreate" component={MemeCreate} />
-                </Drawer.Navigator>
-            </NavigationContainer>
-        </Animated.View>
+        <NavigationContainer>
+            <Drawer.Navigator
+                drawerContent={() => (
+                    <Text>TEST</Text>
+                )}
+            >
+                <Drawer.Screen name="MemeCreate" component={MemeCreate} options={{ headerShown: false }} />
+            </Drawer.Navigator>
+        </NavigationContainer>
     );
 };
 
