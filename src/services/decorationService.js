@@ -1,8 +1,8 @@
 import db from './database';
 
 const DecorationsService = {
-  async addDecoration(img, name) {
-    const id = await db.decorations.add({ img, name });
+  async addDecoration(blob, name) {
+    const id = await db.decorations.add({ blob, name });
     return id;
   },
 

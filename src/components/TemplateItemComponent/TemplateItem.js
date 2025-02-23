@@ -1,100 +1,54 @@
 import React from 'react';
-import {
-    Gesture,
-    GestureDetector,
-    GestureHandlerRootView,
-} from 'react-native-gesture-handler';
-import { Dimensions, Image, Pressable, StyleSheet, Text } from 'react-native';
+import { Image, Platform, Pressable, StyleSheet, Text } from 'react-native';
 import Animated, {
-    Easing,
-    interpolateColor,
-    useAnimatedStyle,
-    useSharedValue,
-    withTiming,
+    interpolateColor, useAnimatedStyle, useSharedValue,
 } from 'react-native-reanimated';
+import { Crosshair, XCircle } from 'react-native-feather';
+import { Utils } from 'src/utils/Utils';
 
-const { width, height } = Dimensions.get('window');
+const TemplateItem = ({ template, onSelect, imgSize, onDelete }) => {
 
-const EASING = Easing.bezier(1, -1, 0.3, 1.43);
+    const { blob, name } = template;
 
-const TemplateItem = ({ template, onSelect, imgSize }) => {
-    const { img, name } = template;
+    const isFromUser = Utils.checkIfImgLoadedFromUser(blob);
 
-    const translateX = useSharedValue(0);
-    const translateY = useSharedValue(0);
+    const isMobile = Platform.OS === "web" ? false : true;
 
     const progress = useSharedValue(0);
 
-    const startX = useSharedValue(0);
-    const startY = useSharedValue(0);
-
-    const hover = Gesture.Hover()
-        .onStart((event) => {
-            startX.value = event.x;
-            startY.value = event.y;
-        })
-        .onUpdate((event) => {
-            translateX.value = (event.x - startX.value) * 0.1;
-            translateY.value = (event.y - startY.value) * 0.1;
-
-            const distance = Math.sqrt(Math.pow(translateX.value, 2) + Math.pow(translateY.value, 2));
-
-            progress.value = distance / 35;
-        })
-        .onEnd(() => {
-            translateX.value = withTiming(0, {
-                duration: 400,
-                easing: EASING,
-            });
-            translateY.value = withTiming(0, {
-                duration: 400,
-                easing: EASING,
-            });
-            progress.value = withTiming(0, {
-                duration: 400,
-                easing: EASING,
-            });
-        });
-
     const boxAnimatedStyle = useAnimatedStyle(() => ({
-        transform: [
-            { translateX: translateX.value },
-            { translateY: translateY.value },
-        ],
         backgroundColor: interpolateColor(
             progress.value,
             [0, 1],
             ['#b58df1', '#fa7f7c']
-        )
+        ),
+        width: imgSize,
+        height: imgSize,
     }));
 
     return (
-        <GestureHandlerRootView style={styles.container}>
-            <GestureDetector gesture={hover}>
-                <Pressable onPress={() => onSelect(template)}>
-                    <Animated.View style={[styles.box, boxAnimatedStyle]}>
-                        { !!img &&
-                            <Image src={{uri: `file://${img}`}} source={{uri: `file://${img}`}} name={name} style={[styles.imageItem, { width: imgSize || (width * 30) / 100 }]} resizeMode='stretch' /> 
-                        }
-                    </Animated.View>
-                </Pressable>
-            </GestureDetector>
-        </GestureHandlerRootView>
+        <Pressable onPress={() => onSelect(template)} style={[styles.container]}>
+            {name !== "/Upload a file" &&
+                <Pressable onPress={() => onDelete(template)} style={{ position: "absolute", zIndex: 10, top: 0.5, right: 0.5, width: "auto", height: "auto" }}>
+                    <XCircle stroke="red" fill="white" />
+                </Pressable>}
+            <Animated.View style={[styles.box, boxAnimatedStyle]}>
+                <Image source={isFromUser && isMobile ? { uri: blob } : blob} name={name} style={{ width: imgSize * .9, height: imgSize * .9, alignSelf: "center" }} resizeMode='contain' />
+            </Animated.View>
+            <Text style={{ color: 'white', fontSize: 12, fontWeight: 'bold', position: 'absolute', bottom: 10, left: 10 }}>{name}</Text>
+        </Pressable>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
-        alignItems: 'center',
-        justifyContent: 'center',
+        position: "relative",
+        width: "min-content"
     },
     box: {
+        flex: 1,
         borderRadius: 20,
         cursor: 'pointer',
-    },
-    imageItem: {
-        aspectRatio: 3 / 2,
-        borderRadius: 10,
     },
 });
 

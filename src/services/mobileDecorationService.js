@@ -1,11 +1,11 @@
 import db from './database'; // SQLite database instance
 
 const SQLiteDecorationsService = {
-  addDecoration(img, name) {
+  addDecoration(blob, name) {
     return new Promise((resolve, reject) => {
       const results = db.getAllSync(
-        'INSERT INTO decorations (img, name) VALUES (?, ?);',
-        [img, name]);
+        'INSERT INTO decorations (blob, name) VALUES (?, ?);',
+        [blob, name]);
       resolve(results);
     });
   },
@@ -38,11 +38,11 @@ const SQLiteDecorationsService = {
   },
 
   updateDecoration(id, updatedData) {
-    const { img, name } = updatedData;
+    const { blob, name } = updatedData;
     return new Promise((resolve, reject) => {
       const results = db.getAllSync(
-        'UPDATE decorations SET img = ?, name = ? WHERE id = ?;',
-        [img, name, id]);
+        'UPDATE decorations SET blob = ?, name = ? WHERE id = ?;',
+        [blob, name, id]);
       resolve(results);
     });
   },

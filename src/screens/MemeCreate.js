@@ -1,34 +1,30 @@
 import {
-  View,
   StyleSheet,
   SafeAreaView,
   Pressable,
   Dimensions,
+  Image,
 } from 'react-native';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { captureRef } from "react-native-view-shot";
-import ZoomableImage from 'src/components/ZoomableImageComponent/ZoomableImage';
 import { Platform } from 'react-native';
 import { getRandomMeme } from 'src/hooks/useTemplates';
-import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import { useSharedValue, withTiming } from 'react-native-reanimated';
 import LavaLampBackground from 'src/components/LavaLampBackgroundComponent/LavaLampBackground';
 import randomColor from 'randomcolor';
-import CaptureOption from 'src/components/CaptureOptionComponent/CaptureOption';
+import StaticOption from 'src/components/CaptureOptionComponent/CaptureOption';
 import domtoimage from 'dom-to-image';
 import EditableText from 'src/components/EditableTextComponent/EditableText';
 import DragableOption from 'src/components/DragableOptionComponent/DragableOption';
 import DraggableContainer from 'src/components/DragableContainerComponent/DragableContainer';
 import DragableTemplate from 'src/components/DragableTemplateComponent/DragableTemplate';
-import { MessageSquare } from 'react-native-feather';
-import Slider from '@react-native-community/slider';
-import { ScrollView } from 'react-native-gesture-handler';
+import { Camera, Edit, MessageSquare } from 'react-native-feather';
 import React from 'react';
+import EditableDecoration from 'src/components/EditableDecorationComponent/EditableDecoration';
 
-const MemeCreate = () => {
+const MemeCreate = ({ navigation, currentMeme}) => {
 
   const { width, height } = Dimensions.get('window');
-
-  const [currentMeme, setCurrentMeme] = useState(null);
 
   const [texts, setTexts] = useState([]);
 
@@ -39,8 +35,6 @@ const MemeCreate = () => {
   const progress = useSharedValue(0);
 
   const initColor = useSharedValue("");
-
-  const imageScale = useSharedValue(0.75);
 
   // Deletes the text element
   const deleteText = useCallback((index) => {
@@ -87,50 +81,29 @@ const MemeCreate = () => {
 
   // Handles the arrangement of the text elements
   const onArrangeEnd = useCallback(
-    (type, x, y) => {
-      if (type === "text") {
-        setTexts((prevTexts) => {
-          let textLabel = "Label " + (prevTexts.length + 1);
-          const newItem = {
-            value: textLabel,
-            type: "text",
-            x: (x - 75) * imageScale.value,
-            y: (y - 50) * imageScale.value,
-            width: 150,
-            height: 50,
-            rotation: 0
-          };
-          setSelectedTextIndex(prevTexts.length);
-          return [...prevTexts, newItem];
-        });
-      }
+    (type, x, y, value) => {
+      if (!value)
+        return;
+      setTexts((prevTexts) => {
+        const newItem = {
+          value,
+          type,
+          x: x - (x > width - 150 ? 150 : 75) + (x < 0 ? Math.abs(x) : 0),
+          y: y - (y > height - 150 ? 150 : 50) + (y < 0 ? Math.abs(y) : 0),
+          width: 150,
+          height: 50,
+          rotation: 0
+        };
+        setSelectedTextIndex(prevTexts.length);
+        return [...prevTexts, newItem];
+      });
     },
     [texts],
   );
 
-
-  // animated style
-  const imageAnimatedScaleStyle = useAnimatedStyle(() => ({
-    transform: [
-      { scaleX: imageScale.value },
-      { scaleY: imageScale.value },
-    ],
-    //transformOrigin: '50% 50%',
-    flexGrow: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  }));
-
   // Trigger the gradient animation
-  // Handles the random selection of the meme if case of no election from drawer
   useEffect(() => {
     progress.value = withTiming(1, { duration: 3000 });
-    if (!currentMeme) {
-      setTimeout(async () => {
-        const meme = await getRandomMeme();
-        setCurrentMeme(meme);
-      }, 1);
-    }
     // random color background generation
     initColor.value = randomColor({ count: 1, luminosity: 'dark' })[0];
   }, []);
@@ -140,70 +113,60 @@ const MemeCreate = () => {
       {/* Gradient Background */}
       <LavaLampBackground count={10} hue={initColor.value} />
 
+      {/* Capture/Share Button */}
+      <StaticOption onPress={() => navigation.openDrawer()} initialPosition={{ x: width - 75, y: height * 0.25 }}>
+        <Edit stroke="black" fill="#fff" width={40} height={40} />
+      </StaticOption>
+
       {/* Draggable Options */}
+      {/* Dragable Decoration display */}
+      <DragableTemplate
+        onMenuOpenCallBack={() => setSelectedTextIndex(-1)}
+        onArrangeEnd={(x, y, value) => onArrangeEnd("decoration", x, y, value)}
+        initialPosition={{ x: width - width * 0.75 - 25, y: height * 0.85 }}
+        parentDimensions={{ width: width, height: height }} />
 
       {/* Draggable Text Option */}
       <DragableOption
         key={`dragable-text-option`}
-        onArrangeEnd={(x, y) => onArrangeEnd("text", x, y)}
-        initialPosition={{ x: width - width * 0.2, y: height * 0.2 }}>
+        onArrangeEnd={(x, y, value) => onArrangeEnd("text", x, y, value)}
+        initialPosition={{ x: width - width * 0.5 - 25, y: height * 0.85 }}>
         <MessageSquare stroke="black" fill="#fff" width={40} height={40} />
       </DragableOption>
 
-      {/* Dragable Decoration display */}
-      <DragableTemplate
-        onArrangeEnd={(template, x, y) => onArrangeEnd(template, x, y)}
-        initialPosition={{ x: width - width * 0.2, y: height * 0.4 }}
-        parentDimensions={{ width: width - width * 0.2, height: height }} />
-
       {/* Capture/Share Button */}
-      <CaptureOption onCapture={handleCapture} initialPosition={{ x: width - width * 0.2, y: height * 0.3 }} />
+      <StaticOption onPress={handleCapture} initialPosition={{ x: width - width * 0.25 - 25, y: height * 0.85 }}>
+        <Camera stroke="black" fill="#fff" width={40} height={40} />
+      </StaticOption>
+
+
+      {/* Draggable Texts */}
+      {texts.map((item, index) => {
+        const child = item.type === "text" ? <EditableText /> : <EditableDecoration />;
+        return <DraggableContainer
+          key={`dragable-container-${index} - ${item.x} - ${item.y}`}
+          item={item}
+          index={index}
+          selected={index === selectedTextIndex}
+          onSelect={(i) => setSelectedTextIndex(i)}
+          onDelete={() => deleteText(index)}
+        >
+          {child}
+        </DraggableContainer>
+      })
+      }
 
       <Pressable
         maxPointers={1}
-        style={{ flex: 1, justifyContent: 'center', width: width, height: height }}
+        style={styles.imageWrapper}
         onPress={() => {
           setSelectedTextIndex(-1);
         }}>
-        <ScrollView
-          scrollEnabled={selectedTextIndex === -1}>
-
-          {/* Meme Image display */}
-          {currentMeme && <Animated.View style={[imageAnimatedScaleStyle]}>
-
-            <ZoomableImage source={currentMeme.blob}>
-              {/* Draggable Texts */}
-              {texts.map((item, index) => (
-                item.type === "text" &&
-                <DraggableContainer
-                  key={`dragable-container-${index} - ${item.x} - ${item.y}`}
-                  item={item}
-                  index={index}
-                  selected={index === selectedTextIndex}
-                  onSelect={(i) => setSelectedTextIndex(i)}
-                  onDelete={() => deleteText(index)}
-                >
-                  <EditableText />
-                </DraggableContainer>
-              ))
-              }
-              </ZoomableImage>
-          </Animated.View>}
-        </ScrollView>
-    </Pressable>
-      {/* Slider for the meme size */ }
-  <View style={[Platform.OS == "web" ? { left: width * 0.4, bottom: height * 0.05 } : { left: width * 0.2, bottom: height * 0.05 }, { position: 'absolute' }]}>
-    <Slider
-      style={[Platform.OS == "web" ? { width: width * 0.2, height: height * 0.05 } : { width: width * 0.6 }]}
-      minimumValue={0.25}
-      maximumValue={2}
-      value={imageScale.value}
-      onValueChange={(value) => imageScale.value = value}
-      step={0.05}
-      minimumTrackTintColor="#FFFFFF"
-      maximumTrackTintColor="#000000"
-    />
-  </View>
+        {/* Meme Image */}
+        {currentMeme && (
+          <Image source={currentMeme.blob} name={currentMeme.name} resizeMode="contain" style={styles.memeImage} />
+        )}
+      </Pressable>
     </SafeAreaView >
   );
 };
@@ -211,9 +174,7 @@ const MemeCreate = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    zIndex: 0,
-    width: "fit-content",
-    height: "fit-content",
+    zIndex: 0
   },
   imageContainer: {
     flexGrow: 1,
@@ -236,7 +197,26 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     zIndex: 10,
-  }
+  },
+  imageWrapper: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+  },
+  memeImageWrapper: {
+    position: "absolute",
+    width: "100%",
+    height: "100%",
+    zIndex: 10,
+    right: Dimensions.get('window').width * 0.05,
+    top: Dimensions.get('window').height * 0.05
+  },
+  memeImage: {
+    width: '100%',
+    height: '100%',
+    maxWidth: Dimensions.get('window').width,
+    maxHeight: Dimensions.get('window').height,
+  },
 });
 
 export default MemeCreate;

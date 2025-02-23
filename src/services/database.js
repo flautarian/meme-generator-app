@@ -85,12 +85,6 @@ const createMobileDb = () => {
   const db = SQLite.openDatabaseSync('meme-factory.db');
 
   try {
-    const dropTablesQuery = `
-        DROP TABLE IF EXISTS templates;
-        DROP TABLE IF EXISTS decorations;
-        DROP TABLE IF EXISTS inputs;
-      `;
-
     const createTemplatesTableQuery = `
           CREATE TABLE IF NOT EXISTS templates (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -127,41 +121,56 @@ const createMobileDb = () => {
       `;
 
     // creating if case, templates and inputs tables
-    //db.runSync(dropTablesQuery);
+    //clearDb(db);
     db.runSync(createTemplatesTableQuery);
     db.runSync(createDecorationsTableQuery);
     db.runSync(createInputsTableQuery);
 
     console.log('Database initialized with schema!');
 
-    // Initialize with default data if empty
+    // Initialize with default templates data if empty
     const initialTemplates = db.getAllSync('SELECT COUNT(*) AS count FROM templates;');
     let result = initialTemplates[0];
 
     if (result.count == 0) {
-      for (let i = 0; i < Utils.getInitMemes().length; i++) {
-        const meme = Utils.getInitMemes()[i];
+      console.log("Inserting initial templates...");
+      Utils.getInitMemes().forEach((meme) => {
         db.runSync(insertTemplateQuery, [meme.blob, meme.name]);
-      }
+      });
     }
     const createdTemplates = db.getAllSync('SELECT COUNT(*) AS count FROM templates;');
     let resultCreatedTemplates = createdTemplates[0];
     console.log("Created templates:", resultCreatedTemplates.count);
 
-
+    // Initialize with default decorations data if empty
     const initialDecorations = db.getAllSync('SELECT COUNT(*) AS count FROM decorations;');
-    result = initialDecorations[0];
+    let resultInitialDecorations = initialDecorations[0];
 
-    if (result.count == 0) {
-      for (let i = 0; i < Utils.getInitMemeDecorations().length; i++) {
-        const decoration = Utils.getInitMemeDecorations()[i];
+    if (resultInitialDecorations.count == 0) {
+      console.log("Inserting initial decorations...");
+      Utils.getInitMemeDecorations().forEach((decoration) => {
         db.runSync(insertDecorationQuery, [decoration.blob, decoration.name]);
-      }
+      });
     }
+    
+    const createdDecorations = db.getAllSync('SELECT COUNT(*) AS count FROM decorations;');
+    let resultCreatedDecorations = createdDecorations[0];
+    console.log("Created decorations:", resultCreatedDecorations.count);
+
   } catch (error) {
     console.error('Error reading or executing SQL file:', error);
   }
   return db;
+}
+
+const clearDb = (db) => {
+  const dropTemplatesTableQuery = `DROP TABLE IF EXISTS templates;`;
+  const dropDecorationsTableQuery = `DROP TABLE IF EXISTS decorations;`;
+  const dropInputsTableQuery = `DROP TABLE IF EXISTS inputs;`;
+
+  db.runSync(dropTemplatesTableQuery);
+  db.runSync(dropDecorationsTableQuery);
+  db.runSync(dropInputsTableQuery);
 }
 
 // Initialize with Web Worker DB insance
@@ -169,3 +178,4 @@ const db = createDatabase(DATABASE_NAME);
 
 // Export the ref to the backend
 export default db;
+

@@ -5,7 +5,7 @@ import Animated, { useAnimatedStyle } from "react-native-reanimated";
 
 const EditableText = ({ item, index, height, width, rotation }) => {
 
-    const [ value, setValue ] = useState(item.value);
+    const [value, setValue] = useState(item.value);
 
     // Flag to check if the component is being edited
     const [isEditing, setIsEditing] = useState(false);
@@ -19,7 +19,7 @@ const EditableText = ({ item, index, height, width, rotation }) => {
     const resizeAnimationStyle = useAnimatedStyle(() => ({
         height: height.value,
         width: width.value,
-        fontSize: (height.value + width.value / 2) / 2 * 0.5,
+        fontSize: (height.value + width.value / 2) / 4 - value.split(" ").length * 5,
         zIndex: 3,
     }))
 
@@ -29,21 +29,20 @@ const EditableText = ({ item, index, height, width, rotation }) => {
     }))
 
     return (
-        <TapGestureHandler
-            onHandlerStateChange={({ nativeEvent }) => {
-                if (nativeEvent.state === 4) {
-                    // handle double tap
-                    setIsEditing(true);
-                }
-            }}
-            numberOfTaps={2}
-        >
-            {/* Label/Input View */}
-            <Animated.View style={[resizeAnimationStyle, rotationAnimationStyle]}>
+        <Animated.View style={[resizeAnimationStyle, rotationAnimationStyle]}>
+            <TapGestureHandler
+                onHandlerStateChange={({ nativeEvent }) => {
+                    if (nativeEvent.state === 4) {
+                        // handle double tap
+                        setIsEditing(true);
+                    }
+                }}
+                numberOfTaps={2}
+            >
                 {isEditing ? (
                     <TextInput
                         aria-label={`text-input-${index}`}
-                        style={[{ ...styles.impact, textAlign: 'center', fontSize: (height.value + width.value / 4) * 0.5 },
+                        style={[{ ...styles.impact, textAlign: 'center' },
                             resizeAnimationStyle,
                         StyleSheet.absoluteFill]}
                         value={value}
@@ -53,13 +52,13 @@ const EditableText = ({ item, index, height, width, rotation }) => {
                     />
                 ) : (
                     <Animated.Text
-                        style={[{ textAlign: 'center', verticalAlign: 'center', flex: 1, alignContent: 'center' }, StyleSheet.absoluteFill, resizeAnimationStyle, styles.impact]}
+                        style={[{ textAlign: 'center', verticalAlign: 'center', flex: 1, alignContent: 'center', borderBlockColor: 'yellow' }, StyleSheet.absoluteFill, resizeAnimationStyle, styles.impact]}
                         selectable={false}>
                         {value}
                     </Animated.Text>
                 )}
-            </Animated.View>
-        </TapGestureHandler>
+            </TapGestureHandler>
+        </Animated.View>
     );
 };
 

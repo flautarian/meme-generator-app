@@ -1,4 +1,4 @@
-export default initMemes =[
+export default initMemes = [
   {
     "name": "Drake Hotline Bling",
     "blob": require("src/assets/templateImages/drake.jpg")

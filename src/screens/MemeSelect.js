@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
-import { View, StyleSheet, Image, Dimensions, FlatList, TextInput, Text, SafeAreaView } from 'react-native';
+import { View, StyleSheet, Image, Dimensions, FlatList, TextInput, Text, SafeAreaView, Platform } from 'react-native';
 import { fetchTemplates } from 'src/hooks/useTemplates';
 import TemplateItem from 'src/components/TemplateItemComponent/TemplateItem';
 
 const { width, height } = Dimensions.get('window');
 
-const MemeSelect = ({ onSelectMeme }) => {
+const MemeSelect = ({ navigation, onSelectMeme }) => {
   const [templates, setTemplates] = useState([]);
   const [name, setName] = useState("");
 
@@ -16,14 +16,22 @@ const MemeSelect = ({ onSelectMeme }) => {
     }, 1);
   }, [name]);
 
+  const closeDrawer = () => {
+    navigation.closeDrawer();
+  };
+
+  const selectMeme = (item) => {
+    onSelectMeme(item);
+    closeDrawer();
+  }
+
   return (
-    <View style={styles.container}>
+    <View  style={{flex: 1}}>
       <View style={styles.titleContainer}>
-        <Text style={styles.heading}>Create Meme from template</Text>
         <Text style={styles.paragraph}>Select the template you want to use:</Text>
       </View>
       <TextInput style={styles.paragraph} placeholder="Search templates..." onChangeText={setName} />
-      <View>
+      <View >
         {templates.length > 0 &&
           <FlatList
             contentContainerStyle={{ alignItems: 'center' }}
@@ -36,7 +44,9 @@ const MemeSelect = ({ onSelectMeme }) => {
               <TemplateItem
                 template={item}
                 key={index}
-                onSelect={(item) => onSelectMeme(item)} />
+                index
+                imgSize={Platform.OS === "web" ? 150 : 75}
+                onSelect={(item) => selectMeme(item)} />
             )}
           />
         }
@@ -59,7 +69,7 @@ const styles = StyleSheet.create({
   },
   memeListContainer: {
     width: width * 0.9,
-    maxHeight: height * 0.7
+    maxHeight: height * 0.85
   },
   heading: {
     fontSize: 22,

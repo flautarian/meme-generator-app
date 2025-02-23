@@ -1,8 +1,8 @@
 import db from './database';
 
 const TemplatesService = {
-  async addTemplate(img, name) {
-    const id = await db.templates.add({ img, name });
+  async addTemplate(blob, name) {
+    const id = await db.templates.add({ blob, name });
     return id;
   },
 

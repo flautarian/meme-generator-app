@@ -9,7 +9,7 @@ import Animated, {
     ReduceMotion,
 } from 'react-native-reanimated';
 
-const DragableOption = ({ onArrangeEnd, onDoubleTap, initialPosition, children, canMove = true }) => {
+const DragableOption = ({ onArrangeEnd, initialPosition, children, canMove = true }) => {
 
     const position = {
         x: useSharedValue(initialPosition.x),
@@ -69,8 +69,9 @@ const DragableOption = ({ onArrangeEnd, onDoubleTap, initialPosition, children, 
     const onDragRelease = useCallback((gestureState) => {
         // send signal to create new object in panel
         const newPos = getNewPosition(gestureState);
-        if (!!onArrangeEnd)
-            onArrangeEnd(newPos.x, newPos.y);
+        const movedEnough = newPos.x > 0 && newPos.y > 0 && (Math.abs(newPos.x - initialPosition.x) > 100 || Math.abs(newPos.y - initialPosition.y) > 100);
+        if (!!onArrangeEnd && movedEnough)
+            onArrangeEnd(newPos.x, newPos.y, "Label");
 
         // Reset position
         position.x.value = withSpring(initialPosition.x, returnSpringConfig);

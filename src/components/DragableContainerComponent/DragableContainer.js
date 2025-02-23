@@ -1,7 +1,7 @@
 import { Children, cloneElement, useEffect } from "react";
 import { useCallback } from "react";
 import { useRef, useState } from "react";
-import { PanResponder, Platform, Pressable, StyleSheet, Text, View } from "react-native";
+import { PanResponder, Pressable, StyleSheet, Text, View } from "react-native";
 import { Move, RotateCcw, Square, Trash2 } from "react-native-feather";
 import Animated, { useAnimatedStyle, useSharedValue } from "react-native-reanimated";
 
@@ -48,22 +48,20 @@ const DraggableContainer = ({ item, index, selected, onSelect, onDelete, childre
         const { moveX, moveY } = gestureState;
         const { width, height } = dimensions;
         const { oX, oY } = originOffset.current;
-        if (Platform.OS === 'web')
-            return { x: moveX - oX, y: moveY - oY - height.value / 2 };
-        return { x: moveX - oX, y: moveY - oY - height.value / 2 };
+        return { x: moveX - oX, y: moveY - oY - height.value / 2 + buttonsSize / 2 };
     }, [dimensions, originOffset]);
 
-    // handle drag function
     const handleDrag = useCallback((gestureState) => {
         if (!selectedContainer.value) return;
         const { x, y } = getNewPosition(gestureState);
         position.x.value = x;
         position.y.value = y;
-        if(!!item){
-            item.x = x;
-            item.y = y;
+        if (!!item) {
+            item.x = position.x.value;
+            item.y = position.y.value;
         }
     }, [position, selectedContainer]);
+    
 
     // Pan responder for the drag
     const dragViewpanResponder = useRef(
@@ -82,7 +80,7 @@ const DraggableContainer = ({ item, index, selected, onSelect, onDelete, childre
         const newHeight = Math.max(newValue + initHeight.value, 25);
         contentView.height.value = newHeight;
         if (newHeight > 25 && y0)
-            position.y.value = gestureState.moveY - buttonsSize;
+            position.y.value = gestureState.moveY - buttonsSize/2;
         // update object height
         if(!!item)
             item.height = newHeight;
@@ -123,7 +121,7 @@ const DraggableContainer = ({ item, index, selected, onSelect, onDelete, childre
         const newWidth = Math.max(newValue + initWidth.value, 25);
         contentView.width.value = newWidth;
         if (newWidth > 25 && x0)
-            position.x.value = gestureState.moveX - buttonsSize;
+            position.x.value = gestureState.moveX - buttonsSize/2;
         // update object width
         if(!!item)
             item.width = newWidth;
@@ -217,8 +215,8 @@ const DraggableContainer = ({ item, index, selected, onSelect, onDelete, childre
 
     return (
         <Animated.View
-            style={[dragAnimationStyle, {zIndex: selected ? 15 : 3}]} // high zIdex to priorize this selected component
-            key={`dragable-text-${index}-${layoutKey}`}
+            style={[dragAnimationStyle, {zIndex: selected ? 15 : 3}]} // high zIndex to priorize this selected component
+            key={`dragable-text-${index}-layoutKey-${layoutKey}-${selected}`}
             onLayout={onComponentLayout}>
             <Pressable
                 onPress={() => onSelect(index)}
@@ -230,7 +228,7 @@ const DraggableContainer = ({ item, index, selected, onSelect, onDelete, childre
                     <View style={[{ visibility: selected ? 'visible' : 'hidden', opacity: selected ? 1 : 0, zIndex: 5 }]}>
                         <Animated.View {...resizeY0ViewpanResponder.panHandlers}>
                             <Text style={styles.positionIconView} selectable={false}>
-                                <Square fill={"#fff"} stroke="black" width={32} height={32} />
+                                <Square fill={"#fff"} stroke="black" width={buttonsSize} height={buttonsSize} />
                             </Text>
                         </Animated.View>
                     </View>
@@ -248,7 +246,7 @@ const DraggableContainer = ({ item, index, selected, onSelect, onDelete, childre
                                 zIndex: 5
                             }]}>
                             <Text style={styles.positionIconView} selectable={false}>
-                                <Square fill={"#fff"} stroke="black" width={32} height={32} />
+                                <Square fill={"#fff"} stroke="black" width={buttonsSize} height={buttonsSize} />
                             </Text>
                         </View>
 
@@ -265,7 +263,7 @@ const DraggableContainer = ({ item, index, selected, onSelect, onDelete, childre
                                 zIndex: 5
                             }]}>
                             <Text style={styles.positionIconView} selectable={false}>
-                                <Square fill={"#fff"} stroke="black" width={32} height={32} />
+                                <Square fill={"#fff"} stroke="black" width={buttonsSize} height={buttonsSize} />
                             </Text>
                         </View>
                     </Animated.View>
@@ -278,7 +276,7 @@ const DraggableContainer = ({ item, index, selected, onSelect, onDelete, childre
                             zIndex: 5
                         }}>
                         <Text style={styles.positionIconView} selectable={false}>
-                            <Square fill={"#fff"} width={32} height={32} />
+                            <Square fill={"#fff"} width={buttonsSize} height={buttonsSize} />
                         </Text>
                     </Animated.View>
                 </Animated.View>
@@ -287,11 +285,10 @@ const DraggableContainer = ({ item, index, selected, onSelect, onDelete, childre
                     <View
                         {...rotateViewpanResponder.panHandlers}
                         style={{
-                            visibility: selected ? 'visible' : 'hidden', opacity: selected ? 1 : 0,
-                            maxWidth: buttonsSize, maxHeight: buttonsSize
+                            visibility: selected ? 'visible' : 'hidden', opacity: selected ? 1 : 0
                         }}>
                         <Text style={styles.positionIconView} selectable={false}>
-                            <RotateCcw stroke="black" width={32} height={32} />
+                            <RotateCcw stroke="black" width={buttonsSize} height={buttonsSize} />
                         </Text>
                     </View>
 
@@ -301,10 +298,9 @@ const DraggableContainer = ({ item, index, selected, onSelect, onDelete, childre
                         style={{
                             visibility: selected ? 'visible' : 'hidden',
                             opacity: selected ? 1 : 0,
-                            maxWidth: buttonsSize, maxHeight: buttonsSize
                         }}>
                         <Text style={styles.positionIconView} selectable={false}>
-                            <Move stroke="black" width={32} height={32} />
+                            <Move stroke="black" width={buttonsSize} height={buttonsSize} />
                         </Text>
                     </View>
 
@@ -317,7 +313,7 @@ const DraggableContainer = ({ item, index, selected, onSelect, onDelete, childre
                         <Pressable
                             onPress={() => onDelete()}
                             style={styles.positionIconView} selectable={false}>
-                            <Trash2 stroke="black" fill={"#fff"} width={32} height={32} />
+                            <Trash2 stroke="black" fill={"#fff"} width={buttonsSize} height={buttonsSize} />
                         </Pressable>
                     </View>
                 </View>

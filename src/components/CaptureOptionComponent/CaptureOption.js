@@ -3,13 +3,13 @@ import { Camera } from 'react-native-feather';
 import { Pressable } from 'react-native-gesture-handler';
 import Animated from 'react-native-reanimated';
 
-const CaptureOption = ({ onCapture, initialPosition }) => {
+const StaticOption = ({ onPress, initialPosition, children }) => {
     return (
         <View style={[styles.container, { top: initialPosition.y, left: initialPosition.x }]}>
             <Animated.View
                 style={[styles.captureBox]}>
-                <Pressable maxPointers={1} onPressOut={() => onCapture()}>
-                    <Camera stroke="black" fill="#fff" width={40} height={40} />
+                <Pressable maxPointers={1} onPressOut={() => onPress()}>
+                    {children}
                 </Pressable>
             </Animated.View>
         </View>
@@ -34,4 +34,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default CaptureOption;
+export default StaticOption;
