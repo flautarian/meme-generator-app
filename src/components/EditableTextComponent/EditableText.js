@@ -19,7 +19,7 @@ const EditableText = ({ item, index, height, width, rotation }) => {
     const resizeAnimationStyle = useAnimatedStyle(() => ({
         height: height.value,
         width: width.value,
-        fontSize: (height.value + width.value / 2) / 4 - value.split(" ").length * 5,
+        //fontSize: (height.value + width.value / 2) / 4 - value.split(" ").length * 5,
         zIndex: 3,
     }))
 
@@ -49,11 +49,14 @@ const EditableText = ({ item, index, height, width, rotation }) => {
                         onChangeText={updateValue}
                         onBlur={() => setIsEditing(false)}
                         autoFocus
+                        adjustsFontSizeToFit={true}
+                        numberOfLines={1}
                     />
                 ) : (
                     <Animated.Text
                         style={[{ textAlign: 'center', verticalAlign: 'center', flex: 1, alignContent: 'center', borderBlockColor: 'yellow' }, StyleSheet.absoluteFill, resizeAnimationStyle, styles.impact]}
-                        selectable={false}>
+                        selectable={false}
+                        adjustsFontSizeToFit={true}>
                         {value}
                     </Animated.Text>
                 )}

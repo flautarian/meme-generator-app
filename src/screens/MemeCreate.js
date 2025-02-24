@@ -8,11 +8,9 @@ import {
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { captureRef } from "react-native-view-shot";
 import { Platform } from 'react-native';
-import { getRandomMeme } from 'src/hooks/useTemplates';
 import { useSharedValue, withTiming } from 'react-native-reanimated';
 import LavaLampBackground from 'src/components/LavaLampBackgroundComponent/LavaLampBackground';
 import randomColor from 'randomcolor';
-import StaticOption from 'src/components/CaptureOptionComponent/CaptureOption';
 import domtoimage from 'dom-to-image';
 import EditableText from 'src/components/EditableTextComponent/EditableText';
 import DragableOption from 'src/components/DragableOptionComponent/DragableOption';
@@ -21,8 +19,9 @@ import DragableTemplate from 'src/components/DragableTemplateComponent/DragableT
 import { Camera, Edit, MessageSquare } from 'react-native-feather';
 import React from 'react';
 import EditableDecoration from 'src/components/EditableDecorationComponent/EditableDecoration';
+import StaticOption from 'src/components/StaticOptionComponent/StaticOption';
 
-const MemeCreate = ({ navigation, currentMeme}) => {
+const MemeCreate = ({ navigation, currentMeme }) => {
 
   const { width, height } = Dimensions.get('window');
 

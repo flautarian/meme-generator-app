@@ -41,3 +41,8 @@ export const deleteDecoration = async (decoration) => {
   const result = await DecorationsService.deleteDecoration(decoration.id);
   return result;
 };
+
+export const deleteTemplate = async (template) => {
+  const result = await TemplatesService.deleteTemplate(template.id);
+  return result;
+};
