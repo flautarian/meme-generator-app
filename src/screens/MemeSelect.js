@@ -5,7 +5,7 @@ import TemplateItem from 'src/components/TemplateItemComponent/TemplateItem';
 import * as ImagePicker from 'expo-image-picker';
 import documentUploadOption from 'src/utils/documentUploadOption';
 
-const { width, height } = Dimensions.get('window');
+const { height } = Dimensions.get('window');
 
 const MemeSelect = ({ navigation, onSelectMeme }) => {
 
@@ -46,7 +46,6 @@ const MemeSelect = ({ navigation, onSelectMeme }) => {
 
   const selectMeme = async (item) => {
     if (item.name === "/Upload a file") {
-      console.log("Selecting file");
       try {
         let result = await ImagePicker.launchImageLibraryAsync({
           mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -58,7 +57,6 @@ const MemeSelect = ({ navigation, onSelectMeme }) => {
 
         if (!result.canceled) {
           const base64Image = `data:image/jpeg;base64,${result.assets[0].base64}`;
-          // Now you can save `base64Image` to your database
           const newTemplate = {
             name: result.assets[0].fileName || result.assets[0].uri.split("/").pop(),
             blob: base64Image,
@@ -95,7 +93,7 @@ const MemeSelect = ({ navigation, onSelectMeme }) => {
             style={styles.memeListContainer}
             data={templateResults}
             keyExtractor={(item, index) => { return `${item.name}-${index}` }}
-            numColumns={2}
+            numColumns={Platform.OS === "web" ? 2 : 4}
             renderItem={({ item, index }) => (
               <TemplateItem
                 template={item}

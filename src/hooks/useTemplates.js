@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import { Platform } from 'react-native';
 
 // Dynamically import the appropriate service
@@ -14,6 +13,14 @@ const DecorationsService =
 
 export const getRandomMeme = async () => {
   const result = await TemplatesService.getAllTemplates();
+  if (result.length === 0)
+    return null;
+  const randomIndex = Math.floor(Math.random() * result.length);
+  return result[randomIndex];
+};
+
+export const getRandomDecoration = async () => {
+  const result = await DecorationsService.getAllDecorations();
   if (result.length === 0)
     return null;
   const randomIndex = Math.floor(Math.random() * result.length);

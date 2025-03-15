@@ -19,5 +19,23 @@ export const Utils = {
         if(!str || typeof str !== "string")
             return false;
         return str.startsWith("data:image");
-    }
+    },
+    convertBase64ToImage : async (base64String) => {
+        try {
+            // Convert Base64 string to a Blob
+            const byteCharacters = atob(base64String.split(',')[1]);
+            const byteNumbers = new Array(byteCharacters.length);
+            for (let i = 0; i < byteCharacters.length; i++) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i);
+            }
+            const byteArray = new Uint8Array(byteNumbers);
+            const blob = new Blob([byteArray], { type: 'image/png' });
+
+            // Create a ClipboardItem and write it to the clipboard
+            return new ClipboardItem({ 'image/png': blob });
+        } catch (error) {
+          Alert.alert('Error', 'Failed to convert Base64 to image.');
+          console.error(error);
+        }
+      }
 }

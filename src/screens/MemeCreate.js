@@ -1,3 +1,4 @@
+import React from 'react';
 import {
   StyleSheet,
   SafeAreaView,
@@ -6,20 +7,21 @@ import {
   Image,
 } from 'react-native';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { captureRef } from "react-native-view-shot";
+import ViewShot from "react-native-view-shot";
 import { Platform } from 'react-native';
 import { useSharedValue, withTiming } from 'react-native-reanimated';
 import LavaLampBackground from 'src/components/LavaLampBackgroundComponent/LavaLampBackground';
 import randomColor from 'randomcolor';
-import domtoimage from 'dom-to-image';
 import EditableText from 'src/components/EditableTextComponent/EditableText';
 import DragableOption from 'src/components/DragableOptionComponent/DragableOption';
 import DraggableContainer from 'src/components/DragableContainerComponent/DragableContainer';
 import DragableTemplate from 'src/components/DragableTemplateComponent/DragableTemplate';
 import { Camera, Edit, MessageSquare } from 'react-native-feather';
-import React from 'react';
 import EditableDecoration from 'src/components/EditableDecorationComponent/EditableDecoration';
 import StaticOption from 'src/components/StaticOptionComponent/StaticOption';
+import Canvas from 'react-native-canvas';
+import * as Sharing from 'expo-sharing';
+import { Utils } from 'src/utils/Utils';
 
 const MemeCreate = ({ navigation, currentMeme }) => {
 
@@ -34,6 +36,7 @@ const MemeCreate = ({ navigation, currentMeme }) => {
   const progress = useSharedValue(0);
 
   const initColor = useSharedValue("");
+  const canvasRef = useRef(null);
 
   // Deletes the text element
   const deleteText = useCallback((index) => {
@@ -50,28 +53,18 @@ const MemeCreate = ({ navigation, currentMeme }) => {
     try {
       // Add a slight delay to ensure rendering is complete
       setTimeout(async () => {
-        let uri = "";
-        if (Platform.OS === "web") {
-          uri = await domtoimage.toPng(memeContainerRef.current, {
-            quality: 0.95
+          memeContainerRef.current.capture().then(async(uri) => {
+            if (Platform.OS === "web") {
+              let uriFileFormat = await Utils.convertBase64ToImage(uri);
+              navigator.clipboard.write([uriFileFormat]);
+            }
+            else {
+              const isAvailableSharing = await Sharing.isAvailableAsync();
+              if(isAvailableSharing){
+                Sharing.shareAsync(uri);
+              }
+            }
           });
-        }
-        else {
-          uri = await captureRef(memeContainerRef, {
-            format: "png",
-            quality: 0.9,
-            result: "tmpfile",
-            useRenderInContext: (Platform.OS === "ios"),
-            snapshotContentContainer: true,
-            handleGLSurfaceViewOnAndroid: true,
-          });
-        }
-
-        console.log("Saved meme:", uri);
-
-        // Ensure the captured URI is valid before copying to clipboard
-        //await Clipboard.setImageAsync(uri);
-        alert("Meme copied to clipboard!");
       }, 100); // 100ms delay
     } catch (error) {
       console.error("Error capturing or copying image:", error);
@@ -112,10 +105,18 @@ const MemeCreate = ({ navigation, currentMeme }) => {
       {/* Gradient Background */}
       <LavaLampBackground count={10} hue={initColor.value} />
 
-      {/* Capture/Share Button */}
-      <StaticOption onPress={() => navigation.openDrawer()} initialPosition={{ x: width - 75, y: height * 0.25 }}>
-        <Edit stroke="black" fill="#fff" width={40} height={40} />
-      </StaticOption>
+      <Canvas ref={canvasRef} />
+      {/* Open drawer Button */}
+      <DragableOption
+        key={`open-meme-drawer-option`}
+        onArrangeEnd={() => navigation.openDrawer()}
+        initialPosition={{ x: width - 75, y: height * 0.25 }}
+        blockDragY={true}
+        limitDistance={40}
+        style={styles.draggableRightBox}
+        animateButton={false}>
+          <Edit stroke="black" fill="#fff" width={40} height={40} />
+      </DragableOption>
 
       {/* Draggable Options */}
       {/* Dragable Decoration display */}
@@ -123,13 +124,15 @@ const MemeCreate = ({ navigation, currentMeme }) => {
         onMenuOpenCallBack={() => setSelectedTextIndex(-1)}
         onArrangeEnd={(x, y, value) => onArrangeEnd("decoration", x, y, value)}
         initialPosition={{ x: width - width * 0.75 - 25, y: height * 0.85 }}
-        parentDimensions={{ width: width, height: height }} />
+        parentDimensions={{ width: width, height: height }} 
+        style={styles.draggableBox} />
 
       {/* Draggable Text Option */}
       <DragableOption
         key={`dragable-text-option`}
         onArrangeEnd={(x, y, value) => onArrangeEnd("text", x, y, value)}
-        initialPosition={{ x: width - width * 0.5 - 25, y: height * 0.85 }}>
+        initialPosition={{ x: width - width * 0.5 - 25, y: height * 0.85 }}
+        style={styles.draggableBox}>
         <MessageSquare stroke="black" fill="#fff" width={40} height={40} />
       </DragableOption>
 
@@ -138,34 +141,36 @@ const MemeCreate = ({ navigation, currentMeme }) => {
         <Camera stroke="black" fill="#fff" width={40} height={40} />
       </StaticOption>
 
+      <ViewShot ref={memeContainerRef} style={styles.memeWrapper}>
+        {/* Draggable Texts */}
+        {texts.map((item, index) => {
+          const child = item.type === "text" ? <EditableText /> : <EditableDecoration />;
+          return <DraggableContainer
+            key={`dragable-container-${index} - ${item.x} - ${item.y}`}
+            item={item}
+            index={index}
+            selected={index === selectedTextIndex}
+            onSelect={(i) => setSelectedTextIndex(i)}
+            onDelete={() => deleteText(index)}
+          >
+            {child}
+          </DraggableContainer>
+        })
+        }
 
-      {/* Draggable Texts */}
-      {texts.map((item, index) => {
-        const child = item.type === "text" ? <EditableText /> : <EditableDecoration />;
-        return <DraggableContainer
-          key={`dragable-container-${index} - ${item.x} - ${item.y}`}
-          item={item}
-          index={index}
-          selected={index === selectedTextIndex}
-          onSelect={(i) => setSelectedTextIndex(i)}
-          onDelete={() => deleteText(index)}
-        >
-          {child}
-        </DraggableContainer>
-      })
-      }
-
-      <Pressable
-        maxPointers={1}
-        style={styles.imageWrapper}
-        onPress={() => {
-          setSelectedTextIndex(-1);
-        }}>
         {/* Meme Image */}
-        {currentMeme && (
-          <Image source={currentMeme.blob} name={currentMeme.name} resizeMode="contain" style={styles.memeImage} />
-        )}
-      </Pressable>
+        <Pressable
+          maxPointers={1}
+          style={styles.imageWrapper}
+          onPress={() => {
+            setSelectedTextIndex(-1);
+          }}>
+          {/* Meme Image */}
+          {currentMeme && (
+            <Image source={currentMeme.blob} name={currentMeme.name} resizeMode="contain" style={styles.memeImage} />
+          )}
+        </Pressable>
+      </ViewShot>
     </SafeAreaView >
   );
 };
@@ -202,6 +207,11 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
+  memeWrapper: {
+    position: "absolute",
+    width: "100%",
+    height: "100%",
+  },
   memeImageWrapper: {
     position: "absolute",
     width: "100%",
@@ -216,6 +226,32 @@ const styles = StyleSheet.create({
     maxWidth: Dimensions.get('window').width,
     maxHeight: Dimensions.get('window').height,
   },
+
+  draggableBox: {
+        transformOrigin: '0% 0%',
+        zIndex: 10,
+        width: 60,
+        height: 60,
+        backgroundColor: 'blue',
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 50,
+    },
+
+    draggableRightBox: {
+        transformOrigin: '-50% 0%',
+        zIndex: 10,
+        width: 120,
+        height: 60,
+        backgroundColor: 'blue',
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderTopLeftRadius: 50,
+        borderBottomLeftRadius: 50,
+        
+    }
 });
 
 export default MemeCreate;

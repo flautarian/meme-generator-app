@@ -38,7 +38,6 @@ const MemeDecorationsList = ({ onSelectDecoration, onCloseMenu }) => {
 
     const selectDecoration = useCallback(async (item) => {
         if (item.name === "/Upload a file") {
-            console.log("Selecting file");
             try {
                 let result = await ImagePicker.launchImageLibraryAsync({
                     mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -50,7 +49,6 @@ const MemeDecorationsList = ({ onSelectDecoration, onCloseMenu }) => {
 
                 if (!result.canceled) {
                     const base64Image = `data:image/jpeg;base64,${result.assets[0].base64}`;
-                    // Now you can save `base64Image` to your database
                     const decoration = {
                         name: result.assets[0].fileName || result.assets[0].uri.split("/").pop(),
                         blob: base64Image,

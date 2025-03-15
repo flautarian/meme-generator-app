@@ -9,7 +9,7 @@ import Animated, {
     ReduceMotion,
 } from 'react-native-reanimated';
 
-const DragableOption = ({ onArrangeEnd, initialPosition, children, canMove = true }) => {
+const DragableOption = ({ onArrangeEnd, initialPosition, children, canMove = true, blockDragX = false, blockDragY = false, animateButton = true, limitDistance = 0, style = {} }) => {
 
     const position = {
         x: useSharedValue(initialPosition.x),
@@ -50,26 +50,34 @@ const DragableOption = ({ onArrangeEnd, initialPosition, children, canMove = tru
     ).current;
 
     const getNewPosition = useCallback((gestureState) => {
-        const { moveX, moveY } = gestureState;
+        const { moveX, moveY, dx, dy } = gestureState;
         const { width, height } = dimensions.current;
-        return { x: moveX - (width * scale.value) / 2, y: moveY - (height * scale.value) / 2 };
+        const result = { x: moveX - (width * scale.value) / 2, y: moveY - (height * scale.value) / 2 };
+        if (limitDistance > 0 && (Math.abs(initialPosition.x - result.x) > limitDistance || Math.abs(initialPosition.y - result.y) > limitDistance))
+            return { x: position.x.value, y: position.y.value };
+        return result;
     }, [dimensions]);
 
     // handle drag function
     const onDrag = useCallback((gestureState) => {
-        if (scale.value == 1.0)
+        if (scale.value == 1.0 && animateButton)
             scale.value = withSpring(1.5, scaleSpringConfig)
 
         const newPos = getNewPosition(gestureState);
-        position.x.value = newPos.x;
-        position.y.value = newPos.y;
+        if (!blockDragX)
+            position.x.value = newPos.x;
+        if (!blockDragY)
+            position.y.value = newPos.y;
     }, []);
 
     // end drag function
     const onDragRelease = useCallback((gestureState) => {
         // send signal to create new object in panel
         const newPos = getNewPosition(gestureState);
-        const movedEnough = newPos.x > 0 && newPos.y > 0 && (Math.abs(newPos.x - initialPosition.x) > 100 || Math.abs(newPos.y - initialPosition.y) > 100);
+        const movedEnough = newPos.x > 0 && newPos.y > 0 &&
+            (limitDistance > 0 ||
+                (Math.abs(newPos.x - initialPosition.x) > 100 ||
+                    Math.abs(newPos.y - initialPosition.y) > 100));
         if (!!onArrangeEnd && movedEnough)
             onArrangeEnd(newPos.x, newPos.y, "Label");
 
@@ -78,7 +86,8 @@ const DragableOption = ({ onArrangeEnd, initialPosition, children, canMove = tru
         position.y.value = withSpring(initialPosition.y, returnSpringConfig);
 
         // Reset scale
-        scale.value = withSpring(1, scaleSpringConfig);
+        if (animateButton)
+            scale.value = withSpring(1, scaleSpringConfig);
     }, [position]);
 
     // animated style
@@ -94,7 +103,7 @@ const DragableOption = ({ onArrangeEnd, initialPosition, children, canMove = tru
 
     return (
         <Animated.View
-            style={[styles.draggableBox, canMove && dragAnimatedStyle]}
+            style={[canMove && dragAnimatedStyle, style]}
             {...panResponder.panHandlers}
             onLayout={(event) => {
                 const { width, height } = event.nativeEvent.layout;
@@ -104,19 +113,5 @@ const DragableOption = ({ onArrangeEnd, initialPosition, children, canMove = tru
         </Animated.View>
     );
 }
-
-const styles = StyleSheet.create({
-    draggableBox: {
-        transformOrigin: '0% 0%',
-        zIndex: 10,
-        width: 60,
-        height: 60,
-        backgroundColor: 'blue',
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderRadius: 50,
-    },
-});
 
 export default DragableOption;

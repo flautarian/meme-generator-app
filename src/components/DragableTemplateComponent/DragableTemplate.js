@@ -10,9 +10,10 @@ import DragableOption from '../DragableOptionComponent/DragableOption';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import MemeDecorationsList from '../MemeDecorationsListComponent/MemeDecorationsList';
 import { useKeyboardVisible } from 'src/hooks/useKeyboardVisible';
+import { getRandomDecoration } from 'src/hooks/useTemplates';
 
 
-const DragableTemplate = ({ onArrangeEnd, initialPosition, parentDimensions, onMenuOpenCallBack }) => {
+const DragableTemplate = ({ onArrangeEnd, initialPosition, parentDimensions, onMenuOpenCallBack, style = {} }) => {
 
     const selectedTemplate = useSharedValue("");
 
@@ -90,6 +91,13 @@ const DragableTemplate = ({ onArrangeEnd, initialPosition, parentDimensions, onM
         elementSize.height.value = withSpring(opened ? parentDimensions.height * 0.35 : 0, scaleSpringConfig);
         elementSize.left.value = withSpring(opened ? parentDimensions.width * 0.05 : initialPosition.x, scaleSpringConfig);
         elementSize.bottom.value = withSpring(opened && isKeyboardVisible ? parentDimensions.height * 0.4 : 50, scaleSpringConfig);
+        if(selectedTemplate.value.length === 0){
+            const initSelectDecoration = async () => {
+                const item = await getRandomDecoration();
+                selectedTemplate.value = item;
+            };
+            initSelectDecoration().catch(console.error);
+        }
     }, [opened, parentDimensions, isKeyboardVisible]);
 
     const tap = Gesture.Tap()
@@ -108,7 +116,8 @@ const DragableTemplate = ({ onArrangeEnd, initialPosition, parentDimensions, onM
                     key={`dragable-template-option`}
                     onArrangeEnd={handleOnArrangeEnd}
                     initialPosition={initialPosition}
-                    canMove={!opened}>
+                    canMove={!opened}
+                    style={style}>
                     <GestureDetector
                         gesture={tap}
                         style={[{ position: "absolute" }]}>

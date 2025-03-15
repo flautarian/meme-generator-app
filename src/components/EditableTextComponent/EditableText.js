@@ -18,15 +18,16 @@ const EditableText = ({ item, index, height, width, rotation }) => {
     // animated size style for the inner component shown
     const resizeAnimationStyle = useAnimatedStyle(() => ({
         height: height.value,
+        flexShrink: 1,
         width: width.value,
-        //fontSize: (height.value + width.value / 2) / 4 - value.split(" ").length * 5,
+        fontSize: (height.value + width.value / 2) / 4 - value.split(" ").length * 5,
         zIndex: 3,
-    }))
+    }));
 
     // animated rotation style for the inner component shown
     const rotationAnimationStyle = useAnimatedStyle(() => ({
         transform: [{ rotate: rotation.value + 'deg' }],
-    }))
+    }));
 
     return (
         <Animated.View style={[resizeAnimationStyle, rotationAnimationStyle]}>
@@ -43,7 +44,7 @@ const EditableText = ({ item, index, height, width, rotation }) => {
                     <TextInput
                         aria-label={`text-input-${index}`}
                         style={[{ ...styles.impact, textAlign: 'center' },
-                            resizeAnimationStyle,
+                            resizeAnimationStyle.initial.value,
                         StyleSheet.absoluteFill]}
                         value={value}
                         onChangeText={updateValue}

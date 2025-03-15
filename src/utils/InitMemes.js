@@ -190,5 +190,13 @@ export default initMemes = [
   {
     "name": "This is where I'd put it if I had one",
     "blob": require("src/assets/templateImages/thisIsWhereIdPut.png")
+  },
+  {
+    "name": "Angel message",
+    "blob": require("src/assets/templateImages/angelmessage.jpg")
+  },
+  {
+    "name": "Vegueta smile",
+    "blob": require("src/assets/templateImages/vegetaSmile.png")
   }
 ];

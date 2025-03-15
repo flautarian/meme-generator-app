@@ -36,6 +36,7 @@ const AppRouterBase = () => {
                 screenOptions={
                     {
                         drawerPosition: 'right',
+                        swipeEnabled: false,
                     }
                 }
             >
