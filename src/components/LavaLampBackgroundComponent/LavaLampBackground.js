@@ -1,5 +1,5 @@
 import { StyleSheet, useWindowDimensions } from 'react-native';
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import Animated, { interpolate, interpolateColor, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import randomColor from 'randomcolor';
 import { Circle } from './Circle';

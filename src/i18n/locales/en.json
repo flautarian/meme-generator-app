@@ -1,0 +1,93 @@
+{
+  "common": {
+    "add": "Add",
+    "delete": "Delete",
+    "cancel": "Cancel",
+    "save": "Save",
+    "edit": "Edit",
+    "share": "Share",
+    "close": "Close",
+    "confirm": "Confirm"
+  },
+  "confirmation": {
+    "deleteText": {
+      "title": "Delete Text",
+      "message": "Are you sure you want to delete this text?"
+    },
+    "deleteDecoration": {
+      "title": "Delete Decoration",
+      "message": "Are you sure you want to delete this decoration?"
+    },
+    "deleteImage": {
+      "title": "Delete Image",
+      "message": "Are you sure you want to delete this meme image?"
+    },
+    "deleteTemplate": {
+      "title": "Delete Template",
+      "message": "Are you sure you want to delete this template?"
+    }
+  },
+  "memeCreate": {
+    "newTextAdded": "New text added",
+    "newDecorationAdded": "New decoration added",
+    "imageCopied": "Image copied to clipboard",
+    "shareError": "Error sharing image",
+    "elementDeleted": "Element deleted successfully",
+    "memeSaved": "Meme saved successfully",
+    "sharingNotAvailable": "Sharing is not available",
+    "errorSavingMeme": "Error saving meme"
+  },
+  "editableText": {
+    "placeholder": "Double tap to edit",
+    "ariaLabel": "Meme text input"
+  },
+  "editableDecoration": {
+    "ariaLabel": "Meme decoration image",
+    "description": "Decorative element for meme"
+  },
+  "languageSelector": {
+    "button": "Language selector",
+    "buttonHint": "Double tap to open language selection menu",
+    "selectLanguage": "Select {{language}} language"
+  },
+  "appInfo": {
+    "button": "App information",
+    "buttonHint": "Double tap to view app information and help",
+    "title": "How to Use Meme Generator",
+    "features": {
+      "title": "Features",
+      "text": "✨ Create custom memes\n✨ Add and edit text\n✨ Add decorative elements\n✨ Multiple language support\n✨ Easy sharing options"
+    },
+    "howToUse": {
+      "title": "How to Use",
+      "addText": "1. Tap '+' to add text",
+      "editText": "2. Double tap text to edit",
+      "moveElements": "3. Drag elements to position",
+      "resize": "4. Pinch to resize elements",
+      "rotate": "5. Use two fingers to rotate"
+    },
+    "sharing": {
+      "title": "Sharing Your Memes",
+      "description": "Tap the share button to save or share your meme. You can:\n• Save to your device\n• Share on social media\n• Copy to clipboard"
+    },
+    "tips": {
+      "title": "Pro Tips",
+      "list": "• Use the Impact font for classic meme style\n• Position text at top and bottom\n• Keep text short and punchy\n• Use contrasting colors"
+    }
+  },
+  "templates": {
+    "searchPlaceholder": "Search templates...",
+    "foundCount": "Templates found: {{count}}",
+    "errorUploading": "Error uploading template",
+    "uploadSuccess": "Template uploaded successfully"
+  },
+  "decorations": {
+    "searchPlaceholder": "Search decorations...",
+    "foundCount": "Decorations found: {{count}}"
+  },
+  "toast": {
+    "success": "Success!",
+    "error": "Error",
+    "warning": "Warning"
+  }
+}

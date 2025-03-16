@@ -1,24 +1,43 @@
 import { Image, StyleSheet, View } from "react-native";
 import Animated, { useAnimatedStyle } from "react-native-reanimated";
+import { useTranslation } from 'react-i18next';
 
 const EditableDecoration = ({ item, index, height, width, rotation }) => {
+    const { t } = useTranslation();
 
     // animated size style for the inner component shown
     const resizeAnimationStyle = useAnimatedStyle(() => ({
         height: height.value,
         width: width.value,
         zIndex: 3,
-    }))
+    }));
 
     // animated rotation style for the inner component shown
     const rotationAnimationStyle = useAnimatedStyle(() => ({
         transform: [{ rotate: rotation.value + 'deg' }],
-    }))
+    }));
 
     return (
-        <Animated.View style={[resizeAnimationStyle, rotationAnimationStyle]}>
-            <View style={styles.container}>
-                <Image source={item.value} style={{ height: height.value, width: width.value }} resizeMode='contain' />
+        <Animated.View 
+            key={`editable-decoration-${index}`} 
+            style={[resizeAnimationStyle, rotationAnimationStyle]}
+            accessible={true}
+            accessibilityLabel={t('editableDecoration.ariaLabel')}
+            accessibilityRole="image"
+            accessibilityHint={t('editableDecoration.description')}
+        >
+            <View 
+                style={styles.container} 
+                accessible={true}
+                accessibilityLabel={t('editableDecoration.ariaLabel')}
+            >
+                <Image 
+                    source={item.value} 
+                    style={{ height: height.value, width: width.value }} 
+                    resizeMode='contain'
+                    accessible={true}
+                    accessibilityLabel={t('editableDecoration.ariaLabel')}
+                />
             </View>
         </Animated.View>
     );

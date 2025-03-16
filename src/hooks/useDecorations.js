@@ -11,3 +11,11 @@ export const fetchDecorations = async (name) => {
     await DecorationsService.getAllDecorations();
   return result;
 };
+
+export const addNewDecoration = async (decoration) => {
+  await DecorationsService.addDecoration(decoration);
+};
+
+export const deleteDecoration = async (decoration) => {
+  await DecorationsService.deleteDecoration(decoration.id);
+};

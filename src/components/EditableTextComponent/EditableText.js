@@ -2,8 +2,11 @@ import { useState } from "react";
 import { StyleSheet, TextInput } from "react-native";
 import { TapGestureHandler } from "react-native-gesture-handler";
 import Animated, { useAnimatedStyle } from "react-native-reanimated";
+import { useTranslation } from 'react-i18next';
 
 const EditableText = ({ item, index, height, width, rotation }) => {
+
+    const { t } = useTranslation();
 
     const [value, setValue] = useState(item.value);
 
@@ -42,7 +45,7 @@ const EditableText = ({ item, index, height, width, rotation }) => {
             >
                 {isEditing ? (
                     <TextInput
-                        aria-label={`text-input-${index}`}
+                        aria-label={t('editableText.ariaLabel')}
                         style={[{ ...styles.impact, textAlign: 'center' },
                             resizeAnimationStyle.initial.value,
                         StyleSheet.absoluteFill]}
@@ -52,13 +55,14 @@ const EditableText = ({ item, index, height, width, rotation }) => {
                         autoFocus
                         adjustsFontSizeToFit={true}
                         numberOfLines={1}
+                        placeholder={t('editableText.placeholder')}
                     />
                 ) : (
                     <Animated.Text
                         style={[{ textAlign: 'center', verticalAlign: 'center', flex: 1, alignContent: 'center', borderBlockColor: 'yellow' }, StyleSheet.absoluteFill, resizeAnimationStyle, styles.impact]}
                         selectable={false}
                         adjustsFontSizeToFit={true}>
-                        {value}
+                        {value || t('editableText.placeholder')}
                     </Animated.Text>
                 )}
             </TapGestureHandler>

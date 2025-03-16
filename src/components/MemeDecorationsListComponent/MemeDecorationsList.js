@@ -6,6 +6,8 @@ import { XCircle } from 'react-native-feather';
 import { SafeAreaView } from 'react-native';
 import documentUploadOption from 'src/utils/documentUploadOption';
 import { deleteDecoration, addNewDecoration } from 'src/hooks/useTemplates';
+import { useConfirmation } from 'src/contexts/ConfirmationContext';
+import { useTranslation } from 'react-i18next';
 import * as ImagePicker from 'expo-image-picker';
 
 const { width, height } = Dimensions.get('window');
@@ -14,6 +16,8 @@ const MemeDecorationsList = ({ onSelectDecoration, onCloseMenu }) => {
     const [decorations, setDecorations] = useState([]);
     const [decorationsFiltered, setDecorationsFiltered] = useState([]);
     const [nameFilter, setNameFilter] = useState("");
+    const { showConfirmation } = useConfirmation();
+    const { t } = useTranslation();
 
     useEffect(() => {
         refreshDecorations();
@@ -22,14 +26,14 @@ const MemeDecorationsList = ({ onSelectDecoration, onCloseMenu }) => {
     const refreshDecorations = useCallback(async () => {
         const decorationResults = await fetchDecorations(nameFilter);
         setDecorations(decorationResults);
-        setDecorationsFiltered(decorationResults);
+        setDecorationsFiltered([...decorationResults, documentUploadOption]);
     }, [nameFilter]);
 
     useEffect(() => {
         const debounce = setTimeout(() => {
             setDecorationsFiltered(
                 [...decorations.filter((item) =>
-                    item.name.toLowerCase().includes(nameFilter.toLowerCase())
+                    item.name?.toLowerCase().includes(nameFilter.toLowerCase())
                 ), documentUploadOption]
             );
         }, 300);
@@ -44,7 +48,6 @@ const MemeDecorationsList = ({ onSelectDecoration, onCloseMenu }) => {
                     allowsEditing: true,
                     base64: true,
                     quality: 1,
-                    //aspect: [4, 3],
                 });
 
                 if (!result.canceled) {
@@ -70,18 +73,26 @@ const MemeDecorationsList = ({ onSelectDecoration, onCloseMenu }) => {
         }
     }, []);
 
-    const onDeleteDecoration = useCallback(async (decoration) => {
-        await deleteDecoration(decoration);
-        await refreshDecorations();
-        setNameFilter("");
-    }, [decorations]);
+    const onHandleDeleteDecoration = useCallback(async (decoration) => {
+        showConfirmation({
+            title: t('confirmation.deleteDecoration.title'),
+            message: t('confirmation.deleteDecoration.message'),
+            onConfirm: async () => {
+                await deleteDecoration(decoration);
+                await refreshDecorations();
+                setNameFilter("");
+            },
+            type: 'decoration',
+            itemId: decoration.id
+        });
+    }, [t, decorations, refreshDecorations]);
 
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.heading}>
                 <TextInput
                     style={[styles.textInput]}
-                    placeholder="Search templates..."
+                    placeholder={t('decorations.searchPlaceholder')}
                     onChangeText={setNameFilter}
                     value={nameFilter}
                 />
@@ -90,7 +101,7 @@ const MemeDecorationsList = ({ onSelectDecoration, onCloseMenu }) => {
                 </Pressable>
             </View>
             <Text>
-                decorations found: {decorationsFiltered.length - 1}
+                {t('decorations.foundCount', { count: decorationsFiltered.length - 1 })}
             </Text>
             {decorations.length > 0 && (
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '100%', height: '100%', padding: 10 }}>
@@ -105,7 +116,7 @@ const MemeDecorationsList = ({ onSelectDecoration, onCloseMenu }) => {
                                 template={item}
                                 onSelect={(item) => selectDecoration(item)}
                                 imgSize={Platform.OS === "web" ? 150 : 75}
-                                onDelete={() => onDeleteDecoration(item)}
+                                onDelete={() => onHandleDeleteDecoration(item)}
                             />
                         )}
                     />

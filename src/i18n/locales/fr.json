@@ -1,0 +1,93 @@
+{
+  "common": {
+    "add": "Ajouter",
+    "delete": "Supprimer",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "edit": "Modifier",
+    "share": "Partager",
+    "close": "Fermer",
+    "confirm": "Confirmer"
+  },
+  "confirmation": {
+    "deleteText": {
+      "title": "Supprimer le Texte",
+      "message": "Êtes-vous sûr de vouloir supprimer ce texte ?"
+    },
+    "deleteDecoration": {
+      "title": "Supprimer la Décoration",
+      "message": "Êtes-vous sûr de vouloir supprimer cette décoration ?"
+    },
+    "deleteImage": {
+      "title": "Supprimer l'Image",
+      "message": "Êtes-vous sûr de vouloir supprimer cette image du mème ?"
+    },
+    "deleteTemplate": {
+      "title": "Supprimer le Modèle",
+      "message": "Êtes-vous sûr de vouloir supprimer ce modèle ?"
+    }
+  },
+  "memeCreate": {
+    "newTextAdded": "Nouveau texte ajouté",
+    "newDecorationAdded": "Nouvelle décoration ajoutée",
+    "elementDeleted": "Élément supprimé avec succès",
+    "memeSaved": "Mème enregistré avec succès",
+    "sharingNotAvailable": "Le partage n'est pas disponible",
+    "errorSavingMeme": "Erreur lors de l'enregistrement du mème",
+    "imageCopied": "Image copiée dans le presse-papiers",
+    "shareError": "Erreur lors du partage de l'image"
+  },
+  "editableText": {
+    "placeholder": "Double-tapez pour modifier",
+    "ariaLabel": "Champ de texte du mème"
+  },
+  "editableDecoration": {
+    "ariaLabel": "Image décorative du mème",
+    "description": "Élément décoratif pour le mème"
+  },
+  "languageSelector": {
+    "button": "Sélecteur de langue",
+    "buttonHint": "Double-tapez pour ouvrir le menu de sélection de langue",
+    "selectLanguage": "Sélectionner la langue {{language}}"
+  },
+  "appInfo": {
+    "button": "Informations sur l'application",
+    "buttonHint": "Double-tapez pour voir les informations et l'aide de l'application",
+    "title": "Comment utiliser le Générateur de Mèmes",
+    "features": {
+      "title": "Fonctionnalités",
+      "text": "✨ Créez des mèmes personnalisés\n✨ Ajoutez et modifiez du texte\n✨ Ajoutez des éléments décoratifs\n✨ Support multilingue\n✨ Options de partage faciles"
+    },
+    "howToUse": {
+      "title": "Mode d'emploi",
+      "addText": "1. Tapez '+' pour ajouter du texte",
+      "editText": "2. Double-tapez pour modifier le texte",
+      "moveElements": "3. Faites glisser les éléments pour les positionner",
+      "resize": "4. Pincez pour redimensionner les éléments",
+      "rotate": "5. Utilisez deux doigts pour pivoter"
+    },
+    "sharing": {
+      "title": "Partager vos Mèmes",
+      "description": "Tapez le bouton partager pour sauvegarder ou partager votre mème. Vous pouvez :\n• Sauvegarder sur votre appareil\n• Partager sur les réseaux sociaux\n• Copier dans le presse-papiers"
+    },
+    "tips": {
+      "title": "Astuces Pro",
+      "list": "• Utilisez la police Impact pour le style mème classique\n• Positionnez le texte en haut et en bas\n• Gardez le texte court et percutant\n• Utilisez des couleurs contrastées"
+    }
+  },
+  "templates": {
+    "searchPlaceholder": "Rechercher des modèles...",
+    "foundCount": "Modèles trouvés : {{count}}",
+    "errorUploading": "Erreur lors du téléchargement du modèle",
+    "uploadSuccess": "Modèle téléchargé avec succès"
+  },
+  "decorations": {
+    "searchPlaceholder": "Rechercher des décorations...",
+    "foundCount": "Décorations trouvées : {{count}}"
+  },
+  "toast": {
+    "success": "Succès !",
+    "error": "Erreur",
+    "warning": "Attention"
+  }
+}

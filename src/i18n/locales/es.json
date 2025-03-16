@@ -1,0 +1,93 @@
+{
+  "common": {
+    "add": "Añadir",
+    "delete": "Eliminar",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "edit": "Editar",
+    "share": "Compartir",
+    "close": "Cerrar",
+    "confirm": "Confirmar"
+  },
+  "confirmation": {
+    "deleteText": {
+      "title": "Eliminar Texto",
+      "message": "¿Estás seguro de que quieres eliminar este texto?"
+    },
+    "deleteDecoration": {
+      "title": "Eliminar Decoración",
+      "message": "¿Estás seguro de que quieres eliminar esta decoración?"
+    },
+    "deleteImage": {
+      "title": "Eliminar Imagen",
+      "message": "¿Estás seguro de que quieres eliminar esta imagen del meme?"
+    },
+    "deleteTemplate": {
+      "title": "Eliminar Plantilla",
+      "message": "¿Estás seguro de que quieres eliminar esta plantilla?"
+    }
+  },
+  "memeCreate": {
+    "newTextAdded": "¡Nuevo elemento de texto añadido!",
+    "newDecorationAdded": "¡Nueva decoración añadida!",
+    "elementDeleted": "Elemento eliminado correctamente",
+    "memeSaved": "Meme guardado correctamente",
+    "sharingNotAvailable": "Compartir no está disponible",
+    "errorSavingMeme": "Error al guardar el meme",
+    "imageCopied": "Imagen copiada al portapapeles",
+    "shareError": "Error al compartir la imagen"
+  },
+  "editableText": {
+    "placeholder": "Doble toque para editar",
+    "ariaLabel": "Campo de texto del meme"
+  },
+  "editableDecoration": {
+    "ariaLabel": "Imagen decorativa del meme",
+    "description": "Elemento decorativo para el meme"
+  },
+  "languageSelector": {
+    "button": "Selector de idioma",
+    "buttonHint": "Doble toque para abrir el menú de selección de idioma",
+    "selectLanguage": "Seleccionar idioma {{language}}"
+  },
+  "appInfo": {
+    "button": "Información de la aplicación",
+    "buttonHint": "Doble toque para ver información y ayuda de la aplicación",
+    "title": "Cómo usar el Generador de Memes",
+    "features": {
+      "title": "Características",
+      "text": "✨ Crea memes personalizados\n✨ Añade y edita texto\n✨ Añade elementos decorativos\n✨ Soporte para múltiples idiomas\n✨ Opciones fáciles de compartir"
+    },
+    "howToUse": {
+      "title": "Cómo usar",
+      "addText": "1. Toca '+' para añadir texto",
+      "editText": "2. Doble toque para editar texto",
+      "moveElements": "3. Arrastra elementos para posicionar",
+      "resize": "4. Pellizca para redimensionar elementos",
+      "rotate": "5. Usa dos dedos para rotar"
+    },
+    "sharing": {
+      "title": "Compartir tus Memes",
+      "description": "Toca el botón compartir para guardar o compartir tu meme. Puedes:\n• Guardar en tu dispositivo\n• Compartir en redes sociales\n• Copiar al portapapeles"
+    },
+    "tips": {
+      "title": "Consejos Pro",
+      "list": "• Usa la fuente Impact para el estilo clásico de meme\n• Posiciona el texto arriba y abajo\n• Mantén el texto corto y directo\n• Usa colores contrastantes"
+    }
+  },
+  "templates": {
+    "searchPlaceholder": "Buscar plantillas...",
+    "foundCount": "Plantillas encontradas: {{count}}",
+    "errorUploading": "Error al subir la plantilla",
+    "uploadSuccess": "Plantilla subida correctamente"
+  },
+  "decorations": {
+    "searchPlaceholder": "Buscar decoraciones...",
+    "foundCount": "Decoraciones encontradas: {{count}}"
+  },
+  "toast": {
+    "success": "¡Éxito!",
+    "error": "Error",
+    "warning": "Advertencia"
+  }
+}
