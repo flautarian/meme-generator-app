@@ -52,22 +52,22 @@ const DragableOption = ({ onArrangeEnd, initialPosition, children, canMove = tru
     const getNewPosition = useCallback((gestureState) => {
         const { moveX, moveY, dx, dy } = gestureState;
         const { width, height } = dimensions.current;
-        const result = { x: moveX - (width * scale.value) / 2, y: moveY - (height * scale.value) / 2 };
+        const result = { x: moveX - (width * scale.get()) / 2, y: moveY - (height * scale.get()) / 2 };
         if (limitDistance > 0 && (Math.abs(initialPosition.x - result.x) > limitDistance || Math.abs(initialPosition.y - result.y) > limitDistance))
-            return { x: position.x.value, y: position.y.value };
+            return { x: position.x.get(), y: position.y.get() };
         return result;
     }, [dimensions]);
 
     // handle drag function
     const onDrag = useCallback((gestureState) => {
-        if (scale.value == 1.0 && animateButton)
-            scale.value = withSpring(1.5, scaleSpringConfig)
+        if (scale.get() == 1.0 && animateButton)
+            scale.set(withSpring(1.5, scaleSpringConfig))
 
         const newPos = getNewPosition(gestureState);
         if (!blockDragX)
-            position.x.value = newPos.x;
+            position.x.set(newPos.x);
         if (!blockDragY)
-            position.y.value = newPos.y;
+            position.y.set(newPos.y);
     }, []);
 
     // end drag function
@@ -82,21 +82,21 @@ const DragableOption = ({ onArrangeEnd, initialPosition, children, canMove = tru
             onArrangeEnd(newPos.x, newPos.y, "Label");
 
         // Reset position
-        position.x.value = withSpring(initialPosition.x, returnSpringConfig);
-        position.y.value = withSpring(initialPosition.y, returnSpringConfig);
+        position.x.set(withSpring(initialPosition.x, returnSpringConfig));
+        position.y.set(withSpring(initialPosition.y, returnSpringConfig));
 
         // Reset scale
         if (animateButton)
-            scale.value = withSpring(1, scaleSpringConfig);
+            scale.set(withSpring(1, scaleSpringConfig));
     }, [position]);
 
     // animated style
     const dragAnimatedStyle = useAnimatedStyle(() => ({
         transform: [
-            { translateX: position.x.value },
-            { translateY: position.y.value },
-            { scaleX: scale.value },
-            { scaleY: scale.value },
+            { translateX: position.x.get() },
+            { translateY: position.y.get() },
+            { scaleX: scale.get() },
+            { scaleY: scale.get() },
         ],
         position: 'absolute',
     }));

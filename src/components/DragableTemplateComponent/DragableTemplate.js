@@ -44,17 +44,17 @@ const DragableTemplate = ({ onArrangeEnd, initialPosition, parentDimensions, onM
     }));
 
     const onSelectDecoration = useCallback(async (item) => {
-        selectedTemplate.value = item;
+        selectedTemplate.set(item);
         toggleMenuState();
     }, [opened, selectedTemplate]);
 
     // menu opened animated style
     const menuOpenedAnimatedStyle = useAnimatedStyle(() => ({
-        opacity: elementSize.opacity.value,
-        width: elementSize.width.value,
-        height: elementSize.height.value,
-        left: elementSize.left.value,
-        bottom: elementSize.bottom.value,
+        opacity: elementSize.opacity.get(),
+        width: elementSize.width.get(),
+        height: elementSize.height.get(),
+        left: elementSize.left.get(),
+        bottom: elementSize.bottom.get(),
     }));
 
     const handleOnArrangeEnd = useCallback((x, y) => {
@@ -71,9 +71,9 @@ const DragableTemplate = ({ onArrangeEnd, initialPosition, parentDimensions, onM
                     openTabTimer.current = 0;
                 };
             }
-            else onArrangeEnd(x, y, selectedTemplate?.value.blob);
+            else onArrangeEnd(x, y, selectedTemplate?.get().blob);
         }
-        else onArrangeEnd(x, y, selectedTemplate?.value.blob);
+        else onArrangeEnd(x, y, selectedTemplate?.get().blob);
     }, [selectedTemplate, onArrangeEnd]);
 
     const toggleMenuState = useCallback(() => {
@@ -86,15 +86,15 @@ const DragableTemplate = ({ onArrangeEnd, initialPosition, parentDimensions, onM
     }, [opened]);
 
     useEffect(() => {
-        elementSize.opacity.value = withSpring(opened ? 1 : 0);
-        elementSize.width.value = withSpring(opened ? parentDimensions.width * 0.9 : 0, scaleSpringConfig);
-        elementSize.height.value = withSpring(opened ? parentDimensions.height * 0.35 : 0, scaleSpringConfig);
-        elementSize.left.value = withSpring(opened ? parentDimensions.width * 0.05 : initialPosition.x, scaleSpringConfig);
-        elementSize.bottom.value = withSpring(opened && isKeyboardVisible ? parentDimensions.height * 0.4 : 50, scaleSpringConfig);
-        if(selectedTemplate.value.length === 0){
+        elementSize.opacity.set(withSpring(opened ? 1 : 0));
+        elementSize.width.set(withSpring(opened ? parentDimensions.width * 0.9 : 0, scaleSpringConfig));
+        elementSize.height.set(withSpring(opened ? parentDimensions.height * 0.35 : 0, scaleSpringConfig));
+        elementSize.left.set(withSpring(opened ? parentDimensions.width * 0.05 : initialPosition.x, scaleSpringConfig));
+        elementSize.bottom.set(withSpring(opened && isKeyboardVisible ? parentDimensions.height * 0.4 : 50, scaleSpringConfig));
+        if (selectedTemplate.get() === 0) {
             const initSelectDecoration = async () => {
                 const item = await getRandomDecoration();
-                selectedTemplate.value = item;
+                selectedTemplate.set(item);
             };
             initSelectDecoration().catch(console.error);
         }
@@ -123,7 +123,7 @@ const DragableTemplate = ({ onArrangeEnd, initialPosition, parentDimensions, onM
                         style={[{ position: "absolute" }]}>
                         <Animated.View style={[buttonAnimatedStyle]}>
                             <Pressable maxPointers={1} style={styles.imageWrapper}>
-                                <Image selectable={false} style={{ width: 50, height: 50 }} source={selectedTemplate.value.blob} resizeMode='contain' />
+                                <Image selectable={false} style={{ width: 50, height: 50 }} source={selectedTemplate.get()?.blob} resizeMode='contain' />
                             </Pressable>
                         </Animated.View>
                     </GestureDetector>

@@ -54,6 +54,7 @@ const MemeCreate = ({ navigation, currentMeme }) => {
       return newTexts;
     });
     setSelectedTextIndex(-1);
+    addToast(t('memeCreate.elementDeleted'), 3000);
   }, [texts]);
 
   // Handles the capture of the img meme to share it
@@ -112,15 +113,15 @@ const MemeCreate = ({ navigation, currentMeme }) => {
 
   // Trigger the gradient animation
   useEffect(() => {
-    progress.value = withTiming(1, { duration: 3000 });
+    progress.set(withTiming(1, { duration: 3000 }));
     // random color background generation
-    initColor.value = randomColor({ count: 1, luminosity: 'dark' })[0];
+    initColor.set(randomColor({ count: 1, luminosity: 'dark' })[0]);
   }, []);
 
   return (
     <SafeAreaView style={styles.container}>
       {/* Gradient Background */}
-      <LavaLampBackground count={10} hue={initColor.value} />
+      <LavaLampBackground count={10} hue={initColor.get()} />
       
       <View style={styles.topBar}>
         <AppInfo />

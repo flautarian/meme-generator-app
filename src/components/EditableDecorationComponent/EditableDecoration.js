@@ -7,14 +7,14 @@ const EditableDecoration = ({ item, index, height, width, rotation }) => {
 
     // animated size style for the inner component shown
     const resizeAnimationStyle = useAnimatedStyle(() => ({
-        height: height.value,
-        width: width.value,
+        height: height.get(),
+        width: width.get(),
         zIndex: 3,
     }));
 
     // animated rotation style for the inner component shown
     const rotationAnimationStyle = useAnimatedStyle(() => ({
-        transform: [{ rotate: rotation.value + 'deg' }],
+        transform: [{ rotate: rotation.get() + 'deg' }],
     }));
 
     return (
@@ -33,7 +33,7 @@ const EditableDecoration = ({ item, index, height, width, rotation }) => {
             >
                 <Image 
                     source={item.value} 
-                    style={{ height: height.value, width: width.value }} 
+                    style={{ height: height.get(), width: width.get() }} 
                     resizeMode='contain'
                     accessible={true}
                     accessibilityLabel={t('editableDecoration.ariaLabel')}

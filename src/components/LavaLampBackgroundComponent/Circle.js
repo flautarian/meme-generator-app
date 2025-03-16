@@ -13,19 +13,19 @@ export const Circle = ({ circle }) => {
     useEffect(() => {
         const randRotation = Math.random() * 360;
 
-        rotation.value = withRepeat(
+        rotation.set(withRepeat(
             withSequence(
                 withTiming(randRotation, { duration: 0, easing: Easing.linear }),
                 withTiming(randRotation + 360, { duration: 7500, easing: Easing.linear })
             ),
             -1, // infinity
             false // no reverse
-        );
+        ));
     }, []);
 
     const animatedStyle = useAnimatedStyle(() => ({
         transform: [
-            { rotate: rotation.value + 'deg' },
+            { rotate: rotation.get() + 'deg' },
         ],
         zIndex: -2,
     }));

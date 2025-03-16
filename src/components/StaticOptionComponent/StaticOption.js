@@ -12,16 +12,16 @@ const StaticOption = ({ onPress, initialPosition, children }) => {
 
     const animatedStyle = useAnimatedStyle(() => {
         return {
-            transform: [{ scale: scale.value }],
+            transform: [{ scale: scale.get() }],
         };
     });
 
     const handlePressIn = () => {
-        scale.value = withSpring(0.7); // Scale down on press
+        scale.set(withSpring(0.7)); // Scale down on press
     };
 
     const handlePressOut = () => {
-        scale.value = withSpring(1); // Scale back to original size
+        scale.set(withSpring(1)); // Scale back to original size
         onPress();
     };
 

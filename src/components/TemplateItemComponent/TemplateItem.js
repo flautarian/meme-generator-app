@@ -18,7 +18,7 @@ const TemplateItem = ({ template, onSelect, imgSize, onDelete }) => {
 
     const boxAnimatedStyle = useAnimatedStyle(() => ({
         backgroundColor: interpolateColor(
-            progress.value,
+            progress.get(),
             [0, 1],
             ['#b58df1', '#fa7f7c']
         ),

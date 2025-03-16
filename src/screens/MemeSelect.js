@@ -6,14 +6,10 @@ import * as ImagePicker from 'expo-image-picker';
 import documentUploadOption from 'src/utils/documentUploadOption';
 import { useTranslation } from 'react-i18next';
 import { useConfirmation } from 'src/contexts/ConfirmationContext';
-import { useNavigation } from '@react-navigation/native';
-
-const { height } = Dimensions.get('window');
 
 const MemeSelect = ({ navigation, onSelectMeme }) => {
   const { t } = useTranslation();
   const { showConfirmation } = useConfirmation();
-
   const [templates, setTemplates] = useState([]);
   const [templateResults, setTemplatesFiltered] = useState([]);
   const [nameFilter, setNameFilter] = useState("");

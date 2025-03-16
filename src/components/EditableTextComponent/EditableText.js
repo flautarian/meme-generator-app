@@ -3,6 +3,7 @@ import { StyleSheet, TextInput } from "react-native";
 import { TapGestureHandler } from "react-native-gesture-handler";
 import Animated, { useAnimatedStyle } from "react-native-reanimated";
 import { useTranslation } from 'react-i18next';
+import { useCallback } from "react";
 
 const EditableText = ({ item, index, height, width, rotation }) => {
 
@@ -13,23 +14,23 @@ const EditableText = ({ item, index, height, width, rotation }) => {
     // Flag to check if the component is being edited
     const [isEditing, setIsEditing] = useState(false);
 
-    const updateValue = (text) => {
+    const updateValue = useCallback((text) => {
         setValue(text);
-        item.value = text;
-    }
+        item.set(text);
+    }, [item]);
 
     // animated size style for the inner component shown
     const resizeAnimationStyle = useAnimatedStyle(() => ({
-        height: height.value,
+        height: height.get(),
         flexShrink: 1,
-        width: width.value,
-        fontSize: (height.value + width.value / 2) / 4 - value.split(" ").length * 5,
+        width: width.get(),
+        fontSize: (height.get() + width.get() / 2) / 4 - value.split(" ").length * 5,
         zIndex: 3,
     }));
 
     // animated rotation style for the inner component shown
     const rotationAnimationStyle = useAnimatedStyle(() => ({
-        transform: [{ rotate: rotation.value + 'deg' }],
+        transform: [{ rotate: rotation.get() + 'deg' }],
     }));
 
     return (
@@ -47,7 +48,7 @@ const EditableText = ({ item, index, height, width, rotation }) => {
                     <TextInput
                         aria-label={t('editableText.ariaLabel')}
                         style={[{ ...styles.impact, textAlign: 'center' },
-                            resizeAnimationStyle.initial.value,
+                            resizeAnimationStyle.initial.get(),
                         StyleSheet.absoluteFill]}
                         value={value}
                         onChangeText={updateValue}
@@ -78,6 +79,8 @@ const styles = StyleSheet.create({
         textShadowRadius: 2,
         textShadowOffset: { width: 1, height: 1 },
         width: "100%",
+        WebkitTextWrap: 'balance',
+        WebkitHyphens: 'auto',
     },
     positionIconView: {
         userSelect: "none",
