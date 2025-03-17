@@ -198,5 +198,9 @@ export default initMemes = [
   {
     "name": "Vegueta smile",
     "blob": require("src/assets/templateImages/vegetaSmile.png")
+  },
+  {
+    "name": "invincible power",
+    "blob": require("src/assets/templateImages/invinciblePower.png")
   }
 ];

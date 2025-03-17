@@ -16,7 +16,7 @@ const EditableText = ({ item, index, height, width, rotation }) => {
 
     const updateValue = useCallback((text) => {
         setValue(text);
-        item.set(text);
+        item.value = text;
     }, [item]);
 
     // animated size style for the inner component shown
@@ -48,7 +48,7 @@ const EditableText = ({ item, index, height, width, rotation }) => {
                     <TextInput
                         aria-label={t('editableText.ariaLabel')}
                         style={[{ ...styles.impact, textAlign: 'center' },
-                            resizeAnimationStyle.initial.get(),
+                            resizeAnimationStyle.initial.value,
                         StyleSheet.absoluteFill]}
                         value={value}
                         onChangeText={updateValue}
@@ -56,14 +56,14 @@ const EditableText = ({ item, index, height, width, rotation }) => {
                         autoFocus
                         adjustsFontSizeToFit={true}
                         numberOfLines={1}
-                        placeholder={t('editableText.placeholder')}
+                        tooltip={t('editableText.placeholder')}
                     />
                 ) : (
                     <Animated.Text
                         style={[{ textAlign: 'center', verticalAlign: 'center', flex: 1, alignContent: 'center', borderBlockColor: 'yellow' }, StyleSheet.absoluteFill, resizeAnimationStyle, styles.impact]}
                         selectable={false}
                         adjustsFontSizeToFit={true}>
-                        {value || t('editableText.placeholder')}
+                        {value}
                     </Animated.Text>
                 )}
             </TapGestureHandler>
