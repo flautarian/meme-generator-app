@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { StyleSheet, TextInput } from "react-native";
 import { TapGestureHandler } from "react-native-gesture-handler";
-import Animated, { useAnimatedStyle } from "react-native-reanimated";
+import Animated, { useAnimatedStyle, useSharedValue } from "react-native-reanimated";
 import { useTranslation } from 'react-i18next';
 import { useCallback } from "react";
+import { useEffect } from "react";
 
 const EditableText = ({ item, index, height, width, rotation }) => {
 
@@ -11,22 +12,23 @@ const EditableText = ({ item, index, height, width, rotation }) => {
 
     const [value, setValue] = useState(item.value);
 
-    // Flag to check if the component is being edited
     const [isEditing, setIsEditing] = useState(false);
+
+    // animated size style for the inner component shown
+    const resizeAnimationStyle = useAnimatedStyle(() => ({
+        maxHeight: height.get(),
+        height: height.get() * 0.9,
+        flexShrink: 1,
+        maxWidth: width.get(),
+        width: width.get() * 0.9,
+        fontSize: (height.get() + width.get() / 2) / 4 - value.split(" ").length * 5,
+        zIndex: 3,
+    }));
 
     const updateValue = useCallback((text) => {
         setValue(text);
         item.value = text;
     }, [item]);
-
-    // animated size style for the inner component shown
-    const resizeAnimationStyle = useAnimatedStyle(() => ({
-        height: height.get(),
-        flexShrink: 1,
-        width: width.get(),
-        fontSize: (height.get() + width.get() / 2) / 4 - value.split(" ").length * 5,
-        zIndex: 3,
-    }));
 
     // animated rotation style for the inner component shown
     const rotationAnimationStyle = useAnimatedStyle(() => ({
@@ -34,7 +36,7 @@ const EditableText = ({ item, index, height, width, rotation }) => {
     }));
 
     return (
-        <Animated.View style={[resizeAnimationStyle, rotationAnimationStyle]}>
+        <Animated.View style={[resizeAnimationStyle, rotationAnimationStyle]} selectable={false} draggable={false} key={`editable-text-${index}`}>
             <TapGestureHandler
                 onHandlerStateChange={({ nativeEvent }) => {
                     if (nativeEvent.state === 4) {
@@ -43,12 +45,13 @@ const EditableText = ({ item, index, height, width, rotation }) => {
                     }
                 }}
                 numberOfTaps={2}
+                draggable={false}
             >
                 {isEditing ? (
                     <TextInput
                         aria-label={t('editableText.ariaLabel')}
                         style={[{ ...styles.impact, textAlign: 'center' },
-                            resizeAnimationStyle.initial.value,
+                        resizeAnimationStyle.initial.value,
                         StyleSheet.absoluteFill]}
                         value={value}
                         onChangeText={updateValue}
@@ -57,11 +60,12 @@ const EditableText = ({ item, index, height, width, rotation }) => {
                         adjustsFontSizeToFit={true}
                         numberOfLines={1}
                         tooltip={t('editableText.placeholder')}
+                        draggable={false}
                     />
                 ) : (
                     <Animated.Text
-                        style={[{ textAlign: 'center', verticalAlign: 'center', flex: 1, alignContent: 'center', borderBlockColor: 'yellow' }, StyleSheet.absoluteFill, resizeAnimationStyle, styles.impact]}
-                        selectable={false}
+                        style={[styles.text, StyleSheet.absoluteFill, resizeAnimationStyle, styles.impact]}
+                        selectable={false} draggable={false}
                         adjustsFontSizeToFit={true}>
                         {value}
                     </Animated.Text>
@@ -81,6 +85,11 @@ const styles = StyleSheet.create({
         width: "100%",
         WebkitTextWrap: 'balance',
         WebkitHyphens: 'auto',
+        textWrap: 'balance',
+        textAlign: 'center',
+        verticalAlign: 'center',
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     positionIconView: {
         userSelect: "none",

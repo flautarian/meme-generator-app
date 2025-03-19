@@ -163,7 +163,7 @@ const MemeCreate = ({ navigation, currentMeme }) => {
         <Camera stroke="black" fill="#fff" width={40} height={40} />
       </StaticOption>
 
-      <ViewShot ref={memeContainerRef} style={styles.memeWrapper}>
+      <ViewShot ref={memeContainerRef} style={styles.memeWrapper} draggable={false}>
         {/* Draggable Texts */}
         {texts.map((item, index) => {
           const child = item.type === "text" ? <EditableText /> : <EditableDecoration />;
@@ -174,6 +174,7 @@ const MemeCreate = ({ navigation, currentMeme }) => {
             selected={index === selectedTextIndex}
             onSelect={(i) => setSelectedTextIndex(i)}
             onDelete={() => deleteText(index)}
+            draggable={false}
           >
             {child}
           </DraggableContainer>

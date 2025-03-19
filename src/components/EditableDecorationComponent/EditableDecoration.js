@@ -25,15 +25,17 @@ const EditableDecoration = ({ item, index, height, width, rotation }) => {
             accessibilityLabel={t('editableDecoration.ariaLabel')}
             accessibilityRole="image"
             accessibilityHint={t('editableDecoration.description')}
+            selectable={false} draggable={false}
         >
             <View 
                 style={styles.container} 
                 accessible={true}
                 accessibilityLabel={t('editableDecoration.ariaLabel')}
+                selectable={false} draggable={false}
             >
                 <Image 
                     source={item.value} 
-                    style={{ height: height.get(), width: width.get() }} 
+                    style={{ height: "100%", width: "100%" }} 
                     resizeMode='contain'
                     accessible={true}
                     accessibilityLabel={t('editableDecoration.ariaLabel')}
