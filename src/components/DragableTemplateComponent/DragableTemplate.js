@@ -13,9 +13,9 @@ import { useKeyboardVisible } from 'src/hooks/useKeyboardVisible';
 import { getRandomDecoration } from 'src/hooks/useTemplates';
 
 
-const DragableTemplate = ({ onArrangeEnd, initialPosition, parentDimensions, onMenuOpenCallBack, style = {} }) => {
+const DragableDecoration = ({ onArrangeEnd, onChangedDecorations, initialPosition, parentDimensions, onMenuOpenCallBack, style = {} }) => {
 
-    const selectedTemplate = useSharedValue("");
+    const selectedDecoration = useSharedValue("");
 
     const openTabTimer = useRef(0);
 
@@ -44,9 +44,9 @@ const DragableTemplate = ({ onArrangeEnd, initialPosition, parentDimensions, onM
     }));
 
     const onSelectDecoration = useCallback(async (item) => {
-        selectedTemplate.set(item);
+        selectedDecoration.set(item);
         toggleMenuState();
-    }, [opened, selectedTemplate]);
+    }, [opened, selectedDecoration]);
 
     // menu opened animated style
     const menuOpenedAnimatedStyle = useAnimatedStyle(() => ({
@@ -71,10 +71,10 @@ const DragableTemplate = ({ onArrangeEnd, initialPosition, parentDimensions, onM
                     openTabTimer.current = 0;
                 };
             }
-            else onArrangeEnd(x, y, selectedTemplate?.get().blob);
+            else onArrangeEnd(x, y, selectedDecoration?.get().blob);
         }
-        else onArrangeEnd(x, y, selectedTemplate?.get().blob);
-    }, [selectedTemplate, onArrangeEnd]);
+        else onArrangeEnd(x, y, selectedDecoration?.get().blob);
+    }, [selectedDecoration, onArrangeEnd]);
 
     const toggleMenuState = useCallback(() => {
         console.log("toggleMenuState");
@@ -91,10 +91,10 @@ const DragableTemplate = ({ onArrangeEnd, initialPosition, parentDimensions, onM
         elementSize.height.set(withSpring(opened ? parentDimensions.height * 0.35 : 0, scaleSpringConfig));
         elementSize.left.set(withSpring(opened ? parentDimensions.width * 0.05 : initialPosition.x, scaleSpringConfig));
         elementSize.bottom.set(withSpring(opened && isKeyboardVisible ? parentDimensions.height * 0.4 : 50, scaleSpringConfig));
-        if (selectedTemplate.get() === 0) {
+        if (selectedDecoration.get() === 0) {
             const initSelectDecoration = async () => {
                 const item = await getRandomDecoration();
-                selectedTemplate.set(item);
+                selectedDecoration.set(item);
             };
             initSelectDecoration().catch(console.error);
         }
@@ -123,7 +123,7 @@ const DragableTemplate = ({ onArrangeEnd, initialPosition, parentDimensions, onM
                         style={[{ position: "absolute" }]}>
                         <Animated.View style={[buttonAnimatedStyle]}>
                             <Pressable maxPointers={1} style={styles.imageWrapper}>
-                                <Image selectable={false} style={{ width: 50, height: 50 }} source={selectedTemplate.get()?.blob} resizeMode='contain' />
+                                <Image selectable={false} style={{ width: 50, height: 50 }} source={selectedDecoration.get()?.blob} resizeMode='contain' />
                             </Pressable>
                         </Animated.View>
                     </GestureDetector>
@@ -131,7 +131,10 @@ const DragableTemplate = ({ onArrangeEnd, initialPosition, parentDimensions, onM
             }
 
             <Animated.View style={[menuOpenedAnimatedStyle, { position: "absolute", zIndex: 15, backgroundColor: 'red', selectable: false, borderRadius: 10 }]}>
-                {opened && <MemeDecorationsList onSelectDecoration={(item) => onSelectDecoration(item)} onCloseMenu={toggleMenuState} />}
+                {opened && <MemeDecorationsList 
+                onSelectDecoration={(item) => onSelectDecoration(item)} 
+                onChangedDecorations={onChangedDecorations}
+                onCloseMenu={toggleMenuState} />}
             </Animated.View>
         </>
     );
@@ -145,4 +148,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default DragableTemplate;
+export default DragableDecoration;

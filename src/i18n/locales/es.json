@@ -51,7 +51,7 @@
     "selectLanguage": "Seleccionar idioma {{language}}"
   },
   "appInfo": {
-    "button": "Información de la aplicación",
+    "button": "Cómo usar",
     "buttonHint": "Doble toque para ver información y ayuda de la aplicación",
     "title": "Cómo usar el Generador de Memes",
     "features": {
@@ -89,5 +89,16 @@
     "success": "¡Éxito!",
     "error": "Error",
     "warning": "Advertencia"
+  },
+  "memeOptions": {
+    "rebootDecorationsDb": "Reiniciar Base de Datos de Decoraciones",
+    "rebootDecorationsDbMessage": "¿Estás seguro de que deseas reiniciar la base de datos de decoraciones? Esto restablecerá todas las decoraciones a los valores predeterminados.",
+    "rebootDecorationsDbConfirm": "Reiniciar",
+    "rebootDecorationsDbHint": "Toca para reiniciar la base de datos de decoraciones",
+    "rebootTemplatesDb": "Reiniciar Base de Datos de Plantillas",
+    "rebootTemplatesDbMessage": "¿Estás seguro de que deseas reiniciar la base de datos de plantillas? Esto restablecerá todas las plantillas a los valores predeterminados.",
+    "rebootTemplatesDbConfirm": "Reiniciar",
+    "rebootTemplatesDbHint": "Toca para reiniciar la base de datos de plantillas",
+    "appSignature": "Este programa ha sido desarrollado por GiacconiDev"
   }
 }

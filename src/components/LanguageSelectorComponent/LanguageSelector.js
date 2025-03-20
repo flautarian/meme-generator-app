@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, TouchableOpacity, Text, StyleSheet, Modal, Pressable } from 'react-native';
+import { View, Pressable, Text, StyleSheet, Modal } from 'react-native';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { Globe } from 'react-native-feather';
 import { useTranslation } from 'react-i18next';
@@ -20,7 +20,7 @@ const LanguageSelector = () => {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity
+      <Pressable
         style={styles.iconButton}
         onPress={toggleDropdown}
         accessible={true}
@@ -28,7 +28,8 @@ const LanguageSelector = () => {
         accessibilityHint={t('languageSelector.buttonHint')}
       >
         <Globe stroke="#007AFF" width={24} height={24} />
-      </TouchableOpacity>
+        <Text style={styles.languageText}>{languages[currentLanguage].name}</Text>
+      </Pressable>
 
       <Modal
         animationType="fade"
@@ -42,7 +43,7 @@ const LanguageSelector = () => {
         >
           <View style={styles.dropdownContainer}>
             {Object.entries(languages).map(([code, { name }]) => (
-              <TouchableOpacity
+              <Pressable
                 key={code}
                 style={[
                   styles.languageButton,
@@ -59,7 +60,7 @@ const LanguageSelector = () => {
                 ]}>
                   {name}
                 </Text>
-              </TouchableOpacity>
+              </Pressable>
             ))}
           </View>
         </Pressable>
@@ -70,14 +71,15 @@ const LanguageSelector = () => {
 
 const styles = StyleSheet.create({
   container: {
-    position: 'absolute',
-    top: 20,
-    right: 20,
-    zIndex: 1000,
+    flex: 1,
+    zIndex: 10,
+    width: '90%',
+    height: '50px',
+    alignSelf: 'center',
   },
   iconButton: {
     padding: 8,
-    borderRadius: 20,
+    borderRadius: 10,
     backgroundColor: 'rgba(255, 255, 255, 0.9)',
     shadowColor: '#000',
     shadowOffset: {
@@ -87,6 +89,10 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-evenly',
   },
   modalOverlay: {
     flex: 1,
@@ -95,11 +101,11 @@ const styles = StyleSheet.create({
   },
   dropdownContainer: {
     backgroundColor: 'white',
-    borderRadius: 15,
+    borderRadius: 10,
     padding: 10,
     marginTop: 70,
-    marginRight: 20,
-    marginLeft: 'auto',
+    marginLeft: 50,
+    marginRight: 'auto',
     width: 150,
     shadowColor: '#000',
     shadowOffset: {

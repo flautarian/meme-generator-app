@@ -28,6 +28,10 @@ const TemplatesService = {
   async deleteTemplate(id) {
     await db.templates.delete(id);
   },
+
+  async rebootTemplates() {
+    await db.templates.clear();
+  },
 };
 
 export default TemplatesService;

@@ -57,16 +57,16 @@ const DragableContainer = ({ item, index, selected, onSelect, onDelete, children
         let { moveX, moveY } = gestureState;
         let { height } = dimensions;
         let { oX, oY } = originOffset.current;
-        return { x: moveX - oX, y: moveY - oY - height.get() / 2 + buttonsSize / 2 };
+        return { x: moveX - oX, y: moveY - oY - height.get() / 2 - buttonsSize * 1.5 };
     }, [dimensions]);
 
     const handleDrag = useCallback((gestureState) => {
         const { x, y } = getNewPosition(gestureState);
         position.x.set(x);
-        position.y.set(y + ((contentView.height.get() / 2) * (buttonsAbove ? 1 : -1)));
+        position.y.set(y);
         if (!!item) {
             item.x = x;
-            item.y = y + ((contentView.height.get() / 2) * (buttonsAbove ? 1 : -1));
+            item.y = y;
         }
         checkButtonsPosition();
     }, [position, checkButtonsPosition, buttonsAbove]);
@@ -212,14 +212,17 @@ const DragableContainer = ({ item, index, selected, onSelect, onDelete, children
     return (
         <Animated.View
             selectable={false}
+            draggable={false}
             style={[dragAnimationStyle, { zIndex: selected ? 15 : 3 }]}
             key={`dragable-text-${index}-layoutKey-${layoutKey}`}
             onLayout={onComponentLayout}>
             <Pressable
                 onPress={() => onSelect(index)}
-                style={[styles.container, { borderColor: selected ? '#fa7f7c' : 'transparent' }]}>
+                style={[styles.container, { borderColor: selected ? '#fa7f7c' : 'transparent' }]}
+                draggable={false}
+                selectable={false}>
                 {childrenWithProps.current}
-                <View style={[{visibility: selected ? 'visible' : 'hidden', opacity: selected ? 1 : 0}, styles.buttonsContainer, buttonsAbove && styles.buttonsAbove]}>
+                <View style={[{ visibility: selected ? 'visible' : 'hidden', opacity: selected ? 1 : 0 }, styles.buttonsContainer, buttonsAbove && styles.buttonsAbove]}>
                     <View {...rotateViewpanResponder.panHandlers} style={[{ width: buttonsSize, height: buttonsSize }, styles.button, styles.rotateButton]}>
                         <RotateCcw stroke="black" width={buttonsSize / 2} height={buttonsSize / 2} />
                     </View>
@@ -230,12 +233,11 @@ const DragableContainer = ({ item, index, selected, onSelect, onDelete, children
                         <Trash2 stroke="black" width={buttonsSize / 2} height={buttonsSize / 2} />
                     </Pressable>
                 </View>
-                <View style={[{visibility: selected ? 'visible' : 'hidden', opacity: selected ? 1 : 0}, styles.resizeHandles]} selectable={false} draggable={false}>
-                    <View {...resizeXFinalViewpanResponder.panHandlers} style={[{ width: buttonsSize, height: buttonsSize }, styles.resizeHandle, styles.leftHandle]} />
-                    <View {...resizeYViewpanResponder.panHandlers} style={[{ width: buttonsSize, height: buttonsSize }, styles.resizeHandle, styles.bottomHandle]} />
-                    <View {...resizeXViewpanResponder.panHandlers} style={[{ width: buttonsSize, height: buttonsSize }, styles.resizeHandle, styles.rightHandle]} />
-                    <View {...resizeYFinalViewpanResponder.panHandlers} style={[{ width: buttonsSize, height: buttonsSize }, styles.resizeHandle, styles.topHandle]} />
-                </View>
+                <View {...resizeXFinalViewpanResponder.panHandlers} style={[{ visibility: selected ? 'visible' : 'hidden', opacity: selected ? 1 : 0, width: buttonsSize, height: buttonsSize }, styles.resizeHandle, styles.leftHandle]} />
+                <View {...resizeYViewpanResponder.panHandlers} style={[{ visibility: selected ? 'visible' : 'hidden', opacity: selected ? 1 : 0, width: buttonsSize, height: buttonsSize }, styles.resizeHandle, styles.bottomHandle]} />
+                <View {...resizeXViewpanResponder.panHandlers} style={[{ visibility: selected ? 'visible' : 'hidden', opacity: selected ? 1 : 0, width: buttonsSize, height: buttonsSize }, styles.resizeHandle, styles.rightHandle]} />
+                <View {...resizeYFinalViewpanResponder.panHandlers} style={[{ visibility: selected ? 'visible' : 'hidden', opacity: selected ? 1 : 0, width: buttonsSize, height: buttonsSize }, styles.resizeHandle, styles.topHandle]} />
+
             </Pressable>
         </Animated.View>
     );
@@ -294,21 +296,25 @@ const styles = StyleSheet.create({
         left: -30,
         top: '50%',
         transform: [{ translateY: -10 }],
+        zIndex: 16,
     },
     rightHandle: {
         right: -30,
         top: '50%',
         transform: [{ translateY: -10 }],
+        zIndex: 16,
     },
     topHandle: {
         top: -30,
         left: '50%',
         transform: [{ translateX: -10 }],
+        zIndex: 16,
     },
     bottomHandle: {
         bottom: -30,
         left: '50%',
         transform: [{ translateX: -10 }],
+        zIndex: 16,
     },
 });
 

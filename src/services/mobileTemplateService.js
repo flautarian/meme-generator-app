@@ -55,6 +55,14 @@ const SQLiteTemplatesService = {
       resolve(results);
     });
   },
+
+  rebootTemplates() {
+    return new Promise((resolve, reject) => {
+      const results = db.getAllSync(
+        'DELETE FROM templates;');
+      resolve(results);
+    });
+  },
 };
 
 export default SQLiteTemplatesService;

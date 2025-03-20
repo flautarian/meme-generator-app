@@ -53,7 +53,13 @@ const DragableOption = ({ onArrangeEnd, initialPosition, children, canMove = tru
         const { moveX, moveY, dx, dy } = gestureState;
         const { width, height } = dimensions.current;
         const result = { x: moveX - (width * scale.get()) / 2, y: moveY - (height * scale.get()) / 2 };
-        if (limitDistance > 0 && (Math.abs(initialPosition.x - result.x) > limitDistance || Math.abs(initialPosition.y - result.y) > limitDistance))
+        if (limitDistance > 0 && (
+            Math.abs(
+                initialPosition.x - result.x
+            ) > limitDistance ||
+            Math.abs(
+                initialPosition.y - result.y
+            ) > limitDistance))
             return { x: position.x.get(), y: position.y.get() };
         return result;
     }, [dimensions]);
@@ -74,10 +80,11 @@ const DragableOption = ({ onArrangeEnd, initialPosition, children, canMove = tru
     const onDragRelease = useCallback((gestureState) => {
         // send signal to create new object in panel
         const newPos = getNewPosition(gestureState);
-        const movedEnough = newPos.x > 0 && newPos.y > 0 &&
+        const absInitialPosition = { x: Math.abs(initialPosition.x), y: Math.abs(initialPosition.y) };
+        const movedEnough = newPos.x != 0 && newPos.y != 0 &&
             (limitDistance > 0 ||
-                (Math.abs(newPos.x - initialPosition.x) > 100 ||
-                    Math.abs(newPos.y - initialPosition.y) > 100));
+                (Math.abs(newPos.x - absInitialPosition.x) > limitDistance ||
+                    Math.abs(newPos.y - absInitialPosition.y) > limitDistance));
         if (!!onArrangeEnd && movedEnough)
             onArrangeEnd(newPos.x, newPos.y, "Label");
 

@@ -5,14 +5,14 @@ import TemplateItem from 'src/components/TemplateItemComponent/TemplateItem';
 import { XCircle } from 'react-native-feather';
 import { SafeAreaView } from 'react-native';
 import documentUploadOption from 'src/utils/documentUploadOption';
-import { deleteDecoration, addNewDecoration } from 'src/hooks/useTemplates';
+import { deleteDecoration, addNewDecoration } from 'src/hooks/useDecorations';
 import { useConfirmation } from 'src/contexts/ConfirmationContext';
 import { useTranslation } from 'react-i18next';
 import * as ImagePicker from 'expo-image-picker';
 
 const { width, height } = Dimensions.get('window');
 
-const MemeDecorationsList = ({ onSelectDecoration, onCloseMenu }) => {
+const MemeDecorationsList = ({ onSelectDecoration, onCloseMenu, onChangedDecorations }) => {
     const [decorations, setDecorations] = useState([]);
     const [decorationsFiltered, setDecorationsFiltered] = useState([]);
     const [nameFilter, setNameFilter] = useState("");
@@ -20,8 +20,9 @@ const MemeDecorationsList = ({ onSelectDecoration, onCloseMenu }) => {
     const { t } = useTranslation();
 
     useEffect(() => {
+        console.log("loading decorations");
         refreshDecorations();
-    }, []);
+    }, [onChangedDecorations]);
 
     const refreshDecorations = useCallback(async () => {
         const decorationResults = await fetchDecorations(nameFilter);

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { View, StyleSheet, Dimensions, FlatList, TextInput, Text, Platform, ScrollView } from 'react-native';
+import { View, StyleSheet, FlatList, TextInput, Text, Platform, ScrollView } from 'react-native';
 import { addNewTemplate, deleteTemplate, fetchTemplates } from 'src/hooks/useTemplates';
 import TemplateItem from 'src/components/TemplateItemComponent/TemplateItem';
 import * as ImagePicker from 'expo-image-picker';
@@ -7,7 +7,7 @@ import documentUploadOption from 'src/utils/documentUploadOption';
 import { useTranslation } from 'react-i18next';
 import { useConfirmation } from 'src/contexts/ConfirmationContext';
 
-const MemeSelect = ({ navigation, onSelectMeme }) => {
+const MemeSelect = ({ navigation, onSelectMeme, onChangedTemplates }) => {
   const { t } = useTranslation();
   const { showConfirmation } = useConfirmation();
   const [templates, setTemplates] = useState([]);
@@ -22,7 +22,7 @@ const MemeSelect = ({ navigation, onSelectMeme }) => {
 
   useEffect(() => {
     refreshTemplates();
-  }, []);
+  }, [onChangedTemplates]);
 
   useEffect(() => {
     const debounce = setTimeout(() => {

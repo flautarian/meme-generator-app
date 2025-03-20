@@ -202,5 +202,29 @@ export default initMemes = [
   {
     "name": "invincible power",
     "blob": require("src/assets/templateImages/invinciblePower.png")
+  },
+  {
+    "name": "mimosin",
+    "blob": require("src/assets/templateImages/mimosin.jpg")
+  },
+  {
+    "name": "anime girl terminator",
+    "blob": require("src/assets/templateImages/animeGirlTerminator.jpg")
+  },
+  {
+    "name": "anime girl crying",
+    "blob": require("src/assets/templateImages/girlCrying.png")
+  },
+  {
+    "name": "2 rows empty meme",
+    "blob": require("src/assets/templateImages/2Rows.png")
+  },
+  {
+    "name": "4 rows empty meme",
+    "blob": require("src/assets/templateImages/4Rows.png")
+  },
+  {
+    "name": "6 rows empty meme",
+    "blob": require("src/assets/templateImages/6Rows.png")
   }
 ];

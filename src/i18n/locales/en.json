@@ -51,7 +51,7 @@
     "selectLanguage": "Select {{language}} language"
   },
   "appInfo": {
-    "button": "App information",
+    "button": "How to use",
     "buttonHint": "Double tap to view app information and help",
     "title": "How to Use Meme Generator",
     "features": {
@@ -74,6 +74,7 @@
       "title": "Pro Tips",
       "list": "• Use the Impact font for classic meme style\n• Position text at top and bottom\n• Keep text short and punchy\n• Use contrasting colors"
     }
+    
   },
   "templates": {
     "searchPlaceholder": "Search templates...",
@@ -89,5 +90,16 @@
     "success": "Success!",
     "error": "Error",
     "warning": "Warning"
+  },
+  "memeOptions": {
+    "rebootDecorationsDb": "Reboot Decorations Database",
+    "rebootDecorationsDbMessage": "Are you sure you want to reboot the decorations database? This will reset all decorations to default.",
+    "rebootDecorationsDbConfirm": "Reboot",
+    "rebootDecorationsDbHint": "Tap to reset decorations database",
+    "rebootTemplatesDb": "Reboot Templates Database",
+    "rebootTemplatesDbMessage": "Are you sure you want to reboot the templates database? This will reset all templates to default.",
+    "rebootTemplatesDbConfirm": "Reboot",
+    "rebootTemplatesDbHint": "Tap to reset templates database",
+    "appSignature": "This app has been developed by GiacconiDev"
   }
 }

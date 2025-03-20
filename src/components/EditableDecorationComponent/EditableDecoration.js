@@ -1,14 +1,21 @@
 import { Image, StyleSheet, View } from "react-native";
-import Animated, { useAnimatedStyle } from "react-native-reanimated";
+import Animated, { useAnimatedStyle, useSharedValue } from "react-native-reanimated";
 import { useTranslation } from 'react-i18next';
 
 const EditableDecoration = ({ item, index, height, width, rotation }) => {
     const { t } = useTranslation();
 
+    const scale = {
+        x: useSharedValue(1),
+        y: useSharedValue(1)
+    }
+
     // animated size style for the inner component shown
     const resizeAnimationStyle = useAnimatedStyle(() => ({
         height: height.get(),
         width: width.get(),
+        scaleX: scale.x.get(),
+        scaleY: scale.y.get(),
         zIndex: 3,
     }));
 

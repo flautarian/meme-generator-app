@@ -55,6 +55,14 @@ const SQLiteDecorationsService = {
       resolve(results);
     });
   },
+
+  rebootDecorations() {
+    return new Promise((resolve, reject) => {
+      const results = db.getAllSync(
+        'DELETE FROM decorations;');
+      resolve(results);
+    });
+  },
 };
 
 export default SQLiteDecorationsService;

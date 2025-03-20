@@ -5,7 +5,7 @@ import {
   Pressable,
   Dimensions,
   Image,
-  View
+
 } from 'react-native';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -17,17 +17,15 @@ import randomColor from 'randomcolor';
 import EditableText from 'src/components/EditableTextComponent/EditableText';
 import DragableOption from 'src/components/DragableOptionComponent/DragableOption';
 import DraggableContainer from 'src/components/DragableContainerComponent/DragableContainer';
-import DragableTemplate from 'src/components/DragableTemplateComponent/DragableTemplate';
-import { Camera, Edit, MessageSquare } from 'react-native-feather';
+import DragableDecoration from 'src/components/DragableTemplateComponent/DragableTemplate';
+import { Camera, Edit, MessageSquare, Settings, Tool } from 'react-native-feather';
 import EditableDecoration from 'src/components/EditableDecorationComponent/EditableDecoration';
 import StaticOption from 'src/components/StaticOptionComponent/StaticOption';
 import ToastModal from 'src/components/ToastModalComponent/ToastModal';
-import LanguageSelector from 'src/components/LanguageSelectorComponent/LanguageSelector';
-import AppInfo from 'src/components/AppInfoComponent/AppInfo';
 import * as Sharing from 'expo-sharing';
 import { Utils } from 'src/utils/Utils';
 
-const MemeCreate = ({ navigation, currentMeme }) => {
+const MemeCreate = ({ navigation, currentMeme, onChangedDecorations }) => {
   const { t } = useTranslation();
   const { width, height } = Dimensions.get('window');
 
@@ -122,11 +120,6 @@ const MemeCreate = ({ navigation, currentMeme }) => {
     <SafeAreaView style={styles.container}>
       {/* Gradient Background */}
       <LavaLampBackground count={10} hue={initColor.get()} />
-      
-      <View style={styles.topBar}>
-        <AppInfo />
-        <LanguageSelector />
-      </View>
 
       {/* Open drawer Button */}
       <DragableOption
@@ -140,11 +133,25 @@ const MemeCreate = ({ navigation, currentMeme }) => {
         <Edit stroke="black" fill="#fff" width={40} height={40} />
       </DragableOption>
 
+
+      {/* Open drawer options Button */}
+      <DragableOption
+        key={`open-options-drawer-option`}
+        onArrangeEnd={() => navigation.getParent().openDrawer()}
+        initialPosition={{ x: -45, y: height * 0.25 }}
+        blockDragY={true}
+        limitDistance={40}
+        style={styles.draggableLeftBox}
+        animateButton={false}>
+        <Tool stroke="black" fill="#fff" width={40} height={40} />
+      </DragableOption>
+
       {/* Draggable Options */}
       {/* Dragable Decoration display */}
-      <DragableTemplate
+      <DragableDecoration
         onMenuOpenCallBack={() => setSelectedTextIndex(-1)}
         onArrangeEnd={(x, y, value) => onArrangeEnd("decoration", x, y, value)}
+        onChangedDecorations={onChangedDecorations}
         initialPosition={{ x: width - width * 0.75 - 25, y: height * 0.85 }}
         parentDimensions={{ width: width, height: height }}
         style={styles.draggableBox} />
@@ -258,6 +265,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderTopLeftRadius: 50,
     borderBottomLeftRadius: 50,
+  },
+  draggableLeftBox: {
+    transformOrigin: '-50% 0%',
+    zIndex: 10,
+    width: 120,
+    height: 60,
+    backgroundColor: 'blue',
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderTopRightRadius: 50,
+    borderBottomRightRadius: 50,
   }
 });
 

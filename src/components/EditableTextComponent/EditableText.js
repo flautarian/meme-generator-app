@@ -22,7 +22,7 @@ const EditableText = ({ item, index, height, width, rotation }) => {
         maxWidth: width.get(),
         width: width.get() * 0.9,
         fontSize: (height.get() + width.get() / 2) / 4 - value.split(" ").length * 5,
-        zIndex: 3,
+        zIndex: 15,
     }));
 
     const updateValue = useCallback((text) => {
@@ -90,6 +90,8 @@ const styles = StyleSheet.create({
         verticalAlign: 'center',
         justifyContent: 'center',
         alignItems: 'center',
+        maxWidth: "100%",
+        maxHeight: "100%",
     },
     positionIconView: {
         userSelect: "none",

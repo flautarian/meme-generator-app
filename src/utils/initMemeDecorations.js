@@ -15,4 +15,12 @@ export default initMemeDecorations = [
     "name": "Cap",
     "blob": require("src/assets/decorationImages/cap.png")
   },
+  {
+    "name": "Girl1",
+    "blob": require("src/assets/decorationImages/girl1.png")
+  },
+  {
+    "name": "Girl2",
+    "blob": require("src/assets/decorationImages/girl2.png")
+  },
 ]

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, TouchableOpacity, Text, StyleSheet, Modal, Pressable, ScrollView, Platform } from 'react-native';
+import { View, Pressable, Text, StyleSheet, Modal, ScrollView, Platform } from 'react-native';
 import { HelpCircle } from 'react-native-feather';
 import { useTranslation } from 'react-i18next';
 
@@ -22,7 +22,7 @@ const AppInfo = () => {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity
+      <Pressable
         style={styles.iconButton}
         onPress={toggleModal}
         accessible={true}
@@ -30,10 +30,11 @@ const AppInfo = () => {
         accessibilityHint={t('appInfo.buttonHint')}
       >
         <HelpCircle stroke="#007AFF" width={24} height={24} />
-      </TouchableOpacity>
+        <Text style={styles.languageText}>{t('appInfo.button')}</Text>
+      </Pressable>
 
       <Modal
-        animationType="fade"
+        animationType="slide"
         transparent={true}
         visible={isModalVisible}
         onRequestClose={toggleModal}
@@ -76,14 +77,14 @@ const AppInfo = () => {
                 </Text>
               </Section>
 
-              <TouchableOpacity
+              <Pressable
                 style={styles.closeButton}
                 onPress={toggleModal}
                 accessible={true}
                 accessibilityLabel={t('common.close')}
               >
                 <Text style={styles.closeButtonText}>{t('common.close')}</Text>
-              </TouchableOpacity>
+              </Pressable>
             </ScrollView>
           </View>
         </View>
@@ -95,14 +96,14 @@ const AppInfo = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    position: 'absolute',
-    top: 20,
-    left: 20,
-    zIndex: 1000,
+    zIndex: 10,
+    width: '25%',
+    height: '50px',
+    alignSelf: 'center',
   },
   iconButton: {
     padding: 8,
-    borderRadius: 20,
+    borderRadius: 10,
     backgroundColor: 'rgba(255, 255, 255, 0.9)',
     shadowColor: '#000',
     shadowOffset: {
@@ -112,6 +113,10 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-evenly',
   },
   modalOverlay: {
     flex: 1,

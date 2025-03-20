@@ -21,9 +21,9 @@ const ToastModal = ({ message, duration = 5000 }) => {
   }, [fadeAnim, duration]);
 
   return (
-    <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
-      <View style={styles.toast}>
-        <Text style={styles.text}>{message}</Text>
+    <Animated.View style={[styles.container, { opacity: fadeAnim }]} selectable={false} draggable={false} >
+      <View style={styles.toast} selectable={false} draggable={false}>
+        <Text style={styles.text} selectable={false} draggable={false} >{message}</Text>
       </View>
     </Animated.View>
   );

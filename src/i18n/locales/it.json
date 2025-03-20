@@ -51,7 +51,7 @@
     "selectLanguage": "Seleziona la lingua {{language}}"
   },
   "appInfo": {
-    "button": "Informazioni sull'app",
+    "button": "Come usare",
     "buttonHint": "Doppio tocco per vedere le informazioni e l'aiuto dell'app",
     "title": "Come usare il Generatore di Meme",
     "features": {
@@ -89,5 +89,16 @@
     "success": "Successo!",
     "error": "Errore",
     "warning": "Attenzione"
+  },
+  "memeOptions": {
+    "rebootDecorationsDb": "Riavvia il Database delle Decorazioni",
+    "rebootDecorationsDbMessage": "Sei sicuro di voler riavviare il database delle decorazioni? Questo ripristinerà tutte le decorazioni ai valori predefiniti.",
+    "rebootDecorationsDbConfirm": "Riavvia",
+    "rebootDecorationsDbHint": "Tocca per riavviare il database delle decorazioni",
+    "rebootTemplatesDb": "Riavvia il Database dei Modelli",
+    "rebootTemplatesDbMessage": "Sei sicuro di voler riavviare il database dei modelli? Questo ripristinerà tutti i modelli ai valori predefiniti.",
+    "rebootTemplatesDbConfirm": "Riavvia",
+    "rebootTemplatesDbHint": "Tocca per riavviare il database dei modelli",
+    "appSignature": "Questo programma è stato sviluppato da GiacconiDev"
   }
 }

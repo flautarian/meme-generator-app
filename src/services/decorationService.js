@@ -28,6 +28,10 @@ const DecorationsService = {
   async deleteDecoration(id) {
     await db.decorations.delete(id);
   },
+
+  async rebootDecorations() {
+    await db.decorations.clear();
+  },
 };
 
 export default DecorationsService;
