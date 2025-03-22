@@ -7,12 +7,16 @@ import Animated, {
     useAnimatedStyle,
 } from 'react-native-reanimated';
 
-const StaticOption = ({ onPress, initialPosition, children }) => {
+const StaticOption = ({ onPress, initialPosition, children, offsetYAzis = useSharedValue(0) }) => {
     const scale = useSharedValue(1);
 
     const animatedStyle = useAnimatedStyle(() => {
         return {
-            transform: [{ scale: scale.get() }],
+            transform: [
+                { scale: scale.get() },
+                { translateY: initialPosition.y + offsetYAzis.get() },
+                { translateX: initialPosition.x },
+            ],
         };
     });
 
@@ -26,8 +30,8 @@ const StaticOption = ({ onPress, initialPosition, children }) => {
     };
 
     return (
-        <View style={[styles.container, { top: initialPosition.y, left: initialPosition.x }]}>
-            <Animated.View style={[styles.captureBox, animatedStyle]}>
+        <Animated.View style={[styles.captureBox, animatedStyle]}>
+            <View style={styles.container}>
                 <Pressable
                     maxPointers={1}
                     onPressIn={handlePressIn}
@@ -35,8 +39,8 @@ const StaticOption = ({ onPress, initialPosition, children }) => {
                 >
                     {children}
                 </Pressable>
-            </Animated.View>
-        </View>
+            </View>
+        </Animated.View>
     );
 };
 

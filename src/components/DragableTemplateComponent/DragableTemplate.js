@@ -13,7 +13,16 @@ import { useKeyboardVisible } from 'src/hooks/useKeyboardVisible';
 import { getRandomDecoration } from 'src/hooks/useTemplates';
 
 
-const DragableDecoration = ({ onArrangeEnd, onChangedDecorations, initialPosition, parentDimensions, onMenuOpenCallBack, style = {} }) => {
+const DragableDecoration = ({
+    onArrangeEnd,
+    onChangedDecorations,
+    initialPosition,
+    parentDimensions,
+    onMenuOpenCallBack,
+    style = {},
+    offsetYAzis = useSharedValue(0),
+    offsetXAzis = useSharedValue(0)
+}) => {
 
     const selectedDecoration = useSharedValue("");
 
@@ -116,6 +125,8 @@ const DragableDecoration = ({ onArrangeEnd, onChangedDecorations, initialPositio
                     key={`dragable-template-option`}
                     onArrangeEnd={handleOnArrangeEnd}
                     initialPosition={initialPosition}
+                    offsetYAzis={offsetYAzis}
+                    offsetXAzis={offsetXAzis}
                     canMove={!opened}
                     style={style}>
                     <GestureDetector
@@ -131,10 +142,10 @@ const DragableDecoration = ({ onArrangeEnd, onChangedDecorations, initialPositio
             }
 
             <Animated.View style={[menuOpenedAnimatedStyle, { position: "absolute", zIndex: 15, backgroundColor: 'red', selectable: false, borderRadius: 10 }]}>
-                {opened && <MemeDecorationsList 
-                onSelectDecoration={(item) => onSelectDecoration(item)} 
-                onChangedDecorations={onChangedDecorations}
-                onCloseMenu={toggleMenuState} />}
+                {opened && <MemeDecorationsList
+                    onSelectDecoration={(item) => onSelectDecoration(item)}
+                    onChangedDecorations={onChangedDecorations}
+                    onCloseMenu={toggleMenuState} />}
             </Animated.View>
         </>
     );

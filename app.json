@@ -13,7 +13,8 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.giacconidev.memegeneratorapp"
     },
     "android": {
       "adaptiveIcon": {
@@ -47,6 +48,14 @@
         }
       ],
       "expo-router"
-    ]
+    ],
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "a7bc06c7-ead9-4019-9950-5cd34d4fc748"
+      }
+    }
   }
 }

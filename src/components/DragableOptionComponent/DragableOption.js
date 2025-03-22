@@ -1,7 +1,5 @@
 import { useCallback, useRef } from 'react';
-import { StyleSheet, PanResponder, Platform, View } from 'react-native';
-import { MessageSquare } from 'react-native-feather';
-import { Pressable } from 'react-native-gesture-handler';
+import { PanResponder } from 'react-native';
 import Animated, {
     useSharedValue,
     useAnimatedStyle,
@@ -9,7 +7,19 @@ import Animated, {
     ReduceMotion,
 } from 'react-native-reanimated';
 
-const DragableOption = ({ onArrangeEnd, initialPosition, children, canMove = true, blockDragX = false, blockDragY = false, animateButton = true, limitDistance = 0, style = {} }) => {
+const DragableOption = ({
+    onArrangeEnd,
+    initialPosition,
+    children,
+    canMove = true,
+    blockDragX = false,
+    blockDragY = false,
+    animateButton = true,
+    limitDistance = 0,
+    style = {},
+    offsetYAzis = useSharedValue(0), 
+    offsetXAzis = useSharedValue(0),
+}) => {
 
     const position = {
         x: useSharedValue(initialPosition.x),
@@ -71,9 +81,9 @@ const DragableOption = ({ onArrangeEnd, initialPosition, children, canMove = tru
 
         const newPos = getNewPosition(gestureState);
         if (!blockDragX)
-            position.x.set(newPos.x);
+            position.x.set(newPos.x - offsetXAzis.get() );
         if (!blockDragY)
-            position.y.set(newPos.y);
+            position.y.set(newPos.y - offsetYAzis.get() );
     }, []);
 
     // end drag function
@@ -100,8 +110,8 @@ const DragableOption = ({ onArrangeEnd, initialPosition, children, canMove = tru
     // animated style
     const dragAnimatedStyle = useAnimatedStyle(() => ({
         transform: [
-            { translateX: position.x.get() },
-            { translateY: position.y.get() },
+            { translateX: position.x.get() + offsetXAzis.get() },
+            { translateY: position.y.get() + offsetYAzis.get() },
             { scaleX: scale.get() },
             { scaleY: scale.get() },
         ],
