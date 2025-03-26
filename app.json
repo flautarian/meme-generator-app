@@ -24,31 +24,12 @@
       "sourceDir": "node_modules/react-native-sqlite-storage/platforms/android-native",
       "packageImportPath": "import io.liteglue.SQLitePluginPackage;",
       "packageInstance": "new SQLitePluginPackage()",
-      "package": "com.anonymous.memegeneratorapp"
+      "package": "com.giacconidev.memegeneratorapp"
     },
     "web": {
       "bundler": "metro",
       "favicon": "src/assets/favicon.png"
     },
-    "plugins": [
-      [
-        "expo-sqlite",
-        {
-          "enableFTS": true,
-          "useSQLCipher": true,
-          "android": {
-            "enableFTS": false,
-            "useSQLCipher": false
-          },
-          "ios": {
-            "customBuildFlags": [
-              "-DSQLITE_ENABLE_DBSTAT_VTAB=1 -DSQLITE_ENABLE_SNAPSHOT=1"
-            ]
-          }
-        }
-      ],
-      "expo-router"
-    ],
     "extra": {
       "router": {
         "origin": false

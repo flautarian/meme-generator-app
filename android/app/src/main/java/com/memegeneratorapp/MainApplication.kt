@@ -1,4 +1,4 @@
-package com.anonymous.memegeneratorapp
+package com.memeGeneratorApp
 
 import android.app.Application
 import android.content.res.Configuration
