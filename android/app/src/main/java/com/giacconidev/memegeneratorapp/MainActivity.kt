@@ -1,4 +1,4 @@
-package com.memeGeneratorApp
+package com.giacconidev.memegeneratorapp
 
 import android.os.Build
 import android.os.Bundle

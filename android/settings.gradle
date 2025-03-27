@@ -21,7 +21,7 @@ extensions.configure(com.facebook.react.ReactSettingsExtension) { ex ->
   }
 }
 
-rootProject.name = 'memegeneratorapp'
+rootProject.name = 'meme-generator-app'
 
 dependencyResolutionManagement {
   versionCatalogs {
