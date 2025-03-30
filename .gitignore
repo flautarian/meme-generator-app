@@ -3,6 +3,12 @@
 # dependencies
 node_modules/
 
+#Keystore
+android/app/memeKey.keystore
+
+#gradle properties
+android/gradle/gradle.properties
+
 # Expo
 .expo/
 dist/

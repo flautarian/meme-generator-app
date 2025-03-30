@@ -25,6 +25,7 @@ import StaticOption from 'src/components/StaticOptionComponent/StaticOption';
 import ToastModal from 'src/components/ToastModalComponent/ToastModal';
 import * as Sharing from 'expo-sharing';
 import { Utils } from 'src/utils/Utils';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 const MemeCreate = ({ navigation, currentMeme, onChangedDecorations }) => {
 
@@ -39,7 +40,8 @@ const MemeCreate = ({ navigation, currentMeme, onChangedDecorations }) => {
   const memeContainerRef = useRef(null);
 
   const progress = useSharedValue(0);
-  const initColor = useSharedValue("");
+  const [initColor, setInitColor] = useState('');
+  const [initLightColor, setInitLightColor] = useState('');
   const [isBotDrawerOpened, setIsBotDrawerOpened] = useState(false);
   const botDrawerAnimation = useSharedValue(0);
 
@@ -146,116 +148,124 @@ const MemeCreate = ({ navigation, currentMeme, onChangedDecorations }) => {
   useEffect(() => {
     progress.set(withTiming(1, { duration: 3000 }));
     // random color background generation
-    initColor.set(randomColor({ count: 1, luminosity: 'dark' })[0]);
+    setInitColor(randomColor({ count: 1, luminosity: 'dark' })[0]);
+    setInitLightColor(randomColor({ count: 1, luminosity: 'light', hue: initColor })[0]);
   }, []);
 
   return (
-    <SafeAreaView style={styles.container}>
-      {/* Gradient Background */}
-      <LavaLampBackground count={10} hue={initColor.get()} />
+    <SafeAreaProvider>
+      <SafeAreaView style={styles.container}>
+        {/* Gradient Background */}
+        <LavaLampBackground count={10} hue={initColor} />
 
-      {/* Open drawer Button */}
-      <DragableOption
-        key={`open-meme-drawer-option`}
-        onArrangeEnd={() => navigation.openDrawer()}
-        initialPosition={{ x: width - 75, y: height * 0.75 }}
-        blockDragY={true}
-        limitDistance={40}
-        style={styles.draggableRightBox}
-        animateButton={false}>
-        <Edit stroke="black" fill="#fff" width={40} height={40} />
-      </DragableOption>
+        {/* Toasts */}
+        {toasts.map((toast) => (
+          <ToastModal
+            key={toast.id}
+            message={toast.message}
+            duration={toast.duration}
+          />
+        ))}
 
-      {/* Open drawer options Button */}
-      <DragableOption
-        key={`open-options-drawer-option`}
-        onArrangeEnd={() => navigation.getParent().openDrawer()}
-        initialPosition={{ x: -45, y: height * 0.75 }}
-        blockDragY={true}
-        limitDistance={40}
-        style={styles.draggableLeftBox}
-        animateButton={false}>
-        <Tool stroke="black" fill="#fff" width={40} height={40} />
-      </DragableOption>
+        {/* Meme image container */}
+        <ViewShot ref={memeContainerRef} style={styles.memeWrapper} draggable={false}>
+          {/* Draggable Texts / decorations */}
+          {texts.map((item, index) => {
+            const child = item.type === "text" ? <EditableText /> : <EditableDecoration />;
+            return <DraggableContainer
+              key={`dragable-container-${index} - ${item.x} - ${item.y}`}
+              item={item}
+              index={index}
+              selected={index === selectedTextIndex}
+              onSelect={(i) => setSelectedTextIndex(i)}
+              onDelete={() => deleteText(index)}
+              draggable={false}
+            >
+              {child}
+            </DraggableContainer>
+          })}
 
-      <Animated.View style={[botContainerAnimatedStyle, { flex: 1, justifyContent: 'center', alignItems: 'center' }]} key={`bot-drawer`}>
-        <Pressable onPress={() => setIsBotDrawerOpened(!isBotDrawerOpened)} >
-          <View style={{ width: 80, height: 40, borderRadius: 20, backgroundColor: '#fff', justifyContent: 'center', alignItems: 'center' }}>
-            {<ChevronUp style={{ transform: [{ rotate: isBotDrawerOpened ? '180deg' : '0deg' }], animationDuration: 300 }} stroke="black" width={20} height={20} />}
-          </View>
-        </Pressable>
-        <View style={{ width: '100%', height: '100%', backgroundColor: 'violet', opacity: isBotDrawerOpened ? 1 : 0, marginTop: 10 }}>
-          <Text>TEXT</Text>
-        </View>
-      </Animated.View>
-
-      <DragableDecoration
-        key={`dragable-decoration-option`}
-        onMenuOpenCallBack={() => setSelectedTextIndex(-1)}
-        onArrangeEnd={(x, y, value) => onArrangeEnd("decoration", x, y, value)}
-        onChangedDecorations={onChangedDecorations}
-        initialPosition={{ x: width - width * 0.75 - 25, y: height + 50 }}
-        showFromDrawer={isBotDrawerOpened}
-        parentDimensions={{ width: width, height: height }}
-        offsetYAzis={botDrawerAnimation}
-        style={styles.draggableBox} />
-      <DragableOption
-        key={`dragable-text-option`}
-        onArrangeEnd={(x, y, value) => onArrangeEnd("text", x, y, value)}
-        initialPosition={{ x: width - width * 0.5 - 25, y: height + 50 }}
-        offsetYAzis={botDrawerAnimation}
-        style={styles.draggableBox}>
-        <MessageSquare stroke="black" fill="#fff" width={40} height={40} />
-      </DragableOption>
-      <StaticOption
-        key={`capture-share-button`}
-        onPress={handleCapture}
-        initialPosition={{ x: width - width * 0.25 - 25, y: height + 50 }}
-        offsetYAzis={botDrawerAnimation}>
-        <Camera stroke="black" fill="#fff" width={40} height={40} />
-      </StaticOption>
-
-
-      <ViewShot ref={memeContainerRef} style={styles.memeWrapper} draggable={false}>
-        {/* Draggable Texts */}
-        {texts.map((item, index) => {
-          const child = item.type === "text" ? <EditableText /> : <EditableDecoration />;
-          return <DraggableContainer
-            key={`dragable-container-${index} - ${item.x} - ${item.y}`}
-            item={item}
-            index={index}
-            selected={index === selectedTextIndex}
-            onSelect={(i) => setSelectedTextIndex(i)}
-            onDelete={() => deleteText(index)}
-            draggable={false}
-          >
-            {child}
-          </DraggableContainer>
-        })}
-
-        {/* Meme Image */}
-        <Pressable
-          maxPointers={1}
-          style={styles.imageWrapper}
-          onPress={() => {
-            setSelectedTextIndex(-1);
-            setIsBotDrawerOpened(false);
-          }}>
           {/* Meme Image */}
-          {currentMeme && (
-            <Image source={currentMeme.blob} name={currentMeme.name} resizeMode="contain" style={styles.memeImage} />
-          )}
-        </Pressable>
-      </ViewShot>
+          <Pressable
+            maxPointers={1}
+            style={styles.imageWrapper}
+            onPress={() => {
+              setSelectedTextIndex(-1);
+              setIsBotDrawerOpened(false);
+            }}>
+            {/* Meme Image */}
+            {currentMeme && (
+              <Image source={currentMeme.blob} name={currentMeme.name} resizeMode="contain" style={styles.memeImage} />
+            )}
+          </Pressable>
+        </ViewShot>
 
-      {toasts.map((toast) => (
-        <ToastModal
-          key={toast.id}
-          message={toast.message}
-          duration={toast.duration}
-        />
-      ))}
-    </SafeAreaView>
+
+        {/* Open drawer Button */}
+        <DragableOption
+          key={`open-meme-drawer-option`}
+          onArrangeEnd={() => navigation.openDrawer()}
+          initialPosition={{ x: width - 75, y: height * 0.75 }}
+          blockDragY={true}
+          limitDistance={40}
+          style={[styles.draggableRightBox, { backgroundColor: initColor }]}
+          animateButton={false}>
+          <Edit stroke="black" fill="#fff" width={40} height={40} />
+        </DragableOption>
+
+        {/* Open drawer options Button */}
+        <DragableOption
+          key={`open-options-drawer-option`}
+          onArrangeEnd={() => navigation.getParent().openDrawer()}
+          initialPosition={{ x: -45, y: height * 0.75 }}
+          blockDragY={true}
+          limitDistance={40}
+          style={[styles.draggableLeftBox, { backgroundColor: initColor }]}
+          animateButton={false}>
+          <Tool stroke="black" fill="#fff" width={40} height={40} />
+        </DragableOption>
+
+        {/* Bottom drawer */}
+        <Animated.View style={[botContainerAnimatedStyle, { flex: 1, justifyContent: 'center', alignItems: 'center' }]} key={`bot-drawer`}>
+          <Pressable onPress={() => setIsBotDrawerOpened(!isBotDrawerOpened)} >
+            <View style={{ width: 100, height: 60, borderRadius: 20, backgroundColor: '#fff', justifyContent: 'center', alignItems: 'center' }}>
+              {<ChevronUp style={{ transform: [{ rotate: isBotDrawerOpened ? '180deg' : '0deg' }], animationDuration: 300 }} stroke="black" width={20} height={20} />}
+            </View>
+          </Pressable>
+          <View style={{ width: '100%', height: '100%', backgroundColor: initColor, marginTop: 0, borderTopLeftRadius: 20, borderTopRightRadius: 20 }}>
+            {/* SPACE!!!! here goes nothing because the content is out the view cause the absolute position */}
+          </View>
+        </Animated.View>
+
+        <DragableDecoration
+          key={`dragable-decoration-option`}
+          onMenuOpenCallBack={() => setSelectedTextIndex(-1)}
+          onArrangeEnd={(x, y, value) => onArrangeEnd("decoration", x, y, value)}
+          onChangedDecorations={onChangedDecorations}
+          initialPosition={{ x: width - width * 0.75 - 25, y: height + 50 }}
+          showFromDrawer={isBotDrawerOpened}
+          parentDimensions={{ width: width, height: height }}
+          offsetYAzis={botDrawerAnimation}
+          style={[styles.draggableBox, { backgroundColor: initLightColor }]} />
+        <DragableOption
+          key={`dragable-text-option`}
+          onArrangeEnd={(x, y, value) => onArrangeEnd("text", x, y, value)}
+          initialPosition={{ x: width - width * 0.5 - 25, y: height + 50 }}
+          offsetYAzis={botDrawerAnimation}
+          style={[styles.draggableBox, { backgroundColor: initLightColor }]}>
+          <MessageSquare stroke="black" fill="#fff" width={40} height={40} />
+        </DragableOption>
+        <StaticOption
+          key={`capture-share-button`}
+          style={{ backgroundColor: initLightColor }}
+          onPress={handleCapture}
+          initialPosition={{ x: width - width * 0.25 - 25, y: height + 50 }}
+          offsetYAzis={botDrawerAnimation}>
+          <Camera stroke="black" fill="#fff" width={40} height={40} />
+        </StaticOption>
+
+      </SafeAreaView>
+    </SafeAreaProvider>
   );
 };
 
@@ -295,7 +305,7 @@ const styles = StyleSheet.create({
     zIndex: 10,
     width: 60,
     height: 60,
-    backgroundColor: 'blue',
+    backgroundColor: '#ffffff',
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
@@ -306,7 +316,7 @@ const styles = StyleSheet.create({
     zIndex: 10,
     width: 120,
     height: 60,
-    backgroundColor: 'blue',
+    backgroundColor: '#ffffff',
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
@@ -318,7 +328,7 @@ const styles = StyleSheet.create({
     zIndex: 10,
     width: 120,
     height: 60,
-    backgroundColor: 'blue',
+    backgroundColor: '#ffffff',
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',

@@ -7,7 +7,7 @@ import Animated, {
     useAnimatedStyle,
 } from 'react-native-reanimated';
 
-const StaticOption = ({ onPress, initialPosition, children, offsetYAzis = useSharedValue(0) }) => {
+const StaticOption = ({ onPress, initialPosition, children, offsetYAzis = useSharedValue(0), style }) => {
     const scale = useSharedValue(1);
 
     const animatedStyle = useAnimatedStyle(() => {
@@ -30,7 +30,7 @@ const StaticOption = ({ onPress, initialPosition, children, offsetYAzis = useSha
     };
 
     return (
-        <Animated.View style={[styles.captureBox, animatedStyle]}>
+        <Animated.View style={[style, styles.captureBox, animatedStyle]}>
             <View style={styles.container}>
                 <Pressable
                     maxPointers={1}
@@ -54,7 +54,6 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: 'violet',
         width: 60,
         height: 60,
         borderRadius: 50,

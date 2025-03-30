@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text } from 'react-native';
-import Animated from 'react-native-reanimated';
+import { StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import MemeCreate from './MemeCreate';
 import MemeSelect from './MemeSelect';
 import MemeOptions from './MemeOptions';
+import { Platform } from 'expo-modules-core';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { useEffect } from 'react';
 import { getRandomMeme } from 'src/hooks/useTemplates';
+import * as NavigationBar from 'expo-navigation-bar';
 
 const AppRouterBase = () => {
     const Drawer = createDrawerNavigator();
@@ -16,6 +17,11 @@ const AppRouterBase = () => {
     const [currentMeme, setCurrentMeme] = useState(null);
     const [onChangedTemplates, setOnChangedTemplates] = useState(false);
     const [onChangedDecorations, setOnChangedDecorations] = useState(false);
+
+    //we fade out bottom nav bar in android
+    if(Platform.OS === 'android') {
+        NavigationBar.setVisibilityAsync('hidden');
+    }
 
     useEffect(() => {
         if (!currentMeme) {

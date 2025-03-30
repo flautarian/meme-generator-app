@@ -99,6 +99,8 @@
     "rebootTemplatesDbMessage": "Sei sicuro di voler riavviare il database dei modelli? Questo ripristinerà tutti i modelli ai valori predefiniti.",
     "rebootTemplatesDbConfirm": "Riavvia",
     "rebootTemplatesDbHint": "Tocca per riavviare il database dei modelli",
-    "appSignature": "Questo programma è stato sviluppato da GiacconiDev"
+    "appSignature": "Questo programma è stato sviluppato da GiacconiDev",
+    "staticBDrawerEnabled": "Opzioni visibili",
+    "staticBDrawerDisabled": "Opzioni nascoste"
   }
 }

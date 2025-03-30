@@ -37,16 +37,6 @@ const SQLiteTemplatesService = {
     });
   },
 
-  updateTemplate(id, updatedData) {
-    const { blob, name } = updatedData;
-    return new Promise((resolve, reject) => {
-      const results = db.getAllSync(
-        'UPDATE templates SET blob = ?, name = ? WHERE id = ?;',
-        [blob, name, id]);
-      resolve(results);
-    });
-  },
-
   deleteTemplate(id) {
     return new Promise((resolve, reject) => {
       const results = db.getAllSync(

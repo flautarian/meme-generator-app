@@ -99,6 +99,8 @@
     "rebootTemplatesDbMessage": "¿Estás seguro de que deseas reiniciar la base de datos de plantillas? Esto restablecerá todas las plantillas a los valores predeterminados.",
     "rebootTemplatesDbConfirm": "Reiniciar",
     "rebootTemplatesDbHint": "Toca para reiniciar la base de datos de plantillas",
-    "appSignature": "Este programa ha sido desarrollado por GiacconiDev"
+    "appSignature": "Este programa ha sido desarrollado por GiacconiDev",
+    "staticBDrawerEnabled": "Opciones visibles",
+    "staticBDrawerDisabled": "Opciones ocultas"
   }
 }

@@ -1,6 +1,7 @@
 import initMemeDecorations from "./initMemeDecorations";
 import InitMemes from "./InitMemes";
 import documentUploadOption from "./documentUploadOption";
+import initSettings from "./initSettings";
 
 export const Utils = {
     getRandomInt: (min, max) => {
@@ -11,6 +12,9 @@ export const Utils = {
     },
     getInitMemeDecorations: () => {
         return initMemeDecorations;
+    },
+    getInitSettings: () => {
+        return initSettings;
     },
     getDocumentUploadOption: () => {
         return documentUploadOption;

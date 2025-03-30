@@ -21,10 +21,6 @@ const DecorationsService = {
       .toArray();
   },
 
-  async updateDecoration(id, updatedData) {
-    await db.decorations.update(id, updatedData);
-  },
-
   async deleteDecoration(id) {
     await db.decorations.delete(id);
   },

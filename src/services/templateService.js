@@ -21,10 +21,6 @@ const TemplatesService = {
       .toArray();
   },
 
-  async updateTemplate(id, updatedData) {
-    await db.templates.update(id, updatedData);
-  },
-
   async deleteTemplate(id) {
     await db.templates.delete(id);
   },

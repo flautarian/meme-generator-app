@@ -44,7 +44,7 @@ const createWebWorkerDb = () => {
   db.version(1).stores({
     templates: '++id, name, blob', // Auto-incrementing ID, image path, and name
     decorations: '++id, name, blob', // Auto-incrementing ID, image path, and name
-    inputs: '++id, templateId, xAxis, yAxis, value', // Auto-incrementing ID, FK, coordinates, and value
+    settings: '++id, valuesStored' // Auto-incrementing ID, values
   });
   // check if templates table is empty to fill with initMemes data
   db.templates.count().then((count) => {
@@ -69,6 +69,14 @@ const createWebWorkerDb = () => {
       });
       db.decorations.bulkAdd(c).catch((err) => {
         console.error('Failed to insert initial memes:', err);
+      });
+    }
+  });
+  // check if settings table is empty to fill with initial settings
+  db.settings.count().then((count) => {
+    if (count === 0) {
+      db.settings.add({ valuesStored: Utils.getInitSettings().valuesStored }).catch((err) => {
+        console.error('Failed to insert initial settings:', err);
       });
     }
   });
@@ -101,14 +109,10 @@ const createMobileDb = () => {
           );
         `;
 
-    const createInputsTableQuery = `
-          CREATE TABLE IF NOT EXISTS Inputs (
-            ID INTEGER PRIMARY KEY AUTOINCREMENT,
-            templateId INTEGER,
-            xAxis INTEGER,
-            yAxis INTEGER,
-            value VARCHAR(255),
-            FOREIGN KEY (templateId) REFERENCES templates(ID) ON DELETE CASCADE
+    const createSettingsTableQuery = `
+          CREATE TABLE IF NOT EXISTS settings (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            valuesStored TEXT NOT NULL  -- JSON string of settings
           );
         `;
 
@@ -120,11 +124,15 @@ const createMobileDb = () => {
         INSERT INTO decorations (blob, name) VALUES (?, ?);
       `;
 
-    // creating if case, templates and inputs tables
+    const insertSettingQuery = `
+        INSERT INTO settings (valuesStored) VALUES (?);
+      `;
+
+    // creating if case, templates and settings tables
     //clearDb(db);
     db.runSync(createTemplatesTableQuery);
     db.runSync(createDecorationsTableQuery);
-    db.runSync(createInputsTableQuery);
+    db.runSync(createSettingsTableQuery);
 
     console.log('Database initialized with schema!');
 
@@ -152,11 +160,22 @@ const createMobileDb = () => {
         db.runSync(insertDecorationQuery, [decoration.blob, decoration.name]);
       });
     }
-    
+
     const createdDecorations = db.getAllSync('SELECT COUNT(*) AS count FROM decorations;');
     let resultCreatedDecorations = createdDecorations[0];
     console.log("Created decorations:", resultCreatedDecorations.count);
 
+    // Initialize with default settings data if empty
+    const initialSettings = db.getAllSync('SELECT COUNT(*) AS count FROM settings;');
+    let resultInitialSettings = initialSettings[0];
+
+    if (resultInitialSettings.count == 0) {
+      console.log("Inserting initial settings...");
+      db.runSync(insertSettingQuery, [Utils.getInitSettings().valuesStored]);
+    }
+    const createdSettings = db.getAllSync('SELECT COUNT(*) AS count FROM settings;');
+    let resultCreatedSettings = createdSettings[0];
+    console.log("Created settings:", resultCreatedSettings.count);
   } catch (error) {
     console.error('Error reading or executing SQL file:', error);
   }
@@ -164,13 +183,16 @@ const createMobileDb = () => {
 }
 
 const clearDb = (db) => {
+  console.log('Clearing database...');
   const dropTemplatesTableQuery = `DROP TABLE IF EXISTS templates;`;
   const dropDecorationsTableQuery = `DROP TABLE IF EXISTS decorations;`;
   const dropInputsTableQuery = `DROP TABLE IF EXISTS inputs;`;
+  const dropSettingsTableQuery = `DROP TABLE IF EXISTS settings;`;
 
   db.runSync(dropTemplatesTableQuery);
   db.runSync(dropDecorationsTableQuery);
   db.runSync(dropInputsTableQuery);
+  db.runSync(dropSettingsTableQuery);
 }
 
 // Initialize with Web Worker DB insance

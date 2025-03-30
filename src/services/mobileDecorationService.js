@@ -37,16 +37,6 @@ const SQLiteDecorationsService = {
     });
   },
 
-  updateDecoration(id, updatedData) {
-    const { blob, name } = updatedData;
-    return new Promise((resolve, reject) => {
-      const results = db.getAllSync(
-        'UPDATE decorations SET blob = ?, name = ? WHERE id = ?;',
-        [blob, name, id]);
-      resolve(results);
-    });
-  },
-
   deleteDecoration(id) {
     return new Promise((resolve, reject) => {
       const results = db.getAllSync(

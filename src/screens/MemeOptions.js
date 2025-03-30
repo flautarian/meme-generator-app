@@ -1,18 +1,39 @@
-import { View, StyleSheet, ScrollView, Pressable, Text } from 'react-native';
+import { View, StyleSheet, ScrollView, Pressable, Text, Switch } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useConfirmation } from 'src/contexts/ConfirmationContext';
 import LanguageSelector from 'src/components/LanguageSelectorComponent/LanguageSelector';
 import AppInfo from 'src/components/AppInfoComponent/AppInfo';
 import { rebootTemplates } from 'src/hooks/useTemplates';
 import { rebootDecorations } from 'src/hooks/useDecorations';
+import { useCallback, useState } from 'react';
+import { fetchSettings, updateSettings } from 'src/hooks/useSettings';
+import { useEffect } from 'react';
 
 const MemeOptions = ({ navigation, onChangedTemplates, onChangedDecorations }) => {
   const { t } = useTranslation();
   const { showConfirmation } = useConfirmation();
+  const [staticBDrawer, setStaticBDrawer] = useState(false);
 
   const closeDrawer = () => {
     navigation.closeDrawer();
   };
+
+  useEffect(() => {
+    fetchSettings().then((result) => {
+      if (result) {
+        const allSettings = JSON.parse(result.valuesStored);
+        setStaticBDrawer(allSettings.staticBDrawerEnabled);
+      }
+    });
+  }, []);
+
+  const handleSettingsUpdate = useCallback(async () => {
+    const updatedStrSettings = {
+      valuesStored: JSON.stringify(
+        { staticBDrawerEnabled: staticBDrawer })
+    };
+    await updateSettings(updatedStrSettings);
+  }, [staticBDrawer]);
 
   const rebootDecorationsDb = () => {
     showConfirmation({
@@ -75,6 +96,21 @@ const MemeOptions = ({ navigation, onChangedTemplates, onChangedDecorations }) =
           </Pressable>
         </View>
 
+        {/* Static bottom drawer checkbox */}
+        <View style={styles.switchSection}>
+          <Text style={styles.dangerButtonText}>{staticBDrawer ? t('memeOptions.staticBDrawerEnabled') : t('memeOptions.staticBDrawerDisabled')}</Text>
+          <Switch
+            trackColor={{ false: '#767577', true: '#81b0ff' }}
+            thumbColor={staticBDrawer ? '#f5dd4b' : '#f4f3f4'}
+            ios_backgroundColor="#3e3e3e"
+            onValueChange={() => {
+              setStaticBDrawer(!staticBDrawer);
+              handleSettingsUpdate();
+            }}
+            value={staticBDrawer}
+          />
+        </View>
+
         {/* App signature */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t('memeOptions.appSignature')}</Text>
@@ -96,6 +132,12 @@ const styles = StyleSheet.create({
   },
   section: {
     marginBottom: 30,
+  },
+  switchSection: {
+    marginBottom: 30,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   searchContainer: {
     padding: 10,

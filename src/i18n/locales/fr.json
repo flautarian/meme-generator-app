@@ -75,17 +75,6 @@
       "list": "• Utilisez la police Impact pour le style mème classique\n• Positionnez le texte en haut et en bas\n• Gardez le texte court et percutant\n• Utilisez des couleurs contrastées"
     }
   },
-  "memeOptions": {
-    "rebootDecorationsDb": "Redémarrer la Base de Données des Décorations",
-    "rebootDecorationsDbMessage": "Êtes-vous sûr de vouloir redémarrer la base de données des décorations? Cela réinitialisera toutes les décorations aux valeurs par défaut.",
-    "rebootDecorationsDbConfirm": "Redémarrer",
-    "rebootDecorationsDbHint": "Appuyez pour réinitialiser la base de données des décorations",
-    "rebootTemplatesDb": "Redémarrer la Base de Données des Modèles",
-    "rebootTemplatesDbMessage": "Êtes-vous sûr de vouloir redémarrer la base de données des modèles? Cela réinitialisera tous les modèles aux valeurs par défaut.",
-    "rebootTemplatesDbConfirm": "Redémarrer",
-    "rebootTemplatesDbHint": "Appuyez pour réinitialiser la base de données des modèles",
-    "appSignature": "Ce programme a été développé par GiacconiDev"
-  },
   "templates": {
     "searchPlaceholder": "Rechercher des modèles...",
     "foundCount": "Modèles trouvés : {{count}}",
@@ -100,5 +89,18 @@
     "success": "Succès !",
     "error": "Erreur",
     "warning": "Attention"
+  },
+  "memeOptions": {
+    "rebootDecorationsDb": "Redémarrer la Base de Données des Décorations",
+    "rebootDecorationsDbMessage": "Êtes-vous sûr de vouloir redémarrer la base de données des décorations? Cela réinitialisera toutes les décorations aux valeurs par défaut.",
+    "rebootDecorationsDbConfirm": "Redémarrer",
+    "rebootDecorationsDbHint": "Appuyez pour réinitialiser la base de données des décorations",
+    "rebootTemplatesDb": "Redémarrer la Base de Données des Modèles",
+    "rebootTemplatesDbMessage": "Êtes-vous sûr de vouloir redémarrer la base de données des modèles? Cela réinitialisera tous les modèles aux valeurs par défaut.",
+    "rebootTemplatesDbConfirm": "Redémarrer",
+    "rebootTemplatesDbHint": "Appuyez pour réinitialiser la base de données des modèles",
+    "appSignature": "Ce programme a été développé par GiacconiDev",
+    "staticBDrawerEnabled": "Options visibles",
+    "staticBDrawerDisabled": "Options ocultas"
   }
 }

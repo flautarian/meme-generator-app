@@ -16,8 +16,8 @@ export const ConfirmationProvider = ({ children }) => {
     isOpen: false,
     title: '',
     message: '',
-    onConfirm: () => {},
-    onCancel: () => {},
+    onConfirm: () => { },
+    onCancel: () => { },
     type: null,
     itemId: null
   });
@@ -41,14 +41,13 @@ export const ConfirmationProvider = ({ children }) => {
     setConfirmationState(prev => ({
       ...prev,
       isOpen: false,
-      onConfirm: () => {},
-      onCancel: () => {}
+      onConfirm: () => { },
+      onCancel: () => { }
     }));
   }, []);
 
   return (
     <ConfirmationContext.Provider value={{ showConfirmation, hideConfirmation }}>
-      {children}
       <ConfirmationModal
         visible={confirmationState.isOpen}
         title={confirmationState.title}
@@ -56,6 +55,7 @@ export const ConfirmationProvider = ({ children }) => {
         onConfirm={confirmationState.onConfirm}
         onCancel={confirmationState.onCancel}
       />
+      {children}
     </ConfirmationContext.Provider>
   );
 };

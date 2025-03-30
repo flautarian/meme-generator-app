@@ -100,6 +100,8 @@
     "rebootTemplatesDbMessage": "Are you sure you want to reboot the templates database? This will reset all templates to default.",
     "rebootTemplatesDbConfirm": "Reboot",
     "rebootTemplatesDbHint": "Tap to reset templates database",
-    "appSignature": "This app has been developed by GiacconiDev"
+    "appSignature": "This app has been developed by GiacconiDev",
+    "staticBDrawerEnabled": "Bottom options fixed",
+    "staticBDrawerDisabled": "Bottom options hidden"
   }
 }

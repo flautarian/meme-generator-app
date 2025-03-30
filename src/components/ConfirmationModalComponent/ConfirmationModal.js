@@ -6,45 +6,55 @@ const ConfirmationModal = ({ visible, title, message, onConfirm, onCancel }) => 
   const { t } = useTranslation();
 
   return (
-    <Modal
-      animationType="fade"
-      transparent={true}
-      visible={visible}
-      onRequestClose={onCancel}
-    >
-      <View style={styles.modalOverlay}>
-        <View style={styles.modalContent}>
-          <Text style={styles.title}>{title}</Text>
-          <Text style={styles.message}>{message}</Text>
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity
-              style={[styles.button, styles.cancelButton]}
-              onPress={onCancel}
-              accessible={true}
-              accessibilityLabel={t('common.cancel')}
-            >
-              <Text style={[styles.buttonText, styles.cancelButtonText]}>
-                {t('common.cancel')}
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.button, styles.deleteButton]}
-              onPress={onConfirm}
-              accessible={true}
-              accessibilityLabel={t('common.delete')}
-            >
-              <Text style={[styles.buttonText, styles.deleteButtonText]}>
-                {t('common.delete')}
-              </Text>
-            </TouchableOpacity>
+    <View style={styles.container}>
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={visible}
+        onRequestClose={onCancel}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.title}>{title}</Text>
+            <Text style={styles.message}>{message}</Text>
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity
+                style={[styles.button, styles.cancelButton]}
+                onPress={onCancel}
+                accessible={true}
+                accessibilityLabel={t('common.cancel')}
+              >
+                <Text style={[styles.buttonText, styles.cancelButtonText]}>
+                  {t('common.cancel')}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.button, styles.deleteButton]}
+                onPress={onConfirm}
+                accessible={true}
+                accessibilityLabel={t('common.delete')}
+              >
+                <Text style={[styles.buttonText, styles.deleteButtonText]}>
+                  {t('common.delete')}
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
-      </View>
-    </Modal>
+      </Modal>
+    </View >
   );
 };
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',

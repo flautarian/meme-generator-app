@@ -96,8 +96,7 @@ const MemeSelect = ({ navigation, onSelectMeme, onChangedTemplates }) => {
       <Text style={styles.resultCount}>
         {t('templates.foundCount', { count: templateResults.length - 1 })}
       </Text>
-      <ScrollView style={styles.content}>
-        <View>
+      <View style={styles.content}>
           {templateResults.length > 0 &&
             <FlatList
               contentContainerStyle={{ alignItems: 'center' }}
@@ -119,7 +118,6 @@ const MemeSelect = ({ navigation, onSelectMeme, onChangedTemplates }) => {
             />
           }
         </View>
-      </ScrollView>
     </View>
   );
 };

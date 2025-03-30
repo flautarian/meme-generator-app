@@ -1,10 +1,9 @@
 import { useState } from "react";
 import { StyleSheet, TextInput } from "react-native";
 import { TapGestureHandler } from "react-native-gesture-handler";
-import Animated, { useAnimatedStyle, useSharedValue } from "react-native-reanimated";
+import Animated, { useAnimatedStyle } from "react-native-reanimated";
 import { useTranslation } from 'react-i18next';
 import { useCallback } from "react";
-import { useEffect } from "react";
 
 const EditableText = ({ item, index, height, width, rotation }) => {
 
