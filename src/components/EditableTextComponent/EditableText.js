@@ -15,12 +15,12 @@ const EditableText = ({ item, index, height, width, rotation }) => {
 
     // animated size style for the inner component shown
     const resizeAnimationStyle = useAnimatedStyle(() => ({
-        maxHeight: height.get(),
-        height: height.get() * 0.9,
+        maxHeight: height.value,
+        height: height.value * 0.9,
         flexShrink: 1,
-        maxWidth: width.get(),
-        width: width.get() * 0.9,
-        fontSize: (height.get() + width.get() / 2) / 4 - value.split(" ").length * 5,
+        maxWidth: width.value,
+        width: width.value * 0.9,
+        fontSize: (height.value + width.value / 2) / 4 - value.split(" ").length * 5,
         zIndex: 15,
     }));
 
@@ -31,7 +31,7 @@ const EditableText = ({ item, index, height, width, rotation }) => {
 
     // animated rotation style for the inner component shown
     const rotationAnimationStyle = useAnimatedStyle(() => ({
-        transform: [{ rotate: rotation.get() + 'deg' }],
+        transform: [{ rotate: rotation.value + 'deg' }],
     }));
 
     return (

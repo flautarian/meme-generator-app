@@ -53,17 +53,17 @@ const DragableDecoration = ({
     }));
 
     const onSelectDecoration = useCallback(async (item) => {
-        selectedDecoration.set(item);
+        selectedDecoration.value = item;
         toggleMenuState();
     }, [opened, selectedDecoration]);
 
     // menu opened animated style
     const menuOpenedAnimatedStyle = useAnimatedStyle(() => ({
-        opacity: elementSize.opacity.get(),
-        width: elementSize.width.get(),
-        height: elementSize.height.get(),
-        left: elementSize.left.get(),
-        bottom: elementSize.bottom.get(),
+        opacity: elementSize.opacity.value,
+        width: elementSize.width.value,
+        height: elementSize.height.value,
+        left: elementSize.left.value,
+        bottom: elementSize.bottom.value,
     }));
 
     const handleOnArrangeEnd = useCallback((x, y) => {
@@ -80,9 +80,9 @@ const DragableDecoration = ({
                     openTabTimer.current = 0;
                 };
             }
-            else onArrangeEnd(x, y, selectedDecoration?.get().blob);
+            else onArrangeEnd(x, y, selectedDecoration?.value.blob);
         }
-        else onArrangeEnd(x, y, selectedDecoration?.get().blob);
+        else onArrangeEnd(x, y, selectedDecoration?.value.blob);
     }, [selectedDecoration, onArrangeEnd]);
 
     const toggleMenuState = useCallback(() => {
@@ -95,15 +95,15 @@ const DragableDecoration = ({
     }, [opened]);
 
     useEffect(() => {
-        elementSize.opacity.set(withSpring(opened ? 1 : 0));
-        elementSize.width.set(withSpring(opened ? parentDimensions.width * 0.9 : 0, scaleSpringConfig));
-        elementSize.height.set(withSpring(opened ? parentDimensions.height * 0.35 : 0, scaleSpringConfig));
-        elementSize.left.set(withSpring(opened ? parentDimensions.width * 0.05 : initialPosition.x, scaleSpringConfig));
-        elementSize.bottom.set(withSpring(opened && isKeyboardVisible ? parentDimensions.height * 0.4 : 50, scaleSpringConfig));
-        if (selectedDecoration.get() === 0) {
+        elementSize.opacity.value = withSpring(opened ? 1 : 0);
+        elementSize.width.value = withSpring(opened ? parentDimensions.width * 0.9 : 0, scaleSpringConfig);
+        elementSize.height.value = withSpring(opened ? parentDimensions.height * 0.35 : 0, scaleSpringConfig);
+        elementSize.left.value = withSpring(opened ? parentDimensions.width * 0.05 : initialPosition.x, scaleSpringConfig);
+        elementSize.bottom.value = withSpring(opened && isKeyboardVisible ? parentDimensions.height * 0.4 : 50, scaleSpringConfig);
+        if (selectedDecoration.value === 0) {
             const initSelectDecoration = async () => {
                 const item = await getRandomDecoration();
-                selectedDecoration.set(item);
+                selectedDecoration.value = item;
             };
             initSelectDecoration().catch(console.error);
         }
@@ -134,7 +134,7 @@ const DragableDecoration = ({
                         style={[{ position: "absolute" }]}>
                         <Animated.View style={[buttonAnimatedStyle]}>
                             <Pressable maxPointers={1} style={styles.imageWrapper}>
-                                <Image selectable={false} style={{ width: 50, height: 50 }} source={selectedDecoration.get()?.blob} resizeMode='contain' />
+                                <Image selectable={false} style={{ width: 50, height: 50 }} source={selectedDecoration.value?.blob} resizeMode='contain' />
                             </Pressable>
                         </Animated.View>
                     </GestureDetector>

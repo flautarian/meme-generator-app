@@ -62,7 +62,7 @@ const DragableOption = ({
     const getNewPosition = useCallback((gestureState) => {
         const { moveX, moveY, dx, dy } = gestureState;
         const { width, height } = dimensions.current;
-        const result = { x: moveX - (width * scale.get()) / 2, y: moveY - (height * scale.get()) / 2 };
+        const result = { x: moveX - (width * scale.value) / 2, y: moveY - (height * scale.value) / 2 };
         if (limitDistance > 0 && (
             Math.abs(
                 initialPosition.x - result.x
@@ -70,20 +70,20 @@ const DragableOption = ({
             Math.abs(
                 initialPosition.y - result.y
             ) > limitDistance))
-            return { x: position.x.get(), y: position.y.get() };
+            return { x: position.x.value, y: position.y.value };
         return result;
     }, [dimensions]);
 
     // handle drag function
     const onDrag = useCallback((gestureState) => {
-        if (scale.get() == 1.0 && animateButton)
-            scale.set(withSpring(1.5, scaleSpringConfig))
+        if (scale.value == 1.0 && animateButton)
+            scale.value = withSpring(1.5, scaleSpringConfig)
 
         const newPos = getNewPosition(gestureState);
         if (!blockDragX)
-            position.x.set(newPos.x - offsetXAzis.get() );
+            position.x.value = newPos.x - offsetXAzis.value;
         if (!blockDragY)
-            position.y.set(newPos.y - offsetYAzis.get() );
+            position.y.value = newPos.y - offsetYAzis.value;
     }, []);
 
     // end drag function
@@ -99,21 +99,21 @@ const DragableOption = ({
             onArrangeEnd(newPos.x, newPos.y, "Label");
 
         // Reset position
-        position.x.set(withSpring(initialPosition.x, returnSpringConfig));
-        position.y.set(withSpring(initialPosition.y, returnSpringConfig));
+        position.x.value = withSpring(initialPosition.x, returnSpringConfig);
+        position.y.value = withSpring(initialPosition.y, returnSpringConfig);
 
         // Reset scale
         if (animateButton)
-            scale.set(withSpring(1, scaleSpringConfig));
+            scale.value = withSpring(1, scaleSpringConfig);
     }, [position]);
 
     // animated style
     const dragAnimatedStyle = useAnimatedStyle(() => ({
         transform: [
-            { translateX: position.x.get() + offsetXAzis.get() },
-            { translateY: position.y.get() + offsetYAzis.get() },
-            { scaleX: scale.get() },
-            { scaleY: scale.get() },
+            { translateX: position.x.value + offsetXAzis.value },
+            { translateY: position.y.value + offsetYAzis.value },
+            { scaleX: scale.value },
+            { scaleY: scale.value },
         ],
         position: 'absolute',
     }));

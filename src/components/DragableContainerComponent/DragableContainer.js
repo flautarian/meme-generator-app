@@ -46,7 +46,7 @@ const DragableContainer = ({ item, index, selected, onSelect, onDelete, children
 
     // Check if container is too close to bottom
     const checkButtonsPosition = useCallback(() => {
-        const containerBottom = position.y.get() + contentView.height.get();
+        const containerBottom = position.y.value + contentView.height.value;
         const windowHeight = windowDimensions.current.height;
         const threshold = windowHeight - 100; // Adjusted threshold
         setButtonsAbove(containerBottom > threshold);
@@ -57,13 +57,13 @@ const DragableContainer = ({ item, index, selected, onSelect, onDelete, children
         let { moveX, moveY } = gestureState;
         let { height } = dimensions;
         let { oX, oY } = originOffset.current;
-        return { x: moveX - oX, y: moveY - oY - height.get() / 2 - buttonsSize * 1.5 };
+        return { x: moveX - oX, y: moveY - oY - height.value / 2 - buttonsSize * 1.5 };
     }, [dimensions]);
 
     const handleDrag = useCallback((gestureState) => {
         const { x, y } = getNewPosition(gestureState);
-        position.x.set(x);
-        position.y.set(y);
+        position.x.value = x;
+        position.y.value = y;
         if (!!item) {
             item.x = x;
             item.y = y;
@@ -83,10 +83,10 @@ const DragableContainer = ({ item, index, selected, onSelect, onDelete, children
     // handle resize function
     const handleResizeY = useCallback((gestureState, y0) => {
         let newValue = y0 ? gestureState.y0 - gestureState.moveY : gestureState.moveY - gestureState.y0;
-        const newHeight = Math.max(newValue + initHeight.get(), 25);
-        contentView.height.set(newHeight);
+        const newHeight = Math.max(newValue + initHeight.value, 25);
+        contentView.height.value = newHeight;
         if (newHeight > 25 && y0)
-            position.y.set(gestureState.moveY - (y0 ? -1 * buttonsSize / 2 : buttonsSize / 2));
+            position.y.value = gestureState.moveY - (y0 ? -1 * buttonsSize / 2 : buttonsSize / 2);
         if (!!item)
             item.height = newHeight;
         checkButtonsPosition();
@@ -99,7 +99,7 @@ const DragableContainer = ({ item, index, selected, onSelect, onDelete, children
             onPanResponderMove: (_, gestureState) =>
                 handleResizeY(gestureState, false),
             onPanResponderRelease: (_, gestureState) => {
-                initHeight.set(contentView.height.get());
+                initHeight.value = contentView.height.value;
                 setLayoutKey((prevKey) => prevKey + 1);
             },
         })
@@ -112,7 +112,7 @@ const DragableContainer = ({ item, index, selected, onSelect, onDelete, children
             onPanResponderMove: (_, gestureState) =>
                 handleResizeY(gestureState, true),
             onPanResponderRelease: (_, gestureState) => {
-                initHeight.set(contentView.height.get());
+                initHeight.value = contentView.height.value;
                 setLayoutKey((prevKey) => prevKey + 1);
             },
         })
@@ -121,10 +121,10 @@ const DragableContainer = ({ item, index, selected, onSelect, onDelete, children
     // handle resize function
     const handleResizeX = useCallback((gestureState, x0) => {
         let newValue = x0 ? gestureState.x0 - gestureState.moveX : gestureState.moveX - gestureState.x0;
-        const newWidth = Math.max(newValue + initWidth.get(), 25);
-        contentView.width.set(newWidth);
+        const newWidth = Math.max(newValue + initWidth.value, 25);
+        contentView.width.value = newWidth;
         if (newWidth > 25 && x0)
-            position.x.set(gestureState.moveX - (x0 ? -1 * buttonsSize / 2 : buttonsSize / 2));
+            position.x.value = gestureState.moveX - (x0 ? -1 * buttonsSize / 2 : buttonsSize / 2);
         if (!!item)
             item.width = newWidth;
         checkButtonsPosition();
@@ -137,7 +137,7 @@ const DragableContainer = ({ item, index, selected, onSelect, onDelete, children
             onPanResponderMove: (_, gestureState) =>
                 handleResizeX(gestureState, false),
             onPanResponderRelease: (_, gestureState) => {
-                initWidth.set(contentView.width.get());
+                initWidth.value = contentView.width.value;
                 setLayoutKey((prevKey) => prevKey + 1);
             },
         })
@@ -150,7 +150,7 @@ const DragableContainer = ({ item, index, selected, onSelect, onDelete, children
             onPanResponderMove: (_, gestureState) =>
                 handleResizeX(gestureState, true),
             onPanResponderRelease: (_, gestureState) => {
-                initWidth.set(contentView.width.get());
+                initWidth.value = contentView.width.value;
                 setLayoutKey((prevKey) => prevKey + 1);
             },
         })
@@ -159,9 +159,9 @@ const DragableContainer = ({ item, index, selected, onSelect, onDelete, children
     // handle rotate function
     const onRotate = useCallback((gestureState) => {
         let newValue = gestureState.x0 - gestureState.moveX;
-        contentView.rotation.set(newValue + initRotation.get());
+        contentView.rotation.value = newValue + initRotation.value;
         if (!!item)
-            item.rotation = contentView.rotation.get();
+            item.rotation = contentView.rotation.value;
     }, [contentView]);
 
     // Pan responder for the rotate
@@ -171,7 +171,7 @@ const DragableContainer = ({ item, index, selected, onSelect, onDelete, children
             onPanResponderMove: (_, gestureState) =>
                 onRotate(gestureState),
             onPanResponderRelease: (_, gestureState) => {
-                initRotation.set(contentView.rotation.get());
+                initRotation.value = contentView.rotation.value;
             },
         })
     ).current;
@@ -179,20 +179,20 @@ const DragableContainer = ({ item, index, selected, onSelect, onDelete, children
     // animated translation style for main Animated.View
     const dragAnimationStyle = useAnimatedStyle(() => ({
         transform: [
-            { translateX: position.x.get() },
-            { translateY: position.y.get() },
+            { translateX: position.x.value },
+            { translateY: position.y.value },
         ],
         position: 'absolute',
     }));
 
     // Init position of the component
     useEffect(() => {
-        position.x.set(item.x);
-        position.y.set(item.y);
+        position.x.value = item.x;
+        position.y.value = item.y;
 
-        initHeight.set(contentView.height.get());
-        initWidth.set(contentView.width.get());
-        initRotation.set(contentView.rotation.get());
+        initHeight.value = contentView.height.value;
+        initWidth.value = contentView.width.value;
+        initRotation.value = contentView.rotation.value;
         checkButtonsPosition();
     }, []);
 
@@ -200,8 +200,8 @@ const DragableContainer = ({ item, index, selected, onSelect, onDelete, children
     const onComponentLayout = useCallback((event) => {
         const { width, height, x, y, top, left } = event.nativeEvent.layout;
         originOffset.current = { oX: x + (left | 0) + width / 2, oY: y + (top | 0) + height / 2 };
-        dimensions.width.set(width);
-        dimensions.height.set(height);
+        dimensions.width.value = width;
+        dimensions.height.value = height;
         checkButtonsPosition();
     }, [dimensions, checkButtonsPosition]);
 

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { Utils } from 'src/utils/Utils';
 import { View, StyleSheet, FlatList, TextInput, Text, Platform, ScrollView } from 'react-native';
 import { addNewTemplate, deleteTemplate, fetchTemplates } from 'src/hooks/useTemplates';
 import TemplateItem from 'src/components/TemplateItemComponent/TemplateItem';
@@ -97,27 +98,27 @@ const MemeSelect = ({ navigation, onSelectMeme, onChangedTemplates }) => {
         {t('templates.foundCount', { count: templateResults.length - 1 })}
       </Text>
       <View style={styles.content}>
-          {templateResults.length > 0 &&
-            <FlatList
-              contentContainerStyle={{ alignItems: 'center' }}
-              showsVerticalScrollIndicator={false}
-              style={styles.memeListContainer}
-              data={templateResults}
-              keyExtractor={(item, index) => `${item.name}-${index}`}
-              numColumns={Platform.OS === "web" ? 2 : 4}
-              renderItem={({ item, index }) => (
-                <TemplateItem
-                  template={item}
-                  key={index}
-                  index={index}
-                  imgSize={Platform.OS === "web" ? 150 : 75}
-                  onSelect={(item) => selectMeme(item)}
-                  onDelete={() => handleDeleteTemplate(item)}
-                />
-              )}
-            />
-          }
-        </View>
+        {templateResults.length > 0 &&
+          <FlatList
+            contentContainerStyle={{ alignItems: 'center' }}
+            showsVerticalScrollIndicator={false}
+            style={styles.memeListContainer}
+            data={templateResults}
+            keyExtractor={(item, index) => `${item.name}-${index}`}
+            numColumns={Platform.OS === "web" ? 2 : 4}
+            renderItem={({ item, index }) => (
+              <TemplateItem
+                template={item}
+                key={index}
+                index={index}
+                imgSize={Platform.OS === "web" ? 150 : 75}
+                onSelect={(item) => selectMeme(item)}
+                onDelete={() => handleDeleteTemplate(item)}
+              />
+            )}
+          />
+        }
+      </View>
     </View>
   );
 };

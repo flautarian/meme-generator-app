@@ -1,7 +1,22 @@
-// Learn more https://docs.expo.io/guides/customizing-metro
-const { getDefaultConfig } = require('expo/metro-config');
 
-/** @type {import('expo/metro-config').MetroConfig} */
-const config = getDefaultConfig(__dirname);
+const { getDefaultConfig, mergeConfig } = require('@react-native/metro-config');
+const path = require('path');
 
-module.exports = config;
+const defaultConfig = getDefaultConfig(__dirname);
+const { assetExts, sourceExts } = defaultConfig.resolver;
+
+const config = {
+    resetCache: true,
+    transformer: {
+        assetPlugins: ['expo-asset/tools/hashAssetFiles'],
+        babelTransformerPath: require.resolve('react-native-svg-transformer/react-native'),
+    },
+    resolver: {
+        assetExts: [...assetExts, "png", "jpg", "jpeg", "svg"],
+        sourceExts: [...sourceExts, "js", "json", "ts", "tsx"],
+    },
+};
+
+const mergedConfig = mergeConfig(defaultConfig, config);
+
+module.exports = mergedConfig;

@@ -12,16 +12,16 @@ const EditableDecoration = ({ item, index, height, width, rotation }) => {
 
     // animated size style for the inner component shown
     const resizeAnimationStyle = useAnimatedStyle(() => ({
-        height: height.get(),
-        width: width.get(),
-        scaleX: scale.x.get(),
-        scaleY: scale.y.get(),
+        height: height.value,
+        width: width.value,
+        scaleX: scale.x.value,
+        scaleY: scale.y.value,
         zIndex: 3,
     }));
 
     // animated rotation style for the inner component shown
     const rotationAnimationStyle = useAnimatedStyle(() => ({
-        transform: [{ rotate: rotation.get() + 'deg' }],
+        transform: [{ rotate: rotation.value + 'deg' }],
     }));
 
     return (

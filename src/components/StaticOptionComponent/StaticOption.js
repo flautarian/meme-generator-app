@@ -13,19 +13,19 @@ const StaticOption = ({ onPress, initialPosition, children, offsetYAzis = useSha
     const animatedStyle = useAnimatedStyle(() => {
         return {
             transform: [
-                { scale: scale.get() },
-                { translateY: initialPosition.y + offsetYAzis.get() },
+                { scale: scale.value },
+                { translateY: initialPosition.y + offsetYAzis.value },
                 { translateX: initialPosition.x },
             ],
         };
     });
 
     const handlePressIn = () => {
-        scale.set(withSpring(0.7)); // Scale down on press
+        scale.value = withSpring(0.7); // Scale down on press
     };
 
     const handlePressOut = () => {
-        scale.set(withSpring(1)); // Scale back to original size
+        scale.value = withSpring(1); // Scale back to original size
         onPress();
     };
 

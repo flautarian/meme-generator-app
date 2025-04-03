@@ -6,8 +6,6 @@ import MemeSelect from './MemeSelect';
 import MemeOptions from './MemeOptions';
 import { Platform } from 'expo-modules-core';
 import { createDrawerNavigator } from '@react-navigation/drawer';
-import { useEffect } from 'react';
-import { getRandomMeme } from 'src/hooks/useTemplates';
 import * as NavigationBar from 'expo-navigation-bar';
 
 const AppRouterBase = () => {
@@ -22,15 +20,6 @@ const AppRouterBase = () => {
     if(Platform.OS === 'android') {
         NavigationBar.setVisibilityAsync('hidden');
     }
-
-    useEffect(() => {
-        if (!currentMeme) {
-            setTimeout(async () => {
-                const meme = await getRandomMeme();
-                setCurrentMeme(meme);
-            }, 1);
-        }
-    }, []);
 
     const changeMemeTemplate = (item) => {
         console.log("changeMemetTemplate", item);
