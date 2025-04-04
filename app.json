@@ -21,12 +21,6 @@
         "foregroundImage": "assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "androidNavigationBar": {
-        "visible": "immersive"
-      },
-      "sourceDir": "node_modules/react-native-sqlite-storage/platforms/android-native",
-      "packageImportPath": "import io.liteglue.SQLitePluginPackage;",
-      "packageInstance": "new SQLitePluginPackage()",
       "package": "com.giacconidev.memegeneratorapp"
     },
     "web": {
