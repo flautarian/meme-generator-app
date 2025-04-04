@@ -12,20 +12,20 @@ import { useTranslation } from 'react-i18next';
 import ViewShot from "react-native-view-shot";
 import { Platform } from 'react-native';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring, withTiming } from 'react-native-reanimated';
-import LavaLampBackground from 'src/components/LavaLampBackgroundComponent/LavaLampBackground';
 import randomColor from 'randomcolor';
-import EditableText from 'src/components/EditableTextComponent/EditableText';
-import DragableOption from 'src/components/DragableOptionComponent/DragableOption';
+import { Camera, Edit, MessageSquare, Tool, ChevronUp } from 'react-native-feather';
+import * as Sharing from 'expo-sharing';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import DraggableContainer from 'src/components/DragableContainerComponent/DragableContainer';
 import DragableDecoration from 'src/components/DragableTemplateComponent/DragableTemplate';
-import { Camera, Edit, MessageSquare, Tool, ChevronUp } from 'react-native-feather';
 import EditableDecoration from 'src/components/EditableDecorationComponent/EditableDecoration';
 import StaticOption from 'src/components/StaticOptionComponent/StaticOption';
 import ToastModal from 'src/components/ToastModalComponent/ToastModal';
 import { Utils } from 'src/utils/Utils';
-import * as Sharing from 'expo-sharing';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
 import memeSelectImages from 'src/utils/memeSelectImages';
+import DragableOption from 'src/components/DragableOptionComponent/DragableOption';
+import EditableText from 'src/components/EditableTextComponent/EditableText';
+import LavaLampBackground from 'src/components/LavaLampBackgroundComponent/LavaLampBackground';
 
 const MemeCreate = ({ navigation, currentMeme, onChangedDecorations }) => {
 

@@ -1,13 +1,13 @@
 import { View, StyleSheet, ScrollView, Pressable, Text, Switch } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useConfirmation } from 'src/contexts/ConfirmationContext';
-import LanguageSelector from 'src/components/LanguageSelectorComponent/LanguageSelector';
-import AppInfo from 'src/components/AppInfoComponent/AppInfo';
 import { rebootTemplates } from 'src/hooks/useTemplates';
 import { rebootDecorations } from 'src/hooks/useDecorations';
 import { useCallback, useState } from 'react';
 import { fetchSettings, updateSettings } from 'src/hooks/useSettings';
 import { useEffect } from 'react';
+import AppInfo from 'src/components/AppInfoComponent/AppInfo';
+import LanguageSelector from 'src/components/LanguageSelectorComponent/LanguageSelector';
 
 const MemeOptions = ({ navigation, onChangedTemplates, onChangedDecorations }) => {
   const { t } = useTranslation();

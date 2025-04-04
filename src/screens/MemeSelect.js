@@ -2,11 +2,11 @@ import { useCallback, useEffect, useState } from 'react';
 import { Utils } from 'src/utils/Utils';
 import { View, StyleSheet, FlatList, TextInput, Text, Platform, ScrollView } from 'react-native';
 import { addNewTemplate, deleteTemplate, fetchTemplates } from 'src/hooks/useTemplates';
-import TemplateItem from 'src/components/TemplateItemComponent/TemplateItem';
 import * as ImagePicker from 'expo-image-picker';
-import documentUploadOption from 'src/utils/documentUploadOption';
 import { useTranslation } from 'react-i18next';
 import { useConfirmation } from 'src/contexts/ConfirmationContext';
+import documentUploadOption from 'src/utils/documentUploadOption';
+import TemplateItem from 'src/components/TemplateItemComponent/TemplateItem';
 
 const MemeSelect = ({ navigation, onSelectMeme, onChangedTemplates }) => {
   const { t } = useTranslation();
