@@ -5,7 +5,8 @@ import {
   Pressable,
   Dimensions,
   Image,
-  View
+  View,
+  Text
 } from 'react-native';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -26,31 +27,38 @@ import memeSelectImages from 'src/utils/memeSelectImages';
 import DragableOption from 'src/components/DragableOptionComponent/DragableOption';
 import EditableText from 'src/components/EditableTextComponent/EditableText';
 import LavaLampBackground from 'src/components/LavaLampBackgroundComponent/LavaLampBackground';
+import { useConfirmation } from 'src/contexts/ConfirmationContext';
 
-const MemeCreate = ({ navigation, currentMeme, onChangedDecorations }) => {
+const MemeCreate = ({ navigation, currentMeme }) => {
 
   const BOTTOM_DRAWER_HEIGHT = 140;
   const BOTTOM_BTN_HEIGHT = 100;
   const BOTTOM_BUTTONS_Y_OFFSET = 140;
 
-  
+
   const { t, i18n } = useTranslation();
-  const EMPTY_MEME = memeSelectImages.find(ms=>ms.language === i18n.language)?.blob || "";
-  const { width, height  } = Dimensions.get('screen');
-  console.log(Dimensions.get('screen'));
+  const EMPTY_MEME = memeSelectImages.find(ms => ms.language === i18n.language)?.blob || "";
+  const { width, height } = Dimensions.get('screen');
 
   const [texts, setTexts] = useState([]);
   const [selectedTextIndex, setSelectedTextIndex] = useState(-1);
   const [toasts, setToasts] = useState([]);
   const memeContainerRef = useRef(null);
 
+  // bottom drawer
   const progress = useSharedValue(0);
   const [initColor, setInitColor] = useState('');
   const [initLightColor, setInitLightColor] = useState('');
   const [isBotDrawerOpened, setIsBotDrawerOpened] = useState(false);
+  const [selectedDecoration, setSelectedDecoration] = useState("");
   const botDrawerAnimation = useSharedValue(0);
   const botBtnAnimation = useSharedValue(0);
   const botButtonsYOffset = useSharedValue(0);
+
+
+  // decorations drawer
+  const { handleCloseDrawer } = useConfirmation();
+
 
   const botContainerAnimatedStyle = useAnimatedStyle(() => ({
     position: 'absolute',
@@ -113,6 +121,8 @@ const MemeCreate = ({ navigation, currentMeme, onChangedDecorations }) => {
     try {
       // disable selection of any item
       setSelectedTextIndex(-1);
+      // hide bottom drawer
+      handleCloseDrawer();
       // Add a slight delay to ensure rendering is complete
       setTimeout(async () => {
         memeContainerRef.current.capture().then(async (uri) => {
@@ -211,8 +221,12 @@ const MemeCreate = ({ navigation, currentMeme, onChangedDecorations }) => {
             maxPointers={1}
             style={styles.imageWrapper}
             onPress={() => {
+              // disable selection of any item
               setSelectedTextIndex(-1);
+              // hide options drawer
               setIsBotDrawerOpened(false);
+              // hide bottom drawer
+              handleCloseDrawer();
             }}>
             {/* Meme Image */}
             {currentMeme && (
@@ -248,7 +262,7 @@ const MemeCreate = ({ navigation, currentMeme, onChangedDecorations }) => {
           animateButton={false}>
           <Tool stroke="black" fill="#fff" width={40} height={40} />
         </DragableOption>
-        
+
         {/* Bottom drawer */}
         <Animated.View style={[botBtnAnimatedStyle, { flex: 1, justifyContent: 'center', alignItems: 'center' }]} key={`bot-drawer-btn`}>
           <Pressable onPress={() => setIsBotDrawerOpened(!isBotDrawerOpened)} >
@@ -267,9 +281,9 @@ const MemeCreate = ({ navigation, currentMeme, onChangedDecorations }) => {
 
         <DragableDecoration
           key={`dragable-decoration-option`}
-          onMenuOpenCallBack={() => setSelectedTextIndex(-1)}
+          onMenuOpenCallBack={() => handleOpenMemeDecorationList()}
           onArrangeEnd={(x, y, value) => onArrangeEnd("decoration", x, y, value)}
-          onChangedDecorations={onChangedDecorations}
+          selectedDecoration={selectedDecoration}
           initialPosition={{ x: width - width * 0.75 - 25, y: height + 50 }}
           showFromDrawer={isBotDrawerOpened}
           parentDimensions={{ width: width, height: height }}
@@ -291,7 +305,6 @@ const MemeCreate = ({ navigation, currentMeme, onChangedDecorations }) => {
           offsetYAzis={botButtonsYOffset}>
           <Camera stroke="black" fill="#fff" width={40} height={40} />
         </StaticOption>
-
       </SafeAreaView>
     </SafeAreaProvider>
   );

@@ -9,9 +9,9 @@ import { useEffect } from 'react';
 import AppInfo from 'src/components/AppInfoComponent/AppInfo';
 import LanguageSelector from 'src/components/LanguageSelectorComponent/LanguageSelector';
 
-const MemeOptions = ({ navigation, onChangedTemplates, onChangedDecorations }) => {
+const MemeOptions = ({ navigation, onChangedTemplates }) => {
   const { t } = useTranslation();
-  const { showConfirmation } = useConfirmation();
+  const { showConfirmation, setOnChangedDecorations } = useConfirmation();
   const [staticBDrawer, setStaticBDrawer] = useState(false);
 
   const closeDrawer = () => {
@@ -42,7 +42,7 @@ const MemeOptions = ({ navigation, onChangedTemplates, onChangedDecorations }) =
       confirmText: t('memeOptions.rebootDecorationsDbConfirm'),
       onConfirm: async () => {
         await rebootDecorations();
-        onChangedDecorations();
+        setOnChangedDecorations((prev) => !prev);
         closeDrawer();
       },
     });
