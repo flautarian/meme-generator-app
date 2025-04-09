@@ -7,7 +7,7 @@ import MemeOptions from './MemeOptions';
 import { Platform } from 'expo-modules-core';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import * as NavigationBar from 'expo-navigation-bar';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
 
 const AppRouterBase = () => {
     const Drawer = createDrawerNavigator();
@@ -21,9 +21,9 @@ const AppRouterBase = () => {
         NavigationBar.setVisibilityAsync('hidden');
     }
 
-    const changeMemeTemplate = (item) => {
+    const changeMemeTemplate = (item) =>
         setCurrentMeme(item);
-    }
+
 
     const LeftDrawerScreen = () => (
         <LeftDrawer.Navigator
@@ -59,11 +59,9 @@ const AppRouterBase = () => {
     );
 
     return (
-        <GestureHandlerRootView>
-            <NavigationContainer>
-                <LeftDrawerScreen />
-            </NavigationContainer>
-        </GestureHandlerRootView>
+        <NavigationContainer>
+            <LeftDrawerScreen />
+        </NavigationContainer>
     );
 };
 

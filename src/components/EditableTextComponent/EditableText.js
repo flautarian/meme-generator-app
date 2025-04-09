@@ -4,6 +4,7 @@ import { TapGestureHandler } from "react-native-gesture-handler";
 import Animated, { useAnimatedStyle } from "react-native-reanimated";
 import { useTranslation } from 'react-i18next';
 import { useCallback } from "react";
+import 'assets/fonts/impact.ttf';
 
 const EditableText = ({ item, index, height, width, rotation }) => {
 

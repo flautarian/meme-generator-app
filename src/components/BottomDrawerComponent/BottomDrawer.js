@@ -16,7 +16,7 @@ const BottomDrawer = ({ children, reference, snapPoints }) => {
       ref={reference}
       onChange={handleSheetChanges}
       index={-1}
-      snapPoints={snapPoints ? snapPoints : ['75%']}
+      snapPoints={!!snapPoints ? snapPoints : ['75%']}
     >
       <BottomSheetView style={styles.contentContainer}>
         {children}

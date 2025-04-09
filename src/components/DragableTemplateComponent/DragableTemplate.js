@@ -1,6 +1,6 @@
 
 import { Image, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
 import Animated, {
     useSharedValue,
     useAnimatedStyle,
@@ -18,7 +18,6 @@ const DragableDecoration = ({
     onArrangeEnd,
     initialPosition,
     parentDimensions,
-    onMenuOpenCallBack,
     style = {},
     offsetYAzis = useSharedValue(0),
     offsetXAzis = useSharedValue(0)
@@ -74,7 +73,7 @@ const DragableDecoration = ({
                     else {
                         const diffDates = new Date().getTime() - openTabTimer.current;
                         if (diffDates < 550 && diffDates > 0)
-                            onMenuOpenCallBack();
+                            handleOpenDrawer(memeDecoration);
                         openTabTimer.current = 0;
                     };
                 }
@@ -102,7 +101,7 @@ const DragableDecoration = ({
     const tap = Gesture.Tap()
         .numberOfTaps(2)
         .onStart(() => {
-            onMenuOpenCallBack();
+            handleOpenDrawer(memeDecoration);
         }).runOnJS(true);
 
     const memeDecoration = <MemeDecorationsList
@@ -126,15 +125,18 @@ const DragableDecoration = ({
                 offsetXAzis={offsetXAzis}
                 canMove={!opened}
                 style={style}>
-                <GestureDetector
-                    gesture={tap}
-                    style={[{ position: "absolute" }]}>
-                    <Animated.View style={[buttonAnimatedStyle]}>
-                        <Pressable maxPointers={1} style={styles.imageWrapper}>
-                            <Image selectable={false} style={{ width: 50, height: 50 }} source={selectedDecoration.value?.blob} resizeMode='contain' />
-                        </Pressable>
-                    </Animated.View>
-                </GestureDetector>
+                <GestureHandlerRootView>
+
+                    <GestureDetector
+                        gesture={tap}
+                        style={[{ position: "absolute" }]}>
+                        <Animated.View style={[buttonAnimatedStyle]}>
+                            <Pressable maxPointers={1} style={styles.imageWrapper}>
+                                <Image selectable={false} style={{ width: 50, height: 50 }} source={selectedDecoration.value?.blob} resizeMode='contain' />
+                            </Pressable>
+                        </Animated.View>
+                    </GestureDetector>
+                </GestureHandlerRootView>
                 <Pressable maxPointers={1} style={styles.imageEditWrapper} onPressOut={() => {
                     handleOpenDecorationSelection();
                 }}>

@@ -4,8 +4,9 @@ import Animated, { interpolate, interpolateColor, useAnimatedStyle, useSharedVal
 import randomColor from 'randomcolor';
 import { Circle } from './Circle';
 import { BlurView } from 'expo-blur';
+import { Platform } from 'react-native';
 
-const LavaLampBackground = ({ count = 10, hue = 'green'}) => {
+const LavaLampBackground = ({ count = 10, hue = 'green' }) => {
 
     const { width, height } = useWindowDimensions();
 
@@ -31,11 +32,11 @@ const LavaLampBackground = ({ count = 10, hue = 'green'}) => {
 
     return (
 
-        <Animated.View style={[StyleSheet.absoluteFillObject, {backgroundColor: hue, zIndex: -1}]}>
+        <Animated.View style={[StyleSheet.absoluteFillObject, { backgroundColor: hue, zIndex: -1 }]}>
             {circles.map((circle, index) => (
                 <Circle key={`circle-color-${circle.color}-index-${index}`} circle={circle} />
             ))}
-            <BlurView style={StyleSheet.absoluteFillObject} intensity={100} blurType="light" experimentalBlurMethod='overlay' />
+            <BlurView style={StyleSheet.absoluteFillObject} intensity={100} blurType="light" />
         </Animated.View>
     );
 };

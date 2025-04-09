@@ -4,7 +4,6 @@ import AppRouterBase from "./screens/AppRouterBase";
 import { LanguageProvider } from './contexts/LanguageContext';
 import { ConfirmationProvider } from './contexts/ConfirmationContext';
 import './i18n/i18n';
-import { Platform } from 'react-native';
 
 const App = () => {
   return (

@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useCallback, useRef } from 
 import ConfirmationModal from '../components/ConfirmationModalComponent/ConfirmationModal';
 import BottomDrawer from 'src/components/BottomDrawerComponent/BottomDrawer';
 import { Text } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 const ConfirmationContext = createContext();
 
@@ -48,10 +49,8 @@ export const ConfirmationProvider = ({ children }) => {
     }));
   }, []);
 
-  
-  const [onChangedDecorations, setOnChangedDecorations] = useState(false);
   const bottomSheetRef = useRef(null);
-  const[bottomDrawerChildren, setBottomDrawerChildren] = useState(<Text>TEST</Text>);
+  const [bottomDrawerChildren, setBottomDrawerChildren] = useState(<Text>TEST</Text>);
 
   const handleCloseDrawer = () => {
     if (!!bottomSheetRef) {
@@ -69,15 +68,17 @@ export const ConfirmationProvider = ({ children }) => {
 
   return (
     <ConfirmationContext.Provider value={{ showConfirmation, hideConfirmation, handleCloseDrawer, handleOpenDrawer }}>
-      <ConfirmationModal
-        visible={confirmationState.isOpen}
-        title={confirmationState.title}
-        message={confirmationState.message}
-        onConfirm={confirmationState.onConfirm}
-        onCancel={confirmationState.onCancel}
-      />
-      {children}
-      <BottomDrawer reference={bottomSheetRef} children={bottomDrawerChildren} />
+      <GestureHandlerRootView>
+        <ConfirmationModal
+          visible={confirmationState.isOpen}
+          title={confirmationState.title}
+          message={confirmationState.message}
+          onConfirm={confirmationState.onConfirm}
+          onCancel={confirmationState.onCancel}
+        />
+        {children}
+        <BottomDrawer reference={bottomSheetRef} children={bottomDrawerChildren} />
+      </GestureHandlerRootView>
     </ConfirmationContext.Provider>
   );
 };

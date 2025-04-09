@@ -31,14 +31,13 @@ import { useConfirmation } from 'src/contexts/ConfirmationContext';
 
 const MemeCreate = ({ navigation, currentMeme }) => {
 
-  const BOTTOM_DRAWER_HEIGHT = 140;
-  const BOTTOM_BTN_HEIGHT = 100;
-  const BOTTOM_BUTTONS_Y_OFFSET = 140;
-
 
   const { t, i18n } = useTranslation();
   const EMPTY_MEME = memeSelectImages.find(ms => ms.language === i18n.language)?.blob || "";
-  const { width, height } = Dimensions.get('screen');
+  const { width, height } = Dimensions.get('window');
+  const BOTTOM_DRAWER_HEIGHT = height * (Platform.OS === 'web' ? 0.2 : 0.15);
+  const BOTTOM_BTN_HEIGHT = height * (Platform.OS === 'web' ? 0.15 : 0.12);
+  const BOTTOM_BUTTONS_Y_OFFSET = height * (Platform.OS === 'web' ? 0.17 : 0.14);
 
   const [texts, setTexts] = useState([]);
   const [selectedTextIndex, setSelectedTextIndex] = useState(-1);
@@ -63,10 +62,9 @@ const MemeCreate = ({ navigation, currentMeme }) => {
   const botContainerAnimatedStyle = useAnimatedStyle(() => ({
     position: 'absolute',
     bottom: -BOTTOM_DRAWER_HEIGHT,
-    left: 0,
-    right: 0,
+    left: Platform.OS === 'web' ? width * 0.2 : width * 0.15,
     zIndex: 5,
-    width: '100%',
+    width: Platform.OS === 'web' ? width * 0.6 : width * 0.75,
     height: Platform.OS === 'web' ? '15dvh' : height * 0.15,
     transform: [
       { translateY: botDrawerAnimation.value }
@@ -75,7 +73,7 @@ const MemeCreate = ({ navigation, currentMeme }) => {
 
   const botBtnAnimatedStyle = useAnimatedStyle(() => ({
     position: 'absolute',
-    top: height * 0.85,
+    top: height * (Platform.OS === 'web' ? 0.85 : 0.9),
     left: 0,
     right: 0,
     zIndex: 5,
@@ -179,8 +177,8 @@ const MemeCreate = ({ navigation, currentMeme }) => {
   useEffect(() => {
     progress.value = withTiming(1, { duration: 3000 });
     // random color background generation
-    setInitColor(randomColor({ count: 1, luminosity: 'dark' })[0]);
-    setInitLightColor(randomColor({ count: 1, luminosity: 'light', hue: initColor })[0]);
+    setInitColor(randomColor({ count: 1, luminosity: 'light', seed: 'violet' })[0]);
+    setInitLightColor(randomColor({ count: 1, luminosity: 'bright', seed: 'violet' })[0]);
   }, []);
 
   return (
@@ -266,7 +264,7 @@ const MemeCreate = ({ navigation, currentMeme }) => {
         {/* Bottom drawer */}
         <Animated.View style={[botBtnAnimatedStyle, { flex: 1, justifyContent: 'center', alignItems: 'center' }]} key={`bot-drawer-btn`}>
           <Pressable onPress={() => setIsBotDrawerOpened(!isBotDrawerOpened)} >
-            <View style={{ width: 100, height: 50, borderRadius: 20, backgroundColor: '#fff', justifyContent: 'center', alignItems: 'center' }}>
+            <View style={{ width: 100, height: 50, borderRadius: 20, backgroundColor: initColor, borderWidth: 1, borderColor: initLightColor, justifyContent: 'center', alignItems: 'center' }}>
               {<ChevronUp style={{ transform: [{ rotate: isBotDrawerOpened ? '180deg' : '0deg' }], animationDuration: 300 }} stroke="black" width={20} height={20} />}
             </View>
           </Pressable>
@@ -274,34 +272,33 @@ const MemeCreate = ({ navigation, currentMeme }) => {
 
         {/* Bottom drawer */}
         <Animated.View style={[botContainerAnimatedStyle, { flex: 1, justifyContent: 'center', alignItems: 'center' }]} key={`bot-drawer`}>
-          <View style={{ width: '100%', height: '100%', backgroundColor: initColor, borderTopLeftRadius: 20, borderTopRightRadius: 20 }}>
+          <View style={{ width: '100%', height: '100%', backgroundColor: initLightColor, borderTopLeftRadius: 20, borderTopRightRadius: 20 }}>
             {/* SPACE!!!! here goes nothing because the content is out the view cause the absolute position */}
           </View>
         </Animated.View>
 
         <DragableDecoration
           key={`dragable-decoration-option`}
-          onMenuOpenCallBack={() => handleOpenMemeDecorationList()}
           onArrangeEnd={(x, y, value) => onArrangeEnd("decoration", x, y, value)}
           selectedDecoration={selectedDecoration}
           initialPosition={{ x: width - width * 0.75 - 25, y: height + 50 }}
           showFromDrawer={isBotDrawerOpened}
           parentDimensions={{ width: width, height: height }}
           offsetYAzis={botButtonsYOffset}
-          style={[styles.draggableBox, { backgroundColor: initLightColor }]} />
+          style={[styles.draggableBox, { backgroundColor: initColor }]} />
         <DragableOption
           key={`dragable-text-option`}
           onArrangeEnd={(x, y, value) => onArrangeEnd("text", x, y, value)}
           initialPosition={{ x: width - width * 0.5 - 25, y: height + 50 }}
           offsetYAzis={botButtonsYOffset}
-          style={[styles.draggableBox, { backgroundColor: initLightColor }]}>
+          style={[styles.draggableBox, { backgroundColor: initColor }]}>
           <MessageSquare stroke="black" fill="#fff" width={40} height={40} />
         </DragableOption>
         <StaticOption
           key={`capture-share-button`}
-          style={{ backgroundColor: initLightColor }}
           onPress={handleCapture}
           initialPosition={{ x: width - width * 0.25 - 25, y: height + 50 }}
+          style={{ backgroundColor: initColor }}
           offsetYAzis={botButtonsYOffset}>
           <Camera stroke="black" fill="#fff" width={40} height={40} />
         </StaticOption>
