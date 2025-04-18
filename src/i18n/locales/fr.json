@@ -101,6 +101,7 @@
     "rebootTemplatesDbHint": "Appuyez pour réinitialiser la base de données des modèles",
     "appSignature": "Ce programme a été développé par GiacconiDev",
     "staticBDrawerEnabled": "Options visibles",
-    "staticBDrawerDisabled": "Options ocultas"
+    "staticBDrawerDisabled": "Options ocultas",
+    "staticBackgroundType": "Type de fond"
   }
 }

@@ -102,6 +102,7 @@
     "rebootTemplatesDbHint": "Tap to reset templates database",
     "appSignature": "This app has been developed by GiacconiDev",
     "staticBDrawerEnabled": "Bottom options fixed",
-    "staticBDrawerDisabled": "Bottom options hidden"
+    "staticBDrawerDisabled": "Bottom options hidden",
+    "staticBackgroundType": "Background type"
   }
 }

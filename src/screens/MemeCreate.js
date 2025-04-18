@@ -6,14 +6,12 @@ import {
   Dimensions,
   Image,
   View,
-  Text
 } from 'react-native';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ViewShot from "react-native-view-shot";
 import { Platform } from 'react-native';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring, withTiming } from 'react-native-reanimated';
-import randomColor from 'randomcolor';
 import { Camera, Edit, MessageSquare, Tool, ChevronUp } from 'react-native-feather';
 import * as Sharing from 'expo-sharing';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -21,55 +19,41 @@ import DraggableContainer from 'src/components/DragableContainerComponent/Dragab
 import DragableDecoration from 'src/components/DragableTemplateComponent/DragableTemplate';
 import EditableDecoration from 'src/components/EditableDecorationComponent/EditableDecoration';
 import StaticOption from 'src/components/StaticOptionComponent/StaticOption';
-import ToastModal from 'src/components/ToastModalComponent/ToastModal';
 import { Utils } from 'src/utils/Utils';
 import memeSelectImages from 'src/utils/memeSelectImages';
 import DragableOption from 'src/components/DragableOptionComponent/DragableOption';
 import EditableText from 'src/components/EditableTextComponent/EditableText';
-import LavaLampBackground from 'src/components/LavaLampBackgroundComponent/LavaLampBackground';
+import LavaLampBackground from 'src/components/Backgrounds/LavaLampBackgroundComponent/LavaLampBackground';
 import { useConfirmation } from 'src/contexts/ConfirmationContext';
+import { useConfig } from 'src/contexts/ConfigContext';
+import GradientBackground from 'src/components/Backgrounds/GradientBackgroundComponent/GradientBackground';
 
 const MemeCreate = ({ navigation, currentMeme }) => {
-
 
   const { t, i18n } = useTranslation();
   const EMPTY_MEME = memeSelectImages.find(ms => ms.language === i18n.language)?.blob || "";
   const { width, height } = Dimensions.get('window');
-  const BOTTOM_DRAWER_HEIGHT = height * (Platform.OS === 'web' ? 0.2 : 0.15);
   const BOTTOM_BTN_HEIGHT = height * (Platform.OS === 'web' ? 0.15 : 0.12);
   const BOTTOM_BUTTONS_Y_OFFSET = height * (Platform.OS === 'web' ? 0.17 : 0.14);
 
   const [texts, setTexts] = useState([]);
   const [selectedTextIndex, setSelectedTextIndex] = useState(-1);
-  const [toasts, setToasts] = useState([]);
   const memeContainerRef = useRef(null);
+
 
   // bottom drawer
   const progress = useSharedValue(0);
-  const [initColor, setInitColor] = useState('');
-  const [initLightColor, setInitLightColor] = useState('');
   const [isBotDrawerOpened, setIsBotDrawerOpened] = useState(false);
   const [selectedDecoration, setSelectedDecoration] = useState("");
-  const botDrawerAnimation = useSharedValue(0);
   const botBtnAnimation = useSharedValue(0);
   const botButtonsYOffset = useSharedValue(0);
 
 
-  // decorations drawer
-  const { handleCloseDrawer } = useConfirmation();
+  // decorations drawer / toasts
+  const { handleCloseDrawer, addToast } = useConfirmation();
 
-
-  const botContainerAnimatedStyle = useAnimatedStyle(() => ({
-    position: 'absolute',
-    bottom: -BOTTOM_DRAWER_HEIGHT,
-    left: Platform.OS === 'web' ? width * 0.2 : width * 0.15,
-    zIndex: 5,
-    width: Platform.OS === 'web' ? width * 0.6 : width * 0.75,
-    height: Platform.OS === 'web' ? '15dvh' : height * 0.15,
-    transform: [
-      { translateY: botDrawerAnimation.value }
-    ],
-  }));
+  // Options config
+  const { staticBDrawer, backgroundType, initColor, initLightColor, initDarkColor } = useConfig();
 
   const botBtnAnimatedStyle = useAnimatedStyle(() => ({
     position: 'absolute',
@@ -91,18 +75,9 @@ const MemeCreate = ({ navigation, currentMeme }) => {
   };
 
   useEffect(() => {
-    botDrawerAnimation.value = withSpring(isBotDrawerOpened ? -BOTTOM_DRAWER_HEIGHT : 0, bottomDrawerSpringConfig);
-    botBtnAnimation.value = withSpring(isBotDrawerOpened ? -BOTTOM_BTN_HEIGHT : 0, bottomDrawerSpringConfig);
-    botButtonsYOffset.value = withSpring(isBotDrawerOpened ? -BOTTOM_BUTTONS_Y_OFFSET : 0, bottomDrawerSpringConfig);
-  }, [isBotDrawerOpened]);
-
-  const addToast = useCallback((message, duration = 5000) => {
-    const id = Date.now();
-    setToasts(prev => [...prev, { id, message, duration }]);
-    setTimeout(() => {
-      setToasts(prev => prev.filter(toast => toast.id !== id));
-    }, duration);
-  }, []);
+    botBtnAnimation.value = withSpring(isBotDrawerOpened || staticBDrawer ? -BOTTOM_BTN_HEIGHT : 0, bottomDrawerSpringConfig);
+    botButtonsYOffset.value = withSpring(isBotDrawerOpened || staticBDrawer ? -BOTTOM_BUTTONS_Y_OFFSET : 0, bottomDrawerSpringConfig);
+  }, [isBotDrawerOpened, staticBDrawer]);
 
   const deleteText = useCallback((index) => {
     setTexts((prevTexts) => {
@@ -148,7 +123,7 @@ const MemeCreate = ({ navigation, currentMeme }) => {
     (type, x, y, value) => {
       if (!value)
         return;
-      setIsBotDrawerOpened((prev) => !prev);
+      setIsBotDrawerOpened(false);
       setTexts((prevTexts) => {
         const newItem = {
           value,
@@ -170,40 +145,33 @@ const MemeCreate = ({ navigation, currentMeme }) => {
       );
       return true;
     },
-    [texts, addToast, t, isBotDrawerOpened],
+    [texts, t, isBotDrawerOpened],
   );
 
   // Trigger the gradient animation
   useEffect(() => {
     progress.value = withTiming(1, { duration: 3000 });
-    // random color background generation
-    setInitColor(randomColor({ count: 1, luminosity: 'light', seed: 'violet' })[0]);
-    setInitLightColor(randomColor({ count: 1, luminosity: 'bright', seed: 'violet' })[0]);
   }, []);
 
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>
         {/* Gradient Background */}
-        <LavaLampBackground count={10} hue={initColor} />
-
-        {/* Toasts */}
-        {toasts.map((toast) => (
-          <ToastModal
-            key={toast.id}
-            message={toast.message}
-            duration={toast.duration}
-          />
-        ))}
+        {backgroundType === "lava" && <LavaLampBackground count={10} hue={initColor} />}
+        {backgroundType === "gradient" && <GradientBackground startColor={initLightColor} endColor={initDarkColor} />}
 
         {/* Meme image container */}
         <ViewShot ref={memeContainerRef} style={styles.memeWrapper} draggable={false}>
           {/* Draggable Texts / decorations */}
           {texts.map((item, index) => {
-            const child = item.type === "text" ? <EditableText /> : <EditableDecoration />;
+            const child = item.type === "text" ? <EditableText item={{ value: item.value }} index={index} /> : <EditableDecoration item={item} index={index} />;
             return <DraggableContainer
               key={`dragable-container-${index} - ${item.x} - ${item.y}`}
-              item={item}
+              x={item.x}
+              y={item.y}
+              width={item.width}
+              height={item.height}
+              rotation={item.rotation}
               index={index}
               selected={index === selectedTextIndex}
               onSelect={(i) => setSelectedTextIndex(i)}
@@ -262,7 +230,7 @@ const MemeCreate = ({ navigation, currentMeme }) => {
         </DragableOption>
 
         {/* Bottom drawer */}
-        <Animated.View style={[botBtnAnimatedStyle, { flex: 1, justifyContent: 'center', alignItems: 'center' }]} key={`bot-drawer-btn`}>
+        <Animated.View style={[botBtnAnimatedStyle, { flex: 1, justifyContent: 'center', alignItems: 'center', display: staticBDrawer ? "none" : "flex" }]} key={`bot-drawer-btn`}>
           <Pressable onPress={() => setIsBotDrawerOpened(!isBotDrawerOpened)} >
             <View style={{ width: 100, height: 50, borderRadius: 20, backgroundColor: initColor, borderWidth: 1, borderColor: initLightColor, justifyContent: 'center', alignItems: 'center' }}>
               {<ChevronUp style={{ transform: [{ rotate: isBotDrawerOpened ? '180deg' : '0deg' }], animationDuration: 300 }} stroke="black" width={20} height={20} />}
@@ -270,19 +238,11 @@ const MemeCreate = ({ navigation, currentMeme }) => {
           </Pressable>
         </Animated.View>
 
-        {/* Bottom drawer */}
-        <Animated.View style={[botContainerAnimatedStyle, { flex: 1, justifyContent: 'center', alignItems: 'center' }]} key={`bot-drawer`}>
-          <View style={{ width: '100%', height: '100%', backgroundColor: initLightColor, borderTopLeftRadius: 20, borderTopRightRadius: 20 }}>
-            {/* SPACE!!!! here goes nothing because the content is out the view cause the absolute position */}
-          </View>
-        </Animated.View>
-
         <DragableDecoration
           key={`dragable-decoration-option`}
           onArrangeEnd={(x, y, value) => onArrangeEnd("decoration", x, y, value)}
           selectedDecoration={selectedDecoration}
           initialPosition={{ x: width - width * 0.75 - 25, y: height + 50 }}
-          showFromDrawer={isBotDrawerOpened}
           parentDimensions={{ width: width, height: height }}
           offsetYAzis={botButtonsYOffset}
           style={[styles.draggableBox, { backgroundColor: initColor }]} />

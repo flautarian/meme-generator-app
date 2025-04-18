@@ -3,37 +3,26 @@ import { useTranslation } from 'react-i18next';
 import { useConfirmation } from 'src/contexts/ConfirmationContext';
 import { rebootTemplates } from 'src/hooks/useTemplates';
 import { rebootDecorations } from 'src/hooks/useDecorations';
-import { useCallback, useState } from 'react';
-import { fetchSettings, updateSettings } from 'src/hooks/useSettings';
-import { useEffect } from 'react';
 import AppInfo from 'src/components/AppInfoComponent/AppInfo';
 import LanguageSelector from 'src/components/LanguageSelectorComponent/LanguageSelector';
+import { useConfig } from 'src/contexts/ConfigContext';
+
+import { Dropdown } from 'react-native-element-dropdown';
 
 const MemeOptions = ({ navigation, onChangedTemplates }) => {
   const { t } = useTranslation();
   const { showConfirmation, setOnChangedDecorations } = useConfirmation();
-  const [staticBDrawer, setStaticBDrawer] = useState(false);
+  const { staticBDrawer, setStaticBDrawer, backgroundType, setBackgroundType, initColor, initLightColor } = useConfig(); // Assuming useLanguage is imported from the correct path
+
+  const backgroundOptions = [
+    "lava",
+    "gradient",
+    "none",
+  ]
 
   const closeDrawer = () => {
     navigation.closeDrawer();
   };
-
-  useEffect(() => {
-    fetchSettings().then((result) => {
-      if (result) {
-        const allSettings = JSON.parse(result.valuesStored);
-        setStaticBDrawer(allSettings.staticBDrawerEnabled);
-      }
-    });
-  }, []);
-
-  const handleSettingsUpdate = useCallback(async () => {
-    const updatedStrSettings = {
-      valuesStored: JSON.stringify(
-        { staticBDrawerEnabled: staticBDrawer })
-    };
-    await updateSettings(updatedStrSettings);
-  }, [staticBDrawer]);
 
   const rebootDecorationsDb = () => {
     showConfirmation({
@@ -100,14 +89,28 @@ const MemeOptions = ({ navigation, onChangedTemplates }) => {
         <View style={styles.switchSection}>
           <Text style={styles.dangerButtonText}>{staticBDrawer ? t('memeOptions.staticBDrawerEnabled') : t('memeOptions.staticBDrawerDisabled')}</Text>
           <Switch
-            trackColor={{ false: '#767577', true: '#81b0ff' }}
-            thumbColor={staticBDrawer ? '#f5dd4b' : '#f4f3f4'}
-            ios_backgroundColor="#3e3e3e"
+            trackColor={{ false: initColor, true: initLightColor }}
+            thumbColor={initColor}
             onValueChange={() => {
               setStaticBDrawer(!staticBDrawer);
-              handleSettingsUpdate();
             }}
             value={staticBDrawer}
+          />
+        </View>
+
+
+        {/* Background type*/}
+        <View style={[styles.switchSection, { flexDirection: 'column', alignItems: 'flex-start' }]}>
+          <Text style={styles.buttonText}>{t('memeOptions.staticBackgroundType')}</Text>
+          <Dropdown
+            style={[styles.selectInput]}
+            data={backgroundOptions.map((item) => ({ label: item, value: item }))}
+            labelField="label"
+            valueField="value"
+            value={backgroundType}
+            onChange={item => {
+              setBackgroundType(item.value);
+            }}
           />
         </View>
 
@@ -138,6 +141,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+  },
+  selectInput: {
+    width: '100%',
+    height: 50,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    alignSelf: 'center',
   },
   searchContainer: {
     padding: 10,
@@ -199,6 +211,7 @@ const styles = StyleSheet.create({
     color: '#007AFF',
     fontSize: 16,
     fontWeight: '500',
+    width: '100%',
   },
   dangerButtonText: {
     color: '#FF5733',

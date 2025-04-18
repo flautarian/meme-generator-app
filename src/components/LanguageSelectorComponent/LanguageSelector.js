@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { View, Pressable, Text, StyleSheet, Modal } from 'react-native';
-import { useLanguage } from '../../contexts/LanguageContext';
+import { useConfig } from '../../contexts/ConfigContext';
 import { Globe } from 'react-native-feather';
 import { useTranslation } from 'react-i18next';
 
 const LanguageSelector = () => {
-  const { currentLanguage, changeLanguage, languages } = useLanguage();
+  const { currentLanguage, changeLanguage, languages } = useConfig();
   const { t } = useTranslation();
   const [isDropdownVisible, setDropdownVisible] = useState(false);
 

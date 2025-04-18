@@ -2,7 +2,7 @@ import { Image, StyleSheet, View } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue } from "react-native-reanimated";
 import { useTranslation } from 'react-i18next';
 
-const EditableDecoration = ({ item, index, height, width, rotation }) => {
+const EditableDecoration = ({ item, index, rotation }) => {
     const { t } = useTranslation();
 
     const scale = {
@@ -12,22 +12,17 @@ const EditableDecoration = ({ item, index, height, width, rotation }) => {
 
     // animated size style for the inner component shown
     const resizeAnimationStyle = useAnimatedStyle(() => ({
-        height: height.value,
-        width: width.value,
-        scaleX: scale.x.value,
-        scaleY: scale.y.value,
+        height: "100%",
+        width: "100%",
+        scaleX: 1,
+        scaleY: 1,
         zIndex: 3,
-    }));
-
-    // animated rotation style for the inner component shown
-    const rotationAnimationStyle = useAnimatedStyle(() => ({
-        transform: [{ rotate: rotation.value + 'deg' }],
     }));
 
     return (
         <Animated.View 
             key={`editable-decoration-${index}`} 
-            style={[resizeAnimationStyle, rotationAnimationStyle]}
+            style={[resizeAnimationStyle]}
             accessible={true}
             accessibilityLabel={t('editableDecoration.ariaLabel')}
             accessibilityRole="image"

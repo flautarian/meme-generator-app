@@ -3,6 +3,20 @@
 # dependencies
 node_modules/
 
+
+.vscode/*
+.env
+
+# Build output
+android/app/build/
+android/app/src/main/assets/index.android.bundle
+android/app/src/main/res/drawable-*/index.android.bundle
+android/app/src/main/res/drawable-*/index.android.bundle.meta
+android/app/src/main/res/raw/index.android.bundle
+android/app/src/main/res/raw/index.android.bundle.meta
+
+
+
 #Keystore
 android/app/memeKey.keystore
 

@@ -101,6 +101,7 @@
     "rebootTemplatesDbHint": "Tocca per riavviare il database dei modelli",
     "appSignature": "Questo programma è stato sviluppato da GiacconiDev",
     "staticBDrawerEnabled": "Opzioni visibili",
-    "staticBDrawerDisabled": "Opzioni nascoste"
+    "staticBDrawerDisabled": "Opzioni nascoste",
+    "staticBackgroundType": "Tipo di sfondo"
   }
 }
