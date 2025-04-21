@@ -46,7 +46,7 @@ export const ConfigProvider = ({ children }) => {
 
   useEffect(() => {
     fetchSettings().then((result) => {
-      if (result) {
+      if (!!result) {
         const allSettings = JSON.parse(result.valuesStored);
         setConfig(allSettings);
       }

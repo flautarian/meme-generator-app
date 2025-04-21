@@ -129,7 +129,7 @@ const createMobileDb = () => {
       `;
 
     // creating if case, templates and settings tables
-    //clearDb(db);
+    // clearDb(db);
     db.runSync(createTemplatesTableQuery);
     db.runSync(createDecorationsTableQuery);
     db.runSync(createSettingsTableQuery);
