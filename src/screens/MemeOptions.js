@@ -6,19 +6,14 @@ import { rebootDecorations } from 'src/hooks/useDecorations';
 import AppInfo from 'src/components/AppInfoComponent/AppInfo';
 import LanguageSelector from 'src/components/LanguageSelectorComponent/LanguageSelector';
 import { useConfig } from 'src/contexts/ConfigContext';
+import { Utils } from 'src/utils/Utils';
 
 import { Dropdown } from 'react-native-element-dropdown';
 
 const MemeOptions = ({ navigation, onChangedTemplates }) => {
   const { t } = useTranslation();
   const { showConfirmation, setOnChangedDecorations } = useConfirmation();
-  const { staticBDrawer, setStaticBDrawer, backgroundType, setBackgroundType, initColor, initLightColor } = useConfig(); // Assuming useLanguage is imported from the correct path
-
-  const backgroundOptions = [
-    "lava",
-    "gradient",
-    "none",
-  ]
+  const { config, setConfig, initColor, initLightColor } = useConfig(); // Assuming useLanguage is imported from the correct path
 
   const closeDrawer = () => {
     navigation.closeDrawer();
@@ -87,14 +82,17 @@ const MemeOptions = ({ navigation, onChangedTemplates }) => {
 
         {/* Static bottom drawer checkbox */}
         <View style={styles.switchSection}>
-          <Text style={styles.dangerButtonText}>{staticBDrawer ? t('memeOptions.staticBDrawerEnabled') : t('memeOptions.staticBDrawerDisabled')}</Text>
+          <Text style={styles.dangerButtonText}>{config.staticBDrawer ? t('memeOptions.staticBDrawerEnabled') : t('memeOptions.staticBDrawerDisabled')}</Text>
           <Switch
             trackColor={{ false: initColor, true: initLightColor }}
             thumbColor={initColor}
             onValueChange={() => {
-              setStaticBDrawer(!staticBDrawer);
+              setConfig({
+                ...config,
+                staticBDrawer: !config.staticBDrawer,
+              });
             }}
-            value={staticBDrawer}
+            value={config.staticBDrawer}
           />
         </View>
 
@@ -104,13 +102,68 @@ const MemeOptions = ({ navigation, onChangedTemplates }) => {
           <Text style={styles.buttonText}>{t('memeOptions.staticBackgroundType')}</Text>
           <Dropdown
             style={[styles.selectInput]}
-            data={backgroundOptions.map((item) => ({ label: item, value: item }))}
+            data={Utils.getBackgroundTypesList().map((item) => ({ label: item, value: item }))}
             labelField="label"
             valueField="value"
-            value={backgroundType}
+            value={config?.backgroundType}
             onChange={item => {
-              setBackgroundType(item.value);
+              setConfig((prev) => ({
+                ...prev,
+                backgroundType: item.value,
+              }));
             }}
+          />
+        </View>
+
+        {/* Resize mode */}
+        <View style={[styles.switchSection, { flexDirection: 'column', alignItems: 'flex-start' }]}>
+          <Text style={styles.buttonText}>{t('memeOptions.staticResizeMode')}</Text>
+          <Dropdown
+            style={[styles.selectInput]}
+            data={Utils.getResizeModesList().map((item) => ({ label: item, value: item }))}
+            labelField="label"
+            valueField="value"
+            value={config?.dragableResizeMode}
+            onChange={item => {
+              setConfig((prev) => ({
+                ...prev,
+                dragableResizeMode: item.value,
+              }));
+            }}
+          />
+        </View>
+
+        {/* Font type */}
+        <View style={[styles.switchSection, { flexDirection: 'column', alignItems: 'flex-start' }]}>
+          <Text style={styles.buttonText}>{t('memeOptions.fontType')}</Text>
+          <Dropdown
+            style={[styles.selectInput]}
+            data={Utils.getFontTypesList().map((item) => ({ label: item, value: item }))}
+            labelField="label"
+            valueField="value"
+            value={config?.fontType}
+            onChange={item => {
+              setConfig((prev) => ({
+                ...prev,
+                fontType: item.value,
+              }));
+            }}
+          />
+        </View>
+
+        {/* Font size auto checkbox */}
+        <View style={styles.switchSection}>
+          <Text style={styles.dangerButtonText}>{config?.fontAutoResize ? t('memeOptions.fontAutoResizeEnabled') : t('memeOptions.fontAutoResizeDisabled')}</Text>
+          <Switch
+            trackColor={{ false: initColor, true: initLightColor }}
+            thumbColor={initColor}
+            onValueChange={() => {
+              setConfig((prev) => ({
+                ...prev,
+                fontAutoResize: !prev?.fontAutoResize,
+              }));
+            }}
+            value={config?.fontAutoResize}
           />
         </View>
 

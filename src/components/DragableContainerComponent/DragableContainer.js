@@ -2,8 +2,9 @@ import React, { useCallback, useEffect, useRef, useState, useMemo } from 'react'
 import { View, PanResponder, Pressable, Dimensions, StyleSheet } from 'react-native';
 import { Move, RotateCcw, Trash2 } from "react-native-feather";
 import Animated, { useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
+import { useConfig } from 'src/contexts/ConfigContext';
 
-const DragableContainer = ({ x, y, height, width, rotation, index, selected, onSelect, onDelete, children }) => {
+const DragableContainer = ({ x, y, height, width, rotation, resizeMode, index, selected, onSelect, onDelete, children }) => {
 
     const item = useMemo(() => {
         return {
@@ -92,6 +93,8 @@ const DragableContainer = ({ x, y, height, width, rotation, index, selected, onS
         })
     ).current;
 
+    /*  Resize pandhandlers */
+
     const resizeYFinalViewpanResponder = useRef(
         PanResponder.create({
             onStartShouldSetPanResponder: () => true,
@@ -135,6 +138,23 @@ const DragableContainer = ({ x, y, height, width, rotation, index, selected, onS
             },
         })
     ).current;
+
+    const resizeXYFinalViewpanResponder = useRef(
+        PanResponder.create({
+            onStartShouldSetPanResponder: () => true,
+            onPanResponderMove: (_, gestureState) => {
+                handleResizeY(gestureState, false);
+                handleResizeX(gestureState, false);
+            },
+            onPanResponderRelease: (_, gestureState) => {
+                initHeight.value = contentView.height.value;
+                initWidth.value = contentView.width.value;
+                setLayoutKey((prevKey) => prevKey + 1);
+            },
+        })
+    ).current;
+
+    /* Rotate functions */
 
     const onRotate = useCallback((gestureState) => {
         let newValue = gestureState.x0 - gestureState.moveX;
@@ -272,6 +292,11 @@ const DragableContainer = ({ x, y, height, width, rotation, index, selected, onS
                     transform: [{ translateX: -10 }],
                     zIndex: 16,
                 },
+                botRightHandle: {
+                    bottom: -15,
+                    right: -15,
+                    zIndex: 16,
+                }
             }),
         []
     );
@@ -291,21 +316,28 @@ const DragableContainer = ({ x, y, height, width, rotation, index, selected, onS
                 <Animated.View style={[rotationAnimationStyle, resizeAnimationStyle]}>
                     {childMemo}
                 </Animated.View>
-                <View style={[{ visibility: selected ? 'visible' : 'hidden', opacity: selected ? 1 : 0 }, styles.buttonsContainer, buttonsAbove && styles.buttonsAbove]}>
-                    <View {...rotateViewpanResponder.panHandlers} style={[{ width: buttonsSize, height: buttonsSize }, styles.button, styles.rotateButton]}>
-                        <RotateCcw stroke="black" width={buttonsSize / 2} height={buttonsSize / 2} />
+                {/* Drag buttons */}
+                {
+                    selected &&
+                    <View style={[{ visibility: selected ? 'visible' : 'hidden', opacity: selected ? 1 : 0 }, styles.buttonsContainer, buttonsAbove && styles.buttonsAbove]}>
+                        <View {...rotateViewpanResponder.panHandlers} style={[{ disabled: !selected, width: buttonsSize, height: buttonsSize }, styles.button, styles.rotateButton]}>
+                            <RotateCcw stroke="black" width={buttonsSize / 2} height={buttonsSize / 2} />
+                        </View>
+                        <View {...dragViewpanResponder.panHandlers} style={[{ disabled: !selected, width: buttonsSize, height: buttonsSize }, styles.button, styles.moveButton]}>
+                            <Move stroke="black" width={buttonsSize / 2} height={buttonsSize / 2} />
+                        </View>
+                        <Pressable onPress={onDelete} style={[{ disabled: !selected, width: buttonsSize, height: buttonsSize }, styles.button, styles.deleteButton]}>
+                            <Trash2 stroke="black" width={buttonsSize / 2} height={buttonsSize / 2} />
+                        </Pressable>
                     </View>
-                    <View {...dragViewpanResponder.panHandlers} style={[{ width: buttonsSize, height: buttonsSize }, styles.button, styles.moveButton]}>
-                        <Move stroke="black" width={buttonsSize / 2} height={buttonsSize / 2} />
-                    </View>
-                    <Pressable onPress={onDelete} style={[{ width: buttonsSize, height: buttonsSize }, styles.button, styles.deleteButton]}>
-                        <Trash2 stroke="black" width={buttonsSize / 2} height={buttonsSize / 2} />
-                    </Pressable>
-                </View>
-                <View {...resizeXFinalViewpanResponder.panHandlers} style={[{ visibility: selected ? 'visible' : 'hidden', opacity: selected ? 1 : 0, width: buttonsSize, height: buttonsSize }, styles.resizeHandle, styles.leftHandle]} />
-                <View {...resizeYViewpanResponder.panHandlers} style={[{ visibility: selected ? 'visible' : 'hidden', opacity: selected ? 1 : 0, width: buttonsSize, height: buttonsSize }, styles.resizeHandle, styles.bottomHandle]} />
-                <View {...resizeXViewpanResponder.panHandlers} style={[{ visibility: selected ? 'visible' : 'hidden', opacity: selected ? 1 : 0, width: buttonsSize, height: buttonsSize }, styles.resizeHandle, styles.rightHandle]} />
-                <View {...resizeYFinalViewpanResponder.panHandlers} style={[{ visibility: selected ? 'visible' : 'hidden', opacity: selected ? 1 : 0, width: buttonsSize, height: buttonsSize }, styles.resizeHandle, styles.topHandle]} />
+                }
+                {/* Resize 4 squares buttons */}
+                {selected && resizeMode === "4-squares" && <View {...resizeXFinalViewpanResponder.panHandlers} style={[{ disabled: !selected, visibility: selected ? 'visible' : 'hidden', opacity: selected ? 1 : 0, width: buttonsSize, height: buttonsSize }, styles.resizeHandle, styles.leftHandle]} />}
+                {selected && resizeMode === "4-squares" && <View {...resizeYViewpanResponder.panHandlers} style={[{ disabled: !selected, visibility: selected ? 'visible' : 'hidden', opacity: selected ? 1 : 0, width: buttonsSize, height: buttonsSize }, styles.resizeHandle, styles.bottomHandle]} />}
+                {selected && resizeMode === "4-squares" && <View {...resizeXViewpanResponder.panHandlers} style={[{ disabled: !selected, visibility: selected ? 'visible' : 'hidden', opacity: selected ? 1 : 0, width: buttonsSize, height: buttonsSize }, styles.resizeHandle, styles.rightHandle]} />}
+                {selected && resizeMode === "4-squares" && <View {...resizeYFinalViewpanResponder.panHandlers} style={[{ disabled: !selected, visibility: selected ? 'visible' : 'hidden', opacity: selected ? 1 : 0, width: buttonsSize, height: buttonsSize }, styles.resizeHandle, styles.topHandle]} />}
+                {/* Resize 1 square button */}
+                {selected && resizeMode === "1-square" && <View {...resizeXYFinalViewpanResponder.panHandlers} style={[{ disabled: !selected, visibility: selected ? 'visible' : 'hidden', opacity: selected ? 1 : 0, width: buttonsSize, height: buttonsSize }, styles.resizeHandle, styles.botRightHandle]} />}
             </Pressable>
         </Animated.View>
     );

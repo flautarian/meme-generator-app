@@ -14,15 +14,19 @@ export const ConfigProvider = ({ children }) => {
 
   // OPTIONS 
 
-  const [staticBDrawer, setStaticBDrawer] = useState(false);
-
-  const [backgroundType, setBackgroundType] = useState("none");
-
   const [initColor, setInitColor] = useState('');
 
   const [initLightColor, setInitLightColor] = useState('');
 
   const [initDarkColor, setInitDarkColor] = useState('');
+
+  const [config, setConfig] = useState({
+    staticBDrawer: false,
+    backgroundType: "lava",
+    dragableResizeMode: "4-squares",
+    fontAutoResize: false,
+    fontType: 'Impact',
+  });
 
   const changeLanguage = useCallback(async (language) => {
     try {
@@ -35,25 +39,18 @@ export const ConfigProvider = ({ children }) => {
 
   const handleSettingsUpdate = useCallback(async () => {
     const updatedStrSettings = {
-      valuesStored: JSON.stringify(
-        {
-          staticBDrawerEnabled: staticBDrawer,
-          backgroundType: backgroundType
-        }),
+      valuesStored: JSON.stringify(config),
     };
     await updateSettings(updatedStrSettings);
-
-  }, [staticBDrawer, backgroundType]);
+  }, [config]);
 
   useEffect(() => {
     fetchSettings().then((result) => {
       if (result) {
         const allSettings = JSON.parse(result.valuesStored);
-        setStaticBDrawer(allSettings.staticBDrawerEnabled);
-        setBackgroundType(allSettings.backgroundType);
+        setConfig(allSettings);
       }
     });
-
 
     // random color background generation
     setInitColor(randomColor({ count: 1, luminosity: 'light', hue: 'purple' })[0]);
@@ -62,20 +59,18 @@ export const ConfigProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    console.log('updating settings', staticBDrawer);
-    // Call the function to update settings whenever staticBDrawer changes
+    // Call the function to update settings
+    console.log("Config updated", config);
     handleSettingsUpdate();
-  }, [staticBDrawer, backgroundType]);
+  }, [config]);
 
   return (
     <ConfigContext.Provider value={{
       currentLanguage,
       changeLanguage,
       languages: LANGUAGES,
-      staticBDrawer,
-      setStaticBDrawer,
-      backgroundType,
-      setBackgroundType,
+      config,
+      setConfig,
       initColor,
       initLightColor,
       initDarkColor,

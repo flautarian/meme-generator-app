@@ -53,7 +53,7 @@ const MemeCreate = ({ navigation, currentMeme }) => {
   const { handleCloseDrawer, addToast } = useConfirmation();
 
   // Options config
-  const { staticBDrawer, backgroundType, initColor, initLightColor, initDarkColor } = useConfig();
+  const { config, initColor, initLightColor, initDarkColor } = useConfig();
 
   const botBtnAnimatedStyle = useAnimatedStyle(() => ({
     position: 'absolute',
@@ -75,9 +75,9 @@ const MemeCreate = ({ navigation, currentMeme }) => {
   };
 
   useEffect(() => {
-    botBtnAnimation.value = withSpring(isBotDrawerOpened || staticBDrawer ? -BOTTOM_BTN_HEIGHT : 0, bottomDrawerSpringConfig);
-    botButtonsYOffset.value = withSpring(isBotDrawerOpened || staticBDrawer ? -BOTTOM_BUTTONS_Y_OFFSET : 0, bottomDrawerSpringConfig);
-  }, [isBotDrawerOpened, staticBDrawer]);
+    botBtnAnimation.value = withSpring(isBotDrawerOpened || config?.staticBDrawer ? -BOTTOM_BTN_HEIGHT : 0, bottomDrawerSpringConfig);
+    botButtonsYOffset.value = withSpring(isBotDrawerOpened || config?.staticBDrawer ? -BOTTOM_BUTTONS_Y_OFFSET : 0, bottomDrawerSpringConfig);
+  }, [isBotDrawerOpened, config?.staticBDrawer]);
 
   const deleteText = useCallback((index) => {
     setTexts((prevTexts) => {
@@ -157,8 +157,8 @@ const MemeCreate = ({ navigation, currentMeme }) => {
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>
         {/* Gradient Background */}
-        {backgroundType === "lava" && <LavaLampBackground count={10} hue={initColor} />}
-        {backgroundType === "gradient" && <GradientBackground startColor={initLightColor} endColor={initDarkColor} />}
+        {config?.backgroundType === "lava" && <LavaLampBackground count={10} hue={initColor} />}
+        {config?.backgroundType === "gradient" && <GradientBackground startColor={initLightColor} endColor={initDarkColor} />}
 
         {/* Meme image container */}
         <ViewShot ref={memeContainerRef} style={styles.memeWrapper} draggable={false}>
@@ -177,6 +177,7 @@ const MemeCreate = ({ navigation, currentMeme }) => {
               onSelect={(i) => setSelectedTextIndex(i)}
               onDelete={() => deleteText(index)}
               draggable={false}
+              resizeMode={config?.dragableResizeMode}
             >
               {child}
             </DraggableContainer>
@@ -230,7 +231,7 @@ const MemeCreate = ({ navigation, currentMeme }) => {
         </DragableOption>
 
         {/* Bottom drawer */}
-        <Animated.View style={[botBtnAnimatedStyle, { flex: 1, justifyContent: 'center', alignItems: 'center', display: staticBDrawer ? "none" : "flex" }]} key={`bot-drawer-btn`}>
+        <Animated.View style={[botBtnAnimatedStyle, { flex: 1, justifyContent: 'center', alignItems: 'center', display: config?.staticBDrawer ? "none" : "flex" }]} key={`bot-drawer-btn`}>
           <Pressable onPress={() => setIsBotDrawerOpened(!isBotDrawerOpened)} >
             <View style={{ width: 100, height: 50, borderRadius: 20, backgroundColor: initColor, borderWidth: 1, borderColor: initLightColor, justifyContent: 'center', alignItems: 'center' }}>
               {<ChevronUp style={{ transform: [{ rotate: isBotDrawerOpened ? '180deg' : '0deg' }], animationDuration: 300 }} stroke="black" width={20} height={20} />}
