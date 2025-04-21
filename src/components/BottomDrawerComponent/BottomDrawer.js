@@ -2,11 +2,12 @@ import React, { useCallback } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
 
-const BottomDrawer = ({ children, reference, snapPoints }) => {
+const BottomDrawer = ({ children, reference, snapPoints, callback = null }) => {
 
   // callbacks
   const handleSheetChanges = useCallback((index) => {
-    console.log('handleSheetChanges', index);
+    if(!!callback)
+      callback(index);
   }, []);
 
 

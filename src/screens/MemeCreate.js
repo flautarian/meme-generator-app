@@ -50,7 +50,7 @@ const MemeCreate = ({ navigation, currentMeme }) => {
 
 
   // decorations drawer / toasts
-  const { handleCloseDrawer, addToast } = useConfirmation();
+  const { handleCloseBottomDrawer, addToast } = useConfirmation();
 
   // Options config
   const { config, initColor, initLightColor, initDarkColor } = useConfig();
@@ -95,7 +95,7 @@ const MemeCreate = ({ navigation, currentMeme }) => {
       // disable selection of any item
       setSelectedTextIndex(-1);
       // hide bottom drawer
-      handleCloseDrawer();
+      handleCloseBottomDrawer();
       // Add a slight delay to ensure rendering is complete
       setTimeout(async () => {
         memeContainerRef.current.capture().then(async (uri) => {
@@ -193,7 +193,7 @@ const MemeCreate = ({ navigation, currentMeme }) => {
               // hide options drawer
               setIsBotDrawerOpened(false);
               // hide bottom drawer
-              handleCloseDrawer();
+              handleCloseBottomDrawer();
             }}>
             {/* Meme Image */}
             {currentMeme && (
