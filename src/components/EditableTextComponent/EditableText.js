@@ -54,6 +54,21 @@ const EditableText = ({ item, index }) => {
         dimensions.height.value = height;
     }, [dimensions]);
 
+    const getFontFamily = useCallback(() => {
+        switch (config?.fontType) {
+            case 'Impact':
+                return { fontFamily: 'Impact' };
+            case 'Arial':
+                return { fontFamily: 'Arial' };
+            case 'Courier':
+                return { fontFamily: 'Courier' };
+            case 'Comic Sans MS':
+                return { fontFamily: 'Comic Sans MS' };
+            default:
+                return { fontFamily: 'Impact' };
+        }
+    }, [config?.fontType]);
+
     return (
         <Animated.View style={[resizeAnimationStyle]} selectable={false} draggable={false} key={`editable-text-${index}`} onLayout={onComponentLayout}>
             <TapGestureHandler
@@ -70,8 +85,8 @@ const EditableText = ({ item, index }) => {
                 {isEditing ? (
                     <TextInput
                         aria-label={t('editableText.ariaLabel')}
-                        style={[{ ...styles.impact, textAlign: 'center' },
-                        resizeAnimationStyle.initial.value,
+                        style={[{ ...styles.font, ...getFontFamily(), textAlign: 'center', fontSize: config?.fontAutoResize ? Math.max((dimensions.height.get() + dimensions.width.get() / 2) / 4 - value.split(" ").length * 5, 10) : fontSize, color: 'white', backgroundColor: 'transparent' },
+                        
                         StyleSheet.absoluteFill]}
                         value={value}
                         onChangeText={updateValue}
@@ -85,7 +100,7 @@ const EditableText = ({ item, index }) => {
                     />
                 ) : (
                     <Animated.Text
-                        style={[styles.text, StyleSheet.absoluteFill, styles.impact, resizeAnimationStyle]}
+                        style={[styles.text, StyleSheet.absoluteFill, styles.font, getFontFamily(), resizeAnimationStyle]}
                         selectable={false}
                         draggable={false}>
                         {value}
@@ -140,9 +155,8 @@ const styles = StyleSheet.create({
     positionIconView: {
         userSelect: "none",
     },
-    impact: {
+    font: {
         textTransform: "uppercase",
-        fontFamily: 'Impact',
         fontColor: 'white',
         color: 'white',
         WebkitTextStroke: '2px black',

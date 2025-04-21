@@ -9,7 +9,7 @@ import Animated, {
 import DragableOption from '../DragableOptionComponent/DragableOption';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useKeyboardVisible } from 'src/hooks/useKeyboardVisible';
-import { getRandomDecoration } from 'src/hooks/useTemplates';
+import { getRandomDecoration } from 'src/hooks/useDecorations';
 import { Edit } from 'react-native-feather';
 import { useConfirmation } from 'src/contexts/ConfirmationContext';
 import MemeDecorationsList from '../MemeDecorationsListComponent/MemeDecorationsList';
@@ -51,16 +51,7 @@ const DragableDecoration = ({
         height: opened ? parentDimensions.height * 0.35 : 50,
     }));
 
-    // menu opened animated style
-    const menuOpenedAnimatedStyle = useAnimatedStyle(() => ({
-        opacity: elementSize.opacity.value,
-        width: elementSize.width.value,
-        height: elementSize.height.value,
-        left: elementSize.left.value,
-        bottom: elementSize.bottom.value,
-    }));
-
-    const { handleOpenDrawer, handleCloseDrawer } = useConfirmation();
+    const { handleOpenBottomDrawer, handleCloseBottomDrawer } = useConfirmation();
 
     const handleOnArrangeEnd = useCallback((x, y) => {
         if (!!selectedDecoration?.value && !!selectedDecoration?.value?.blob) {
@@ -73,7 +64,7 @@ const DragableDecoration = ({
                     else {
                         const diffDates = new Date().getTime() - openTabTimer.current;
                         if (diffDates < 550 && diffDates > 0)
-                            handleOpenDrawer(memeDecoration);
+                            handleOpenBottomDrawer(memeDecoration);
                         openTabTimer.current = 0;
                     };
                 }
@@ -89,7 +80,8 @@ const DragableDecoration = ({
         elementSize.height.value = withSpring(opened ? parentDimensions.height * 0.35 : 0, scaleSpringConfig);
         elementSize.left.value = withSpring(opened ? parentDimensions.width * 0.05 : initialPosition.x, scaleSpringConfig);
         elementSize.bottom.value = withSpring(opened && isKeyboardVisible ? parentDimensions.height * 0.4 : 50, scaleSpringConfig);
-        if (selectedDecoration.value === 0) {
+        if (selectedDecoration.value === "") {
+            selectedDecoration.value = "calculating";
             const initSelectDecoration = async () => {
                 const item = await getRandomDecoration();
                 selectedDecoration.value = item;
@@ -101,18 +93,18 @@ const DragableDecoration = ({
     const tap = Gesture.Tap()
         .numberOfTaps(2)
         .onStart(() => {
-            handleOpenDrawer(memeDecoration);
+            handleOpenBottomDrawer(memeDecoration);
         }).runOnJS(true);
 
     const memeDecoration = <MemeDecorationsList
         onSelectDecoration={(item) => {
             selectedDecoration.value = item;
-            handleCloseDrawer();
+            handleCloseBottomDrawer();
         }}
-        onCloseMenu={handleCloseDrawer} />;
+        onCloseMenu={handleCloseBottomDrawer} />;
 
     const handleOpenDecorationSelection = () => {
-        handleOpenDrawer(memeDecoration);
+        handleOpenBottomDrawer(memeDecoration);
     }
 
     return (

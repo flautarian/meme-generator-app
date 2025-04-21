@@ -69,14 +69,14 @@ export const ConfirmationProvider = ({ children }) => {
   const bottomSheetRef = useRef(null);
   const [bottomDrawerChildren, setBottomDrawerChildren] = useState(<Text></Text>);
 
-  const handleCloseDrawer = () => {
+  const handleCloseBottomDrawer = () => {
     if (!!bottomSheetRef) {
       setBottomDrawerChildren(null);
       bottomSheetRef.current.close();
     }
   }
 
-  const handleOpenDrawer = (child) => {
+  const handleOpenBottomDrawer = (child) => {
     if (!!bottomSheetRef) {
       setBottomDrawerChildren(child);
       bottomSheetRef.current.expand();
@@ -84,7 +84,7 @@ export const ConfirmationProvider = ({ children }) => {
   }
 
   return (
-    <ConfirmationContext.Provider value={{ showConfirmation, hideConfirmation, handleCloseDrawer, handleOpenDrawer, addToast }}>
+    <ConfirmationContext.Provider value={{ showConfirmation, hideConfirmation, handleCloseBottomDrawer, handleOpenBottomDrawer, addToast }}>
       <GestureHandlerRootView>
         {/* Confirmation Modal */}
         <ConfirmationModal
