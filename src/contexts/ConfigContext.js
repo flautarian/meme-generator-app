@@ -23,8 +23,8 @@ export const ConfigProvider = ({ children }) => {
   const [config, setConfig] = useState({
     staticBDrawer: false,
     backgroundType: "lava",
-    dragableResizeMode: "4-squares",
-    fontAutoResize: false,
+    dragableResizeMode: "1-square",
+    fontAutoResize: true,
     fontType: 'Impact',
   });
 
@@ -46,7 +46,7 @@ export const ConfigProvider = ({ children }) => {
 
   useEffect(() => {
     fetchSettings().then((result) => {
-      if (result) {
+      if (!!result) {
         const allSettings = JSON.parse(result.valuesStored);
         setConfig(allSettings);
       }

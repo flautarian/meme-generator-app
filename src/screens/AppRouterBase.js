@@ -7,7 +7,6 @@ import MemeOptions from './MemeOptions';
 import { Platform } from 'expo-modules-core';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import * as NavigationBar from 'expo-navigation-bar';
-import { GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
 
 const AppRouterBase = () => {
     const Drawer = createDrawerNavigator();
@@ -24,52 +23,40 @@ const AppRouterBase = () => {
     const changeMemeTemplate = (item) =>
         setCurrentMeme(item);
 
-
-    const LeftDrawerScreen = () => (
-        <LeftDrawer.Navigator
-            drawerContent={(props) => <MemeOptions
-                {...props}
-                onChangedTemplates={setOnChangedTemplates} />}
-            screenOptions={{
-                drawerPosition: 'left',
-                swipeEnabled: false,
-            }}
-        >
-            <LeftDrawer.Screen name="Main" options={{ headerShown: false }}>
-                {(props) => (
-                    <Drawer.Navigator
-                        drawerContent={(props) =>
-                            <MemeSelect
-                                {...props}
-                                onSelectMeme={changeMemeTemplate}
-                                onChangedTemplates={setOnChangedTemplates} />
-                        }
-                        screenOptions={{
-                            drawerPosition: 'right',
-                            swipeEnabled: false,
-                        }}
-                    >
-                        <Drawer.Screen name="MemeCreate" options={{ headerShown: false }}>
-                            {(props) => <MemeCreate {...props} currentMeme={currentMeme} />}
-                        </Drawer.Screen>
-                    </Drawer.Navigator>
-                )}
-            </LeftDrawer.Screen>
-        </LeftDrawer.Navigator>
-    );
-
     return (
         <NavigationContainer>
-            <LeftDrawerScreen />
+            <LeftDrawer.Navigator
+                drawerContent={(props) => <MemeOptions
+                    {...props}
+                    onChangedTemplates={setOnChangedTemplates} />}
+                screenOptions={{
+                    drawerPosition: 'left',
+                    swipeEnabled: false,
+                }}
+            >
+                <LeftDrawer.Screen name="Main" options={{ headerShown: false }}>
+                    {(props) => (
+                        <Drawer.Navigator
+                            drawerContent={(props) =>
+                                <MemeSelect
+                                    {...props}
+                                    onSelectMeme={changeMemeTemplate}
+                                    onChangedTemplates={setOnChangedTemplates} />
+                            }
+                            screenOptions={{
+                                drawerPosition: 'right',
+                                swipeEnabled: false,
+                            }}
+                        >
+                            <Drawer.Screen name="MemeCreate" options={{ headerShown: false }}>
+                                {(props) => <MemeCreate {...props} currentMeme={currentMeme} />}
+                            </Drawer.Screen>
+                        </Drawer.Navigator>
+                    )}
+                </LeftDrawer.Screen>
+            </LeftDrawer.Navigator>
         </NavigationContainer>
     );
 };
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        position: 'relative', // Ensures children are positioned relative to this container
-    },
-});
 
 export default AppRouterBase;

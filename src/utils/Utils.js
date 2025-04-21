@@ -59,6 +59,8 @@ export const Utils = {
         return [
             "Impact",
             "Arial",
+            "Courier",
+            "Comic Sans MS",
         ]
     }
 
