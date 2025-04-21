@@ -20,11 +20,11 @@ export const Utils = {
         return documentUploadOption;
     },
     checkIfImgLoadedFromUser: (str) => {
-        if(!str || typeof str !== "string")
+        if (!str || typeof str !== "string")
             return false;
         return str.startsWith("data:image");
     },
-    convertBase64ToImage : async (base64String) => {
+    convertBase64ToImage: async (base64String) => {
         try {
             // Convert Base64 string to a Blob
             const byteCharacters = atob(base64String.split(',')[1]);
@@ -38,8 +38,28 @@ export const Utils = {
             // Create a ClipboardItem and write it to the clipboard
             return new ClipboardItem({ 'image/png': blob });
         } catch (error) {
-          Alert.alert('Error', 'Failed to convert Base64 to image.');
-          console.error(error);
+            Alert.alert('Error', 'Failed to convert Base64 to image.');
+            console.error(error);
         }
-      }
+    },
+    getBackgroundTypesList: () => {
+        return [
+            "lava",
+            "gradient",
+            "none",
+        ]
+    },
+    getResizeModesList: () => {
+        return [
+            "4-squares",
+            "1-square",
+        ]
+    },
+    getFontTypesList: () => {
+        return [
+            "Impact",
+            "Arial",
+        ]
+    }
+
 }

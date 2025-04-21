@@ -3,37 +3,21 @@ import { useTranslation } from 'react-i18next';
 import { useConfirmation } from 'src/contexts/ConfirmationContext';
 import { rebootTemplates } from 'src/hooks/useTemplates';
 import { rebootDecorations } from 'src/hooks/useDecorations';
-import { useCallback, useState } from 'react';
-import { fetchSettings, updateSettings } from 'src/hooks/useSettings';
-import { useEffect } from 'react';
 import AppInfo from 'src/components/AppInfoComponent/AppInfo';
 import LanguageSelector from 'src/components/LanguageSelectorComponent/LanguageSelector';
+import { useConfig } from 'src/contexts/ConfigContext';
+import { Utils } from 'src/utils/Utils';
 
-const MemeOptions = ({ navigation, onChangedTemplates, onChangedDecorations }) => {
+import { Dropdown } from 'react-native-element-dropdown';
+
+const MemeOptions = ({ navigation, onChangedTemplates }) => {
   const { t } = useTranslation();
-  const { showConfirmation } = useConfirmation();
-  const [staticBDrawer, setStaticBDrawer] = useState(false);
+  const { showConfirmation, setOnChangedDecorations } = useConfirmation();
+  const { config, setConfig, initColor, initLightColor } = useConfig(); // Assuming useLanguage is imported from the correct path
 
   const closeDrawer = () => {
     navigation.closeDrawer();
   };
-
-  useEffect(() => {
-    fetchSettings().then((result) => {
-      if (result) {
-        const allSettings = JSON.parse(result.valuesStored);
-        setStaticBDrawer(allSettings.staticBDrawerEnabled);
-      }
-    });
-  }, []);
-
-  const handleSettingsUpdate = useCallback(async () => {
-    const updatedStrSettings = {
-      valuesStored: JSON.stringify(
-        { staticBDrawerEnabled: staticBDrawer })
-    };
-    await updateSettings(updatedStrSettings);
-  }, [staticBDrawer]);
 
   const rebootDecorationsDb = () => {
     showConfirmation({
@@ -42,7 +26,7 @@ const MemeOptions = ({ navigation, onChangedTemplates, onChangedDecorations }) =
       confirmText: t('memeOptions.rebootDecorationsDbConfirm'),
       onConfirm: async () => {
         await rebootDecorations();
-        onChangedDecorations();
+        setOnChangedDecorations((prev) => !prev);
         closeDrawer();
       },
     });
@@ -98,16 +82,88 @@ const MemeOptions = ({ navigation, onChangedTemplates, onChangedDecorations }) =
 
         {/* Static bottom drawer checkbox */}
         <View style={styles.switchSection}>
-          <Text style={styles.dangerButtonText}>{staticBDrawer ? t('memeOptions.staticBDrawerEnabled') : t('memeOptions.staticBDrawerDisabled')}</Text>
+          <Text style={styles.dangerButtonText}>{config.staticBDrawer ? t('memeOptions.staticBDrawerEnabled') : t('memeOptions.staticBDrawerDisabled')}</Text>
           <Switch
-            trackColor={{ false: '#767577', true: '#81b0ff' }}
-            thumbColor={staticBDrawer ? '#f5dd4b' : '#f4f3f4'}
-            ios_backgroundColor="#3e3e3e"
+            trackColor={{ false: initColor, true: initLightColor }}
+            thumbColor={initColor}
             onValueChange={() => {
-              setStaticBDrawer(!staticBDrawer);
-              handleSettingsUpdate();
+              setConfig({
+                ...config,
+                staticBDrawer: !config.staticBDrawer,
+              });
             }}
-            value={staticBDrawer}
+            value={config.staticBDrawer}
+          />
+        </View>
+
+
+        {/* Background type*/}
+        <View style={[styles.switchSection, { flexDirection: 'column', alignItems: 'flex-start' }]}>
+          <Text style={styles.buttonText}>{t('memeOptions.staticBackgroundType')}</Text>
+          <Dropdown
+            style={[styles.selectInput]}
+            data={Utils.getBackgroundTypesList().map((item) => ({ label: item, value: item }))}
+            labelField="label"
+            valueField="value"
+            value={config?.backgroundType}
+            onChange={item => {
+              setConfig((prev) => ({
+                ...prev,
+                backgroundType: item.value,
+              }));
+            }}
+          />
+        </View>
+
+        {/* Resize mode */}
+        <View style={[styles.switchSection, { flexDirection: 'column', alignItems: 'flex-start' }]}>
+          <Text style={styles.buttonText}>{t('memeOptions.staticResizeMode')}</Text>
+          <Dropdown
+            style={[styles.selectInput]}
+            data={Utils.getResizeModesList().map((item) => ({ label: item, value: item }))}
+            labelField="label"
+            valueField="value"
+            value={config?.dragableResizeMode}
+            onChange={item => {
+              setConfig((prev) => ({
+                ...prev,
+                dragableResizeMode: item.value,
+              }));
+            }}
+          />
+        </View>
+
+        {/* Font type */}
+        <View style={[styles.switchSection, { flexDirection: 'column', alignItems: 'flex-start' }]}>
+          <Text style={styles.buttonText}>{t('memeOptions.fontType')}</Text>
+          <Dropdown
+            style={[styles.selectInput]}
+            data={Utils.getFontTypesList().map((item) => ({ label: item, value: item }))}
+            labelField="label"
+            valueField="value"
+            value={config?.fontType}
+            onChange={item => {
+              setConfig((prev) => ({
+                ...prev,
+                fontType: item.value,
+              }));
+            }}
+          />
+        </View>
+
+        {/* Font size auto checkbox */}
+        <View style={styles.switchSection}>
+          <Text style={styles.dangerButtonText}>{config?.fontAutoResize ? t('memeOptions.fontAutoResizeEnabled') : t('memeOptions.fontAutoResizeDisabled')}</Text>
+          <Switch
+            trackColor={{ false: initColor, true: initLightColor }}
+            thumbColor={initColor}
+            onValueChange={() => {
+              setConfig((prev) => ({
+                ...prev,
+                fontAutoResize: !prev?.fontAutoResize,
+              }));
+            }}
+            value={config?.fontAutoResize}
           />
         </View>
 
@@ -138,6 +194,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+  },
+  selectInput: {
+    width: '100%',
+    height: 50,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    alignSelf: 'center',
   },
   searchContainer: {
     padding: 10,
@@ -199,6 +264,7 @@ const styles = StyleSheet.create({
     color: '#007AFF',
     fontSize: 16,
     fontWeight: '500',
+    width: '100%',
   },
   dangerButtonText: {
     color: '#FF5733',

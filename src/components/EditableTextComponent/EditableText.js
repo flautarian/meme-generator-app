@@ -1,11 +1,15 @@
-import { useState } from "react";
-import { StyleSheet, TextInput } from "react-native";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { Pressable, StyleSheet, TextInput } from "react-native";
 import { TapGestureHandler } from "react-native-gesture-handler";
-import Animated, { useAnimatedStyle } from "react-native-reanimated";
+import Animated, { useAnimatedStyle, useSharedValue } from "react-native-reanimated";
 import { useTranslation } from 'react-i18next';
-import { useCallback } from "react";
+import 'assets/fonts/impact.ttf';
+import { Minus, Plus } from "react-native-feather";
+import { useConfig } from "src/contexts/ConfigContext";
 
-const EditableText = ({ item, index, height, width, rotation }) => {
+const EditableText = ({ item, index }) => {
+
+    console.log("EditableText", item, index);
 
     const { t } = useTranslation();
 
@@ -13,14 +17,19 @@ const EditableText = ({ item, index, height, width, rotation }) => {
 
     const [isEditing, setIsEditing] = useState(false);
 
+    const [fontSize, setFontSize] = useState(20);
+
+    const { config } = useConfig();
+
+    const dimensions = { width: useSharedValue(0), height: useSharedValue(0) };
+
     // animated size style for the inner component shown
     const resizeAnimationStyle = useAnimatedStyle(() => ({
-        maxHeight: height.value,
-        height: height.value * 0.9,
+        height: "100%",
+        width: "100%",
         flexShrink: 1,
-        maxWidth: width.value,
-        width: width.value * 0.9,
-        fontSize: (height.value + width.value / 2) / 4 - value.split(" ").length * 5,
+        backgroundColor: 'transparent',
+        fontSize: config?.fontAutoResize ? Math.max((dimensions.height.get() + dimensions.width.get() / 2) / 4 - value.split(" ").length * 5, 10) : fontSize,
         zIndex: 15,
     }));
 
@@ -29,13 +38,24 @@ const EditableText = ({ item, index, height, width, rotation }) => {
         item.value = text;
     }, [item]);
 
-    // animated rotation style for the inner component shown
-    const rotationAnimationStyle = useAnimatedStyle(() => ({
-        transform: [{ rotate: rotation.value + 'deg' }],
-    }));
+    const alterFontSize = useCallback((point) => {
+        setFontSize(prevFontSize => {
+            const newFontSize = prevFontSize + point;
+            if (newFontSize < 10) return prevFontSize; // prevent font size from going below 10
+            if (newFontSize > 100) return prevFontSize; // prevent font size from going above 100
+            return newFontSize;
+        });
+    }, [fontSize]);
+
+
+    const onComponentLayout = useCallback((event) => {
+        const { width, height } = event.nativeEvent.layout;
+        dimensions.width.value = width;
+        dimensions.height.value = height;
+    }, [dimensions]);
 
     return (
-        <Animated.View style={[resizeAnimationStyle, rotationAnimationStyle]} selectable={false} draggable={false} key={`editable-text-${index}`}>
+        <Animated.View style={[resizeAnimationStyle]} selectable={false} draggable={false} key={`editable-text-${index}`} onLayout={onComponentLayout}>
             <TapGestureHandler
                 onHandlerStateChange={({ nativeEvent }) => {
                     if (nativeEvent.state === 4) {
@@ -45,6 +65,7 @@ const EditableText = ({ item, index, height, width, rotation }) => {
                 }}
                 numberOfTaps={2}
                 draggable={false}
+                selectable={false}
             >
                 {isEditing ? (
                     <TextInput
@@ -56,20 +77,29 @@ const EditableText = ({ item, index, height, width, rotation }) => {
                         onChangeText={updateValue}
                         onBlur={() => setIsEditing(false)}
                         autoFocus
-                        adjustsFontSizeToFit={true}
                         numberOfLines={1}
                         tooltip={t('editableText.placeholder')}
+                        selectable={false}
                         draggable={false}
+                        pointerEvents="box-only"
                     />
                 ) : (
                     <Animated.Text
-                        style={[styles.text, StyleSheet.absoluteFill, resizeAnimationStyle, styles.impact]}
-                        selectable={false} draggable={false}
-                        adjustsFontSizeToFit={true}>
+                        style={[styles.text, StyleSheet.absoluteFill, styles.impact, resizeAnimationStyle]}
+                        selectable={false}
+                        draggable={false}>
                         {value}
                     </Animated.Text>
                 )}
             </TapGestureHandler>
+
+            {!config?.fontAutoResize && <Pressable onPress={() => alterFontSize(10)} style={[{ width: 30, height: 30 }, styles.button]}>
+                <Plus stroke="black" width={15} height={15} />
+            </Pressable>}
+
+            {!config?.fontAutoResize && <Pressable onPress={() => alterFontSize(-10)} style={[{ width: 30, height: 30 }, styles.button]}>
+                <Minus stroke="black" width={15} height={15} />
+            </Pressable>}
         </Animated.View>
     );
 };
@@ -92,6 +122,21 @@ const styles = StyleSheet.create({
         maxWidth: "100%",
         maxHeight: "100%",
     },
+    button: {
+        borderRadius: 20,
+        backgroundColor: '#fff',
+        justifyContent: 'center',
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
+        zIndex: 20,
+    },
     positionIconView: {
         userSelect: "none",
     },
@@ -104,6 +149,7 @@ const styles = StyleSheet.create({
         textShadowColor: 'black',
         textShadowRadius: 4,
         textShadowOffset: { width: 2, height: 2 },
+        overflow: 'hidden',
     }
 });
 

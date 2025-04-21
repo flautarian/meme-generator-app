@@ -101,6 +101,11 @@
     "rebootTemplatesDbHint": "Toca para reiniciar la base de datos de plantillas",
     "appSignature": "Este programa ha sido desarrollado por GiacconiDev",
     "staticBDrawerEnabled": "Opciones visibles",
-    "staticBDrawerDisabled": "Opciones ocultas"
+    "staticBDrawerDisabled": "Opciones ocultas",
+    "staticBackgroundType": "Tipo de fondo",
+    "staticResizeMode": "Tipo de reescalado de detalles",
+    "fontType": "Tipo de fuente",
+    "fontAutoResizeEnabled": "Fuente redimensionada automáticamente",
+    "fontAutoResizeDisabled": "Fuente redimensionada manualmente"
   }
 }

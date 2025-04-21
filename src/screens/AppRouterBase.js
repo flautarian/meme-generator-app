@@ -7,6 +7,7 @@ import MemeOptions from './MemeOptions';
 import { Platform } from 'expo-modules-core';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import * as NavigationBar from 'expo-navigation-bar';
+import { GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
 
 const AppRouterBase = () => {
     const Drawer = createDrawerNavigator();
@@ -14,24 +15,21 @@ const AppRouterBase = () => {
 
     const [currentMeme, setCurrentMeme] = useState(null);
     const [onChangedTemplates, setOnChangedTemplates] = useState(false);
-    const [onChangedDecorations, setOnChangedDecorations] = useState(false);
 
     //we fade out bottom nav bar in android
-    if(Platform.OS === 'android') {
+    if (Platform.OS === 'android') {
         NavigationBar.setVisibilityAsync('hidden');
     }
 
-    const changeMemeTemplate = (item) => {
-        console.log("changeMemetTemplate", item);
+    const changeMemeTemplate = (item) =>
         setCurrentMeme(item);
-    }
+
 
     const LeftDrawerScreen = () => (
         <LeftDrawer.Navigator
             drawerContent={(props) => <MemeOptions
                 {...props}
-                onChangedTemplates={setOnChangedTemplates}
-                onChangedDecorations={setOnChangedDecorations} />}
+                onChangedTemplates={setOnChangedTemplates} />}
             screenOptions={{
                 drawerPosition: 'left',
                 swipeEnabled: false,
@@ -44,8 +42,7 @@ const AppRouterBase = () => {
                             <MemeSelect
                                 {...props}
                                 onSelectMeme={changeMemeTemplate}
-                                onChangedTemplates={setOnChangedTemplates}
-                                onChangedDecorations={setOnChangedDecorations} />
+                                onChangedTemplates={setOnChangedTemplates} />
                         }
                         screenOptions={{
                             drawerPosition: 'right',

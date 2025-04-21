@@ -12,15 +12,14 @@ import * as ImagePicker from 'expo-image-picker';
 
 const { width, height } = Dimensions.get('window');
 
-const MemeDecorationsList = ({ onSelectDecoration, onCloseMenu, onChangedDecorations }) => {
+const MemeDecorationsList = ({ onSelectDecoration, onCloseMenu }) => {
     const [decorations, setDecorations] = useState([]);
     const [decorationsFiltered, setDecorationsFiltered] = useState([]);
     const [nameFilter, setNameFilter] = useState("");
-    const { showConfirmation } = useConfirmation();
+    const { showConfirmation, onChangedDecorations } = useConfirmation();
     const { t } = useTranslation();
 
     useEffect(() => {
-        console.log("loading decorations");
         refreshDecorations();
     }, [onChangedDecorations]);
 

@@ -1,58 +1,51 @@
-import React, { useCallback, useEffect, useRef, useState, Children, cloneElement } from 'react';
-import { View, PanResponder, Pressable, Dimensions, StyleSheet, Text } from 'react-native';
-import { Move, RotateCcw, Square, Trash2 } from "react-native-feather";
+import React, { useCallback, useEffect, useRef, useState, useMemo } from 'react';
+import { View, PanResponder, Pressable, Dimensions, StyleSheet } from 'react-native';
+import { Move, RotateCcw, Trash2 } from "react-native-feather";
 import Animated, { useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
+import { useConfig } from 'src/contexts/ConfigContext';
 
-const DragableContainer = ({ item, index, selected, onSelect, onDelete, children }) => {
-    // Position of the component
+const DragableContainer = ({ x, y, height, width, rotation, resizeMode, index, selected, onSelect, onDelete, children }) => {
+
+    const item = useMemo(() => {
+        return {
+            height: height || 100,
+            width: width || 100,
+            rotation: rotation || 0,
+            x: x || 0,
+            y: y || 0,
+        };
+    }, [height, width, rotation]);
+
     const position = {
         x: useSharedValue(-1000),
         y: useSharedValue(-1000),
     };
 
-    // Used to keep track of the origin offset of the component
     const originOffset = useRef({ oX: 0, oY: 0 });
 
-    // Content view dimensions and rotation
     const contentView = {
         height: useSharedValue(item.height),
         width: useSharedValue(item.width),
         rotation: useSharedValue(item.rotation)
     };
 
-    // Init height of the component
     const initHeight = useSharedValue(0);
-
-    // Init width of the component
     const initWidth = useSharedValue(0);
-
-    // Init rotation of the component
     const initRotation = useSharedValue(0);
 
-    // Size of the buttons
     const buttonsSize = 30;
-
-    // Used to force re-render of the component because IOS doesn't make a re render when size of the component changes
     const [layoutKey, setLayoutKey] = useState(0);
-
-    // Dimensions of the component
     const dimensions = { width: useSharedValue(0), height: useSharedValue(0) };
-
-    // Window dimensions
     const windowDimensions = useRef(Dimensions.get('window'));
-
-    // State to track if buttons should be above
     const [buttonsAbove, setButtonsAbove] = useState(false);
 
-    // Check if container is too close to bottom
     const checkButtonsPosition = useCallback(() => {
         const containerBottom = position.y.value + contentView.height.value;
         const windowHeight = windowDimensions.current.height;
-        const threshold = windowHeight - 100; // Adjusted threshold
+        const threshold = windowHeight - 100;
         setButtonsAbove(containerBottom > threshold);
-    }, []);
+    }, [position.y, contentView.height]);
 
-    // Get new position of the component
     const getNewPosition = useCallback((gestureState) => {
         let { moveX, moveY } = gestureState;
         let { height } = dimensions;
@@ -69,18 +62,15 @@ const DragableContainer = ({ item, index, selected, onSelect, onDelete, children
             item.y = y;
         }
         checkButtonsPosition();
-    }, [position, checkButtonsPosition, buttonsAbove]);
+    }, [position, getNewPosition, checkButtonsPosition]);
 
-    // Pan responder for the drag
     const dragViewpanResponder = useRef(
         PanResponder.create({
             onStartShouldSetPanResponder: () => true,
-            onPanResponderMove: (_, gestureState) =>
-                handleDrag(gestureState),
+            onPanResponderMove: (_, gestureState) => handleDrag(gestureState),
         })
     ).current;
 
-    // handle resize function
     const handleResizeY = useCallback((gestureState, y0) => {
         let newValue = y0 ? gestureState.y0 - gestureState.moveY : gestureState.moveY - gestureState.y0;
         const newHeight = Math.max(newValue + initHeight.value, 25);
@@ -90,14 +80,12 @@ const DragableContainer = ({ item, index, selected, onSelect, onDelete, children
         if (!!item)
             item.height = newHeight;
         checkButtonsPosition();
-    }, [contentView, dimensions, checkButtonsPosition]);
+    }, [contentView, initHeight, checkButtonsPosition]);
 
-    // Pan responder for the resize Y
     const resizeYViewpanResponder = useRef(
         PanResponder.create({
             onStartShouldSetPanResponder: () => true,
-            onPanResponderMove: (_, gestureState) =>
-                handleResizeY(gestureState, false),
+            onPanResponderMove: (_, gestureState) => handleResizeY(gestureState, false),
             onPanResponderRelease: (_, gestureState) => {
                 initHeight.value = contentView.height.value;
                 setLayoutKey((prevKey) => prevKey + 1);
@@ -105,12 +93,12 @@ const DragableContainer = ({ item, index, selected, onSelect, onDelete, children
         })
     ).current;
 
-    // Pan responder for the resize Y (final Y)
+    /*  Resize pandhandlers */
+
     const resizeYFinalViewpanResponder = useRef(
         PanResponder.create({
             onStartShouldSetPanResponder: () => true,
-            onPanResponderMove: (_, gestureState) =>
-                handleResizeY(gestureState, true),
+            onPanResponderMove: (_, gestureState) => handleResizeY(gestureState, true),
             onPanResponderRelease: (_, gestureState) => {
                 initHeight.value = contentView.height.value;
                 setLayoutKey((prevKey) => prevKey + 1);
@@ -118,7 +106,6 @@ const DragableContainer = ({ item, index, selected, onSelect, onDelete, children
         })
     ).current;
 
-    // handle resize function
     const handleResizeX = useCallback((gestureState, x0) => {
         let newValue = x0 ? gestureState.x0 - gestureState.moveX : gestureState.moveX - gestureState.x0;
         const newWidth = Math.max(newValue + initWidth.value, 25);
@@ -128,14 +115,12 @@ const DragableContainer = ({ item, index, selected, onSelect, onDelete, children
         if (!!item)
             item.width = newWidth;
         checkButtonsPosition();
-    }, [contentView, checkButtonsPosition]);
+    }, [contentView, initWidth, checkButtonsPosition]);
 
-    // Pan responder for the resize X
     const resizeXViewpanResponder = useRef(
         PanResponder.create({
             onStartShouldSetPanResponder: () => true,
-            onPanResponderMove: (_, gestureState) =>
-                handleResizeX(gestureState, false),
+            onPanResponderMove: (_, gestureState) => handleResizeX(gestureState, false),
             onPanResponderRelease: (_, gestureState) => {
                 initWidth.value = contentView.width.value;
                 setLayoutKey((prevKey) => prevKey + 1);
@@ -143,12 +128,10 @@ const DragableContainer = ({ item, index, selected, onSelect, onDelete, children
         })
     ).current;
 
-    // Pan responder for the resize X (final X)
     const resizeXFinalViewpanResponder = useRef(
         PanResponder.create({
             onStartShouldSetPanResponder: () => true,
-            onPanResponderMove: (_, gestureState) =>
-                handleResizeX(gestureState, true),
+            onPanResponderMove: (_, gestureState) => handleResizeX(gestureState, true),
             onPanResponderRelease: (_, gestureState) => {
                 initWidth.value = contentView.width.value;
                 setLayoutKey((prevKey) => prevKey + 1);
@@ -156,27 +139,40 @@ const DragableContainer = ({ item, index, selected, onSelect, onDelete, children
         })
     ).current;
 
-    // handle rotate function
+    const resizeXYFinalViewpanResponder = useRef(
+        PanResponder.create({
+            onStartShouldSetPanResponder: () => true,
+            onPanResponderMove: (_, gestureState) => {
+                handleResizeY(gestureState, false);
+                handleResizeX(gestureState, false);
+            },
+            onPanResponderRelease: (_, gestureState) => {
+                initHeight.value = contentView.height.value;
+                initWidth.value = contentView.width.value;
+                setLayoutKey((prevKey) => prevKey + 1);
+            },
+        })
+    ).current;
+
+    /* Rotate functions */
+
     const onRotate = useCallback((gestureState) => {
         let newValue = gestureState.x0 - gestureState.moveX;
         contentView.rotation.value = newValue + initRotation.value;
         if (!!item)
             item.rotation = contentView.rotation.value;
-    }, [contentView]);
+    }, [contentView, initRotation]);
 
-    // Pan responder for the rotate
     const rotateViewpanResponder = useRef(
         PanResponder.create({
             onStartShouldSetPanResponder: () => true,
-            onPanResponderMove: (_, gestureState) =>
-                onRotate(gestureState),
+            onPanResponderMove: (_, gestureState) => onRotate(gestureState),
             onPanResponderRelease: (_, gestureState) => {
                 initRotation.value = contentView.rotation.value;
             },
         })
     ).current;
 
-    // animated translation style for main Animated.View
     const dragAnimationStyle = useAnimatedStyle(() => ({
         transform: [
             { translateX: position.x.value },
@@ -185,7 +181,6 @@ const DragableContainer = ({ item, index, selected, onSelect, onDelete, children
         position: 'absolute',
     }));
 
-    // Init position of the component
     useEffect(() => {
         position.x.value = item.x;
         position.y.value = item.y;
@@ -194,9 +189,8 @@ const DragableContainer = ({ item, index, selected, onSelect, onDelete, children
         initWidth.value = contentView.width.value;
         initRotation.value = contentView.rotation.value;
         checkButtonsPosition();
-    }, []);
+    }, [item, checkButtonsPosition]);
 
-    // Get the layout of the component
     const onComponentLayout = useCallback((event) => {
         const { width, height, x, y, top, left } = event.nativeEvent.layout;
         originOffset.current = { oX: x + (left | 0) + width / 2, oY: y + (top | 0) + height / 2 };
@@ -205,9 +199,107 @@ const DragableContainer = ({ item, index, selected, onSelect, onDelete, children
         checkButtonsPosition();
     }, [dimensions, checkButtonsPosition]);
 
-    const childrenWithProps = useRef(Children.map(children, (child) =>
-        cloneElement(child, { item: item, index: index, height: contentView.height, width: contentView.width, rotation: contentView.rotation })
-    ));
+    // animated size style for the inner component shown
+    const resizeAnimationStyle = useAnimatedStyle(() => ({
+        height: contentView.height.value,
+        width: contentView.width.value,
+        maxWidth: contentView.width.value,
+        maxHeight: contentView.height.value,
+        backgroundColor: 'transparent',
+        zIndex: 15,
+    }));
+
+    // animated rotation style for the inner component shown
+    const rotationAnimationStyle = useAnimatedStyle(() => ({
+        transform: [{ rotate: contentView.rotation.value + 'deg' }],
+    }));
+
+    // Componente hijo que queremos memorizar
+    const childMemo = useMemo(() => children, []);
+
+    const styles = useMemo(
+        () =>
+            StyleSheet.create({
+                container: {
+                    borderWidth: 1,
+                    borderStyle: 'dashed',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                },
+                buttonsContainer: {
+                    position: 'absolute',
+                    bottom: -60,
+                    left: 0,
+                    right: 0,
+                    flexDirection: 'row',
+                    justifyContent: 'space-around',
+                    alignItems: 'center',
+                    paddingHorizontal: 10,
+                    zIndex: 16,
+                },
+                buttonsAbove: {
+                    bottom: 'auto',
+                    top: -60,
+                },
+                button: {
+                    borderRadius: 20,
+                    backgroundColor: '#fff',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    shadowColor: '#000',
+                    shadowOffset: {
+                        width: 0,
+                        height: 2,
+                    },
+                    shadowOpacity: 0.25,
+                    shadowRadius: 3.84,
+                    elevation: 5,
+                },
+                resizeHandles: {
+                    position: 'absolute',
+                    width: '100%',
+                    height: '100%',
+                },
+                resizeHandle: {
+                    position: 'absolute',
+                    width: 30,
+                    height: 30,
+                    backgroundColor: '#fa7f7c',
+                    borderRadius: 20,
+                    zIndex: 16,
+                },
+                leftHandle: {
+                    left: -30,
+                    top: '50%',
+                    transform: [{ translateY: -10 }],
+                    zIndex: 16,
+                },
+                rightHandle: {
+                    right: -30,
+                    top: '50%',
+                    transform: [{ translateY: -10 }],
+                    zIndex: 16,
+                },
+                topHandle: {
+                    top: -30,
+                    left: '50%',
+                    transform: [{ translateX: -10 }],
+                    zIndex: 16,
+                },
+                bottomHandle: {
+                    bottom: -30,
+                    left: '50%',
+                    transform: [{ translateX: -10 }],
+                    zIndex: 16,
+                },
+                botRightHandle: {
+                    bottom: -15,
+                    right: -15,
+                    zIndex: 16,
+                }
+            }),
+        []
+    );
 
     return (
         <Animated.View
@@ -221,101 +313,34 @@ const DragableContainer = ({ item, index, selected, onSelect, onDelete, children
                 style={[styles.container, { borderColor: selected ? '#fa7f7c' : 'transparent' }]}
                 draggable={false}
                 selectable={false}>
-                {childrenWithProps.current}
-                <View style={[{ visibility: selected ? 'visible' : 'hidden', opacity: selected ? 1 : 0 }, styles.buttonsContainer, buttonsAbove && styles.buttonsAbove]}>
-                    <View {...rotateViewpanResponder.panHandlers} style={[{ width: buttonsSize, height: buttonsSize }, styles.button, styles.rotateButton]}>
-                        <RotateCcw stroke="black" width={buttonsSize / 2} height={buttonsSize / 2} />
+                <Animated.View style={[rotationAnimationStyle, resizeAnimationStyle]}>
+                    {childMemo}
+                </Animated.View>
+                {/* Drag buttons */}
+                {
+                    selected &&
+                    <View style={[{ visibility: selected ? 'visible' : 'hidden', opacity: selected ? 1 : 0 }, styles.buttonsContainer, buttonsAbove && styles.buttonsAbove]}>
+                        <View {...rotateViewpanResponder.panHandlers} style={[{ disabled: !selected, width: buttonsSize, height: buttonsSize }, styles.button, styles.rotateButton]}>
+                            <RotateCcw stroke="black" width={buttonsSize / 2} height={buttonsSize / 2} />
+                        </View>
+                        <View {...dragViewpanResponder.panHandlers} style={[{ disabled: !selected, width: buttonsSize, height: buttonsSize }, styles.button, styles.moveButton]}>
+                            <Move stroke="black" width={buttonsSize / 2} height={buttonsSize / 2} />
+                        </View>
+                        <Pressable onPress={onDelete} style={[{ disabled: !selected, width: buttonsSize, height: buttonsSize }, styles.button, styles.deleteButton]}>
+                            <Trash2 stroke="black" width={buttonsSize / 2} height={buttonsSize / 2} />
+                        </Pressable>
                     </View>
-                    <View {...dragViewpanResponder.panHandlers} style={[{ width: buttonsSize, height: buttonsSize }, styles.button, styles.moveButton]}>
-                        <Move stroke="black" width={buttonsSize / 2} height={buttonsSize / 2} />
-                    </View>
-                    <Pressable onPress={onDelete} style={[{ width: buttonsSize, height: buttonsSize }, styles.button, styles.deleteButton]}>
-                        <Trash2 stroke="black" width={buttonsSize / 2} height={buttonsSize / 2} />
-                    </Pressable>
-                </View>
-                <View {...resizeXFinalViewpanResponder.panHandlers} style={[{ visibility: selected ? 'visible' : 'hidden', opacity: selected ? 1 : 0, width: buttonsSize, height: buttonsSize }, styles.resizeHandle, styles.leftHandle]} />
-                <View {...resizeYViewpanResponder.panHandlers} style={[{ visibility: selected ? 'visible' : 'hidden', opacity: selected ? 1 : 0, width: buttonsSize, height: buttonsSize }, styles.resizeHandle, styles.bottomHandle]} />
-                <View {...resizeXViewpanResponder.panHandlers} style={[{ visibility: selected ? 'visible' : 'hidden', opacity: selected ? 1 : 0, width: buttonsSize, height: buttonsSize }, styles.resizeHandle, styles.rightHandle]} />
-                <View {...resizeYFinalViewpanResponder.panHandlers} style={[{ visibility: selected ? 'visible' : 'hidden', opacity: selected ? 1 : 0, width: buttonsSize, height: buttonsSize }, styles.resizeHandle, styles.topHandle]} />
-
+                }
+                {/* Resize 4 squares buttons */}
+                {selected && resizeMode === "4-squares" && <View {...resizeXFinalViewpanResponder.panHandlers} style={[{ disabled: !selected, visibility: selected ? 'visible' : 'hidden', opacity: selected ? 1 : 0, width: buttonsSize, height: buttonsSize }, styles.resizeHandle, styles.leftHandle]} />}
+                {selected && resizeMode === "4-squares" && <View {...resizeYViewpanResponder.panHandlers} style={[{ disabled: !selected, visibility: selected ? 'visible' : 'hidden', opacity: selected ? 1 : 0, width: buttonsSize, height: buttonsSize }, styles.resizeHandle, styles.bottomHandle]} />}
+                {selected && resizeMode === "4-squares" && <View {...resizeXViewpanResponder.panHandlers} style={[{ disabled: !selected, visibility: selected ? 'visible' : 'hidden', opacity: selected ? 1 : 0, width: buttonsSize, height: buttonsSize }, styles.resizeHandle, styles.rightHandle]} />}
+                {selected && resizeMode === "4-squares" && <View {...resizeYFinalViewpanResponder.panHandlers} style={[{ disabled: !selected, visibility: selected ? 'visible' : 'hidden', opacity: selected ? 1 : 0, width: buttonsSize, height: buttonsSize }, styles.resizeHandle, styles.topHandle]} />}
+                {/* Resize 1 square button */}
+                {selected && resizeMode === "1-square" && <View {...resizeXYFinalViewpanResponder.panHandlers} style={[{ disabled: !selected, visibility: selected ? 'visible' : 'hidden', opacity: selected ? 1 : 0, width: buttonsSize, height: buttonsSize }, styles.resizeHandle, styles.botRightHandle]} />}
             </Pressable>
         </Animated.View>
     );
 };
 
-const styles = StyleSheet.create({
-    container: {
-        borderWidth: 1,
-        borderStyle: 'dashed',
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    buttonsContainer: {
-        position: 'absolute',
-        bottom: -60,
-        left: 0,
-        right: 0,
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-        alignItems: 'center',
-        paddingHorizontal: 10,
-        zIndex: 16,
-    },
-    buttonsAbove: {
-        bottom: 'auto',
-        top: -60,
-    },
-    button: {
-        borderRadius: 20,
-        backgroundColor: '#fff',
-        justifyContent: 'center',
-        alignItems: 'center',
-        shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 2,
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 3.84,
-        elevation: 5,
-    },
-    resizeHandles: {
-        position: 'absolute',
-        width: '100%',
-        height: '100%',
-    },
-    resizeHandle: {
-        position: 'absolute',
-        width: 30,
-        height: 30,
-        backgroundColor: '#fa7f7c',
-        borderRadius: 20,
-        zIndex: 16,
-    },
-    leftHandle: {
-        left: -30,
-        top: '50%',
-        transform: [{ translateY: -10 }],
-        zIndex: 16,
-    },
-    rightHandle: {
-        right: -30,
-        top: '50%',
-        transform: [{ translateY: -10 }],
-        zIndex: 16,
-    },
-    topHandle: {
-        top: -30,
-        left: '50%',
-        transform: [{ translateX: -10 }],
-        zIndex: 16,
-    },
-    bottomHandle: {
-        bottom: -30,
-        left: '50%',
-        transform: [{ translateX: -10 }],
-        zIndex: 16,
-    },
-});
-
-export default DragableContainer;
+export default React.memo(DragableContainer);

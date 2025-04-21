@@ -1,6 +1,6 @@
 
 import { Image, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
 import Animated, {
     useSharedValue,
     useAnimatedStyle,
@@ -8,17 +8,16 @@ import Animated, {
 } from 'react-native-reanimated';
 import DragableOption from '../DragableOptionComponent/DragableOption';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import MemeDecorationsList from '../MemeDecorationsListComponent/MemeDecorationsList';
 import { useKeyboardVisible } from 'src/hooks/useKeyboardVisible';
 import { getRandomDecoration } from 'src/hooks/useTemplates';
-
+import { Edit } from 'react-native-feather';
+import { useConfirmation } from 'src/contexts/ConfirmationContext';
+import MemeDecorationsList from '../MemeDecorationsListComponent/MemeDecorationsList';
 
 const DragableDecoration = ({
     onArrangeEnd,
-    onChangedDecorations,
     initialPosition,
     parentDimensions,
-    onMenuOpenCallBack,
     style = {},
     offsetYAzis = useSharedValue(0),
     offsetXAzis = useSharedValue(0)
@@ -52,11 +51,6 @@ const DragableDecoration = ({
         height: opened ? parentDimensions.height * 0.35 : 50,
     }));
 
-    const onSelectDecoration = useCallback(async (item) => {
-        selectedDecoration.value = item;
-        toggleMenuState();
-    }, [opened, selectedDecoration]);
-
     // menu opened animated style
     const menuOpenedAnimatedStyle = useAnimatedStyle(() => ({
         opacity: elementSize.opacity.value,
@@ -66,33 +60,28 @@ const DragableDecoration = ({
         bottom: elementSize.bottom.value,
     }));
 
+    const { handleOpenDrawer, handleCloseDrawer } = useConfirmation();
+
     const handleOnArrangeEnd = useCallback((x, y) => {
-        // android menu open system
-        if (Platform.OS === "android") {
-            const diffPos = { x: x - initialPosition.x, y: y - initialPosition.y };
-            const diffPosAbs = Math.abs(diffPos.x) + Math.abs(diffPos.y);
-            if (diffPosAbs < 50 && !opened) {
-                if (openTabTimer.current === 0) openTabTimer.current = new Date().getTime();
-                else {
-                    const diffDates = new Date().getTime() - openTabTimer.current;
-                    if (diffDates < 550 && diffDates > 0)
-                        toggleMenuState();
-                    openTabTimer.current = 0;
-                };
+        if (!!selectedDecoration?.value && !!selectedDecoration?.value?.blob) {
+            // android menu open system
+            if (Platform.OS === "android") {
+                const diffPos = { x: x - initialPosition.x, y: y - initialPosition.y };
+                const diffPosAbs = Math.abs(diffPos.x) + Math.abs(diffPos.y);
+                if (diffPosAbs < 50 && !opened) {
+                    if (openTabTimer.current === 0) openTabTimer.current = new Date().getTime();
+                    else {
+                        const diffDates = new Date().getTime() - openTabTimer.current;
+                        if (diffDates < 550 && diffDates > 0)
+                            handleOpenDrawer(memeDecoration);
+                        openTabTimer.current = 0;
+                    };
+                }
+                else onArrangeEnd(x, y, selectedDecoration?.value.blob);
             }
             else onArrangeEnd(x, y, selectedDecoration?.value.blob);
         }
-        else onArrangeEnd(x, y, selectedDecoration?.value.blob);
     }, [selectedDecoration, onArrangeEnd]);
-
-    const toggleMenuState = useCallback(() => {
-        console.log("toggleMenuState");
-        setOpened((prevState) => {
-            if (!prevState)
-                onMenuOpenCallBack();
-            return !prevState;
-        });
-    }, [opened]);
 
     useEffect(() => {
         elementSize.opacity.value = withSpring(opened ? 1 : 0);
@@ -112,23 +101,32 @@ const DragableDecoration = ({
     const tap = Gesture.Tap()
         .numberOfTaps(2)
         .onStart(() => {
-            if (!opened) {
-                toggleMenuState();
-                onMenuOpenCallBack();
-            }
+            handleOpenDrawer(memeDecoration);
         }).runOnJS(true);
+
+    const memeDecoration = <MemeDecorationsList
+        onSelectDecoration={(item) => {
+            selectedDecoration.value = item;
+            handleCloseDrawer();
+        }}
+        onCloseMenu={handleCloseDrawer} />;
+
+    const handleOpenDecorationSelection = () => {
+        handleOpenDrawer(memeDecoration);
+    }
 
     return (
         <>
-            {!opened &&
-                <DragableOption
-                    key={`dragable-template-option`}
-                    onArrangeEnd={handleOnArrangeEnd}
-                    initialPosition={initialPosition}
-                    offsetYAzis={offsetYAzis}
-                    offsetXAzis={offsetXAzis}
-                    canMove={!opened}
-                    style={style}>
+            <DragableOption
+                key={`dragable-template-option`}
+                onArrangeEnd={handleOnArrangeEnd}
+                initialPosition={initialPosition}
+                offsetYAzis={offsetYAzis}
+                offsetXAzis={offsetXAzis}
+                canMove={!opened}
+                style={style}>
+                <GestureHandlerRootView>
+
                     <GestureDetector
                         gesture={tap}
                         style={[{ position: "absolute" }]}>
@@ -138,15 +136,13 @@ const DragableDecoration = ({
                             </Pressable>
                         </Animated.View>
                     </GestureDetector>
-                </DragableOption >
-            }
-
-            <Animated.View style={[menuOpenedAnimatedStyle, { position: "absolute", zIndex: 15, backgroundColor: 'red', selectable: false, borderRadius: 10 }]}>
-                {opened && <MemeDecorationsList
-                    onSelectDecoration={(item) => onSelectDecoration(item)}
-                    onChangedDecorations={onChangedDecorations}
-                    onCloseMenu={toggleMenuState} />}
-            </Animated.View>
+                </GestureHandlerRootView>
+                <Pressable maxPointers={1} style={styles.imageEditWrapper} onPressOut={() => {
+                    handleOpenDecorationSelection();
+                }}>
+                    <Edit stroke="black" width={20} height={20} />
+                </Pressable>
+            </DragableOption >
         </>
     );
 }
@@ -156,6 +152,17 @@ const styles = StyleSheet.create({
         flex: 1,
         width: 50,
         height: 50,
+    },
+    imageEditWrapper: {
+        position: 'absolute',
+        borderRadius: 20,
+        top: 0,
+        right: -10,
+        width: 30,
+        height: 30,
+        backgroundColor: 'white',
+        justifyContent: 'center',
+        alignItems: 'center',
     },
 });
 
