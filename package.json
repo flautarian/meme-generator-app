@@ -7,6 +7,7 @@
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
+    "build-web": "npx expo export --platform web",
     "build-android": "cd android && ./gradlew build -x lint",
     "bundle-android": "npx react-native bundle --platform android --dev false --entry-file src/index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res"
   },
