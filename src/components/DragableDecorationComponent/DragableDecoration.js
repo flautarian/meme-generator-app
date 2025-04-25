@@ -4,10 +4,9 @@ import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-g
 import Animated, {
     useSharedValue,
     useAnimatedStyle,
-    withSpring,
 } from 'react-native-reanimated';
 import DragableOption from '../DragableOptionComponent/DragableOption';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useKeyboardVisible } from 'src/hooks/useKeyboardVisible';
 import { getRandomDecoration } from 'src/hooks/useDecorations';
 import { Edit } from 'react-native-feather';
@@ -15,12 +14,11 @@ import { useConfirmation } from 'src/contexts/ConfirmationContext';
 import MemeDecorationsList from '../MemeDecorationsListComponent/MemeDecorationsList';
 
 const DragableDecoration = ({
-    onArrangeEnd,
     initialPosition,
+    onArrangeEnd,
     parentDimensions,
+    limitDistance = 0,
     style = {},
-    offsetYAzis = useSharedValue(0),
-    offsetXAzis = useSharedValue(0)
 }) => {
 
     const selectedDecoration = useSharedValue("");
@@ -30,20 +28,6 @@ const DragableDecoration = ({
     const [opened, setOpened] = useState(false);
 
     const isKeyboardVisible = useKeyboardVisible();
-
-    const scaleSpringConfig = {
-        duration: 350,
-        dampingRatio: 1,
-        stiffness: 100,
-    };
-
-    const elementSize = {
-        width: useSharedValue(0),
-        height: useSharedValue(0),
-        left: useSharedValue(0),
-        bottom: useSharedValue(initialPosition.y),
-        opacity: useSharedValue(0)
-    };
 
     // button animated style
     const buttonAnimatedStyle = useAnimatedStyle(() => ({
@@ -75,11 +59,6 @@ const DragableDecoration = ({
     }, [selectedDecoration, onArrangeEnd]);
 
     useEffect(() => {
-        elementSize.opacity.value = withSpring(opened ? 1 : 0);
-        elementSize.width.value = withSpring(opened ? parentDimensions.width * 0.9 : 0, scaleSpringConfig);
-        elementSize.height.value = withSpring(opened ? parentDimensions.height * 0.35 : 0, scaleSpringConfig);
-        elementSize.left.value = withSpring(opened ? parentDimensions.width * 0.05 : initialPosition.x, scaleSpringConfig);
-        elementSize.bottom.value = withSpring(opened && isKeyboardVisible ? parentDimensions.height * 0.4 : 50, scaleSpringConfig);
         if (selectedDecoration.value === "") {
             selectedDecoration.value = "calculating";
             const initSelectDecoration = async () => {
@@ -112,13 +91,11 @@ const DragableDecoration = ({
             <DragableOption
                 key={`dragable-template-option`}
                 onArrangeEnd={handleOnArrangeEnd}
+                limitDistance={limitDistance}
                 initialPosition={initialPosition}
-                offsetYAzis={offsetYAzis}
-                offsetXAzis={offsetXAzis}
                 canMove={!opened}
                 style={style}>
                 <GestureHandlerRootView>
-
                     <GestureDetector
                         gesture={tap}
                         style={[{ position: "absolute" }]}>

@@ -9,8 +9,6 @@ import { useConfig } from "src/contexts/ConfigContext";
 
 const EditableText = ({ item, index }) => {
 
-    console.log("EditableText", item, index);
-
     const { t } = useTranslation();
 
     const [value, setValue] = useState(item.value);

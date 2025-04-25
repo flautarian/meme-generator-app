@@ -16,7 +16,7 @@ import { Camera, Edit, MessageSquare, Tool, ChevronUp } from 'react-native-feath
 import * as Sharing from 'expo-sharing';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import DraggableContainer from 'src/components/DragableContainerComponent/DragableContainer';
-import DragableDecoration from 'src/components/DragableTemplateComponent/DragableTemplate';
+import DragableDecoration from 'src/components/DragableDecorationComponent/DragableDecoration';
 import EditableDecoration from 'src/components/EditableDecorationComponent/EditableDecoration';
 import StaticOption from 'src/components/StaticOptionComponent/StaticOption';
 import { Utils } from 'src/utils/Utils';
@@ -42,11 +42,14 @@ const MemeCreate = ({ navigation, currentMeme }) => {
 
 
   // bottom drawer
-  const progress = useSharedValue(0);
   const [isBotDrawerOpened, setIsBotDrawerOpened] = useState(false);
   const [selectedDecoration, setSelectedDecoration] = useState("");
   const botBtnAnimation = useSharedValue(0);
   const botButtonsYOffset = useSharedValue(0);
+
+  const [capturePosition, setCapturePosition] = useState({ x: width - width * 0.25 - 25, y: height + 50 + botButtonsYOffset.get() });
+  const [dragableTextPosition, setDragableTextPosition] = useState({ x: width - width * 0.5 - 25, y: height + 50 + botButtonsYOffset.get() });
+  const [dragableDecorationPosition, setDragableDecorationPosition] = useState({ x: width - width * 0.75 - 25, y: height + 50 + botButtonsYOffset.get() });
 
 
   // decorations drawer / toasts
@@ -75,8 +78,14 @@ const MemeCreate = ({ navigation, currentMeme }) => {
   };
 
   useEffect(() => {
-    botBtnAnimation.value = withSpring(isBotDrawerOpened || config?.staticBDrawer ? -BOTTOM_BTN_HEIGHT : 0, bottomDrawerSpringConfig);
-    botButtonsYOffset.value = withSpring(isBotDrawerOpened || config?.staticBDrawer ? -BOTTOM_BUTTONS_Y_OFFSET : 0, bottomDrawerSpringConfig);
+    // if true, we show the bottom drawer
+    botBtnAnimation.set(withSpring(isBotDrawerOpened || config?.staticBDrawer ? -BOTTOM_BTN_HEIGHT : 0, bottomDrawerSpringConfig));
+    botButtonsYOffset.set(isBotDrawerOpened || config?.staticBDrawer ? -BOTTOM_BUTTONS_Y_OFFSET : 0, bottomDrawerSpringConfig);
+
+    setCapturePosition((prev) => ({ ...prev, y: height + 50 + botButtonsYOffset.get() }));
+    setDragableTextPosition((prev) => ({ ...prev, y: height + 50 + botButtonsYOffset.get() }));
+    setDragableDecorationPosition((prev) => ({ ...prev, y: height + 50 + botButtonsYOffset.get() }));
+    
   }, [isBotDrawerOpened, config?.staticBDrawer]);
 
   const deleteText = useCallback((index) => {
@@ -148,17 +157,12 @@ const MemeCreate = ({ navigation, currentMeme }) => {
     [texts, t, isBotDrawerOpened],
   );
 
-  // Trigger the gradient animation
-  useEffect(() => {
-    progress.value = withTiming(1, { duration: 3000 });
-  }, []);
-
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>
         {/* Gradient Background */}
         {config?.backgroundType === "lava" && <LavaLampBackground count={10} hue={initColor} />}
-        {config?.backgroundType === "gradient" && <GradientBackground startColor={initLightColor} endColor={initDarkColor} />}
+        {config?.backgroundType === "gradient" && <GradientBackground startColor={initLightColor} endColor={initDarkColor} duration={3000} />}
 
         {/* Meme image container */}
         <ViewShot ref={memeContainerRef} style={styles.memeWrapper} draggable={false}>
@@ -243,26 +247,27 @@ const MemeCreate = ({ navigation, currentMeme }) => {
           key={`dragable-decoration-option`}
           onArrangeEnd={(x, y, value) => onArrangeEnd("decoration", x, y, value)}
           selectedDecoration={selectedDecoration}
-          initialPosition={{ x: width - width * 0.75 - 25, y: height + 50 }}
+          initialPosition={dragableDecorationPosition}
           parentDimensions={{ width: width, height: height }}
-          offsetYAzis={botButtonsYOffset}
+          limitDistance={100}
           style={[styles.draggableBox, { backgroundColor: initColor }]} />
         <DragableOption
           key={`dragable-text-option`}
           onArrangeEnd={(x, y, value) => onArrangeEnd("text", x, y, value)}
-          initialPosition={{ x: width - width * 0.5 - 25, y: height + 50 }}
-          offsetYAzis={botButtonsYOffset}
+          initialPosition={dragableTextPosition}
+          limitDistance={100}
           style={[styles.draggableBox, { backgroundColor: initColor }]}>
           <MessageSquare stroke="black" fill="#fff" width={40} height={40} />
         </DragableOption>
-        <StaticOption
+        <DragableOption
           key={`capture-share-button`}
-          onPress={handleCapture}
-          initialPosition={{ x: width - width * 0.25 - 25, y: height + 50 }}
-          style={{ backgroundColor: initColor }}
-          offsetYAzis={botButtonsYOffset}>
+          onArrangeEnd={handleCapture}
+          initialPosition={capturePosition}
+          style={[styles.draggableBox, { backgroundColor: initColor }]}
+          blockDragY={true}
+          blockDragX={true}>
           <Camera stroke="black" fill="#fff" width={40} height={40} />
-        </StaticOption>
+        </DragableOption>
       </SafeAreaView>
     </SafeAreaProvider>
   );

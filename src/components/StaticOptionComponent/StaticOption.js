@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Pressable } from 'react-native-gesture-handler';
 import Animated, {
@@ -7,15 +7,26 @@ import Animated, {
     useAnimatedStyle,
 } from 'react-native-reanimated';
 
-const StaticOption = ({ onPress, initialPosition, children, offsetYAzis = useSharedValue(0), style }) => {
+const StaticOption = ({ onPress, initialPosition = { x: 0, y: 0 }, children, style }) => {
+
+    const position = {
+        x: useSharedValue(initialPosition.x),
+        y: useSharedValue(initialPosition.y),
+    };
+
+    useEffect(() => {
+        position.x.set(withSpring(initialPosition.x));
+        position.y.set(withSpring(initialPosition.y));
+    }, [initialPosition]);
+    
     const scale = useSharedValue(1);
 
     const animatedStyle = useAnimatedStyle(() => {
         return {
             transform: [
                 { scale: scale.value },
-                { translateY: initialPosition.y + offsetYAzis.value },
-                { translateX: initialPosition.x },
+                { translateY: position?.y.get() },
+                { translateX: position?.x.get() },
             ],
         };
     });

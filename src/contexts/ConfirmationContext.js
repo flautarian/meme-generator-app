@@ -58,7 +58,8 @@ export const ConfirmationProvider = ({ children }) => {
 
   const addToast = useCallback((message, duration = 5000) => {
     const id = Date.now();
-    setToasts(prev => [...prev, { id, message, duration }]);
+    // we only set one toast per time
+    setToasts(prev => [{ id, message, duration }]);
     setTimeout(() => {
       setToasts(prev => prev.filter(toast => toast.id !== id));
     }, duration);

@@ -17,6 +17,7 @@ const BottomDrawer = ({ children, reference, snapPoints, callback = null }) => {
       ref={reference}
       onChange={handleSheetChanges}
       index={-1}
+      animationDuration={1500}
       snapPoints={!!snapPoints ? snapPoints : ['75%']}
     >
       <BottomSheetView style={styles.contentContainer}>
