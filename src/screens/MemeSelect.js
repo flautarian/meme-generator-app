@@ -140,7 +140,7 @@ const MemeSelect = ({ navigation, onSelectMeme, onChangedTemplates }) => {
             style={styles.memeListContainer}
             data={templateResults}
             keyExtractor={(item, index) => `${item.name}-${index}`}
-            horizontal={true}
+            numColumns={Platform.OS === "web" ? 2 : 4}
             renderItem={({ item, index }) => (
               <TemplateItem
                 template={item}

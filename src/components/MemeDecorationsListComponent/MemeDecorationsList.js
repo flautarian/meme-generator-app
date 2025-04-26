@@ -108,9 +108,10 @@ const MemeDecorationsList = ({ onSelectDecoration, onCloseMenu }) => {
                     <FlatList
                         showsVerticalScrollIndicator={true}
                         style={styles.memeListContainer}
+                        contentContainerStyle={{ alignItems: 'center', justifyContent: 'center' }}
                         data={decorationsFiltered}
                         keyExtractor={(item, index) => `${item.name}-${index}`}
-                        numColumns={4}
+                        horizontal={true}
                         renderItem={({ item, index }) => (
                             <TemplateItem
                                 template={item}
