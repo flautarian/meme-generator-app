@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { Utils } from 'src/utils/Utils';
 import { View, StyleSheet, FlatList, TextInput, Text, Platform, ScrollView } from 'react-native';
 import { addNewTemplate, deleteTemplate, fetchTemplates } from 'src/hooks/useTemplates';
@@ -9,10 +9,15 @@ import documentUploadOption from 'src/utils/documentUploadOption';
 import TemplateItem from 'src/components/TemplateItemComponent/TemplateItem';
 
 const MemeSelect = ({ navigation, onSelectMeme, onChangedTemplates }) => {
+
   const { t } = useTranslation();
+
   const { showConfirmation } = useConfirmation();
+
   const [templates, setTemplates] = useState([]);
+
   const [templateResults, setTemplatesFiltered] = useState([]);
+
   const [nameFilter, setNameFilter] = useState("");
 
   const refreshTemplates = useCallback(async () => {
@@ -84,6 +89,36 @@ const MemeSelect = ({ navigation, onSelectMeme, onChangedTemplates }) => {
     }
   }, [refreshTemplates]);
 
+
+  const styles = useMemo(() => StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: '#fff',
+    },
+    searchContainer: {
+      padding: 10,
+    },
+    searchInput: {
+      height: 40,
+      borderColor: '#ddd',
+      borderWidth: 1,
+      borderRadius: 8,
+      paddingHorizontal: 10,
+    },
+    resultCount: {
+      paddingHorizontal: 10,
+      paddingBottom: 5,
+      color: '#666',
+    },
+    content: {
+      flex: 1,
+    },
+    memeListContainer: {
+      width: "90%",
+      padding: 5,
+    },
+  }), []);
+
   return (
     <View style={styles.container}>
       <View style={styles.searchContainer}>
@@ -100,12 +135,12 @@ const MemeSelect = ({ navigation, onSelectMeme, onChangedTemplates }) => {
       <View style={styles.content}>
         {templateResults.length > 0 &&
           <FlatList
-            contentContainerStyle={{ alignItems: 'center' }}
-            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ alignItems: 'center', justifyContent: 'space-between' }}
+            showsVerticalScrollIndicator={true}
             style={styles.memeListContainer}
             data={templateResults}
             keyExtractor={(item, index) => `${item.name}-${index}`}
-            numColumns={Platform.OS === "web" ? 2 : 4}
+            horizontal={true}
             renderItem={({ item, index }) => (
               <TemplateItem
                 template={item}
@@ -122,34 +157,5 @@ const MemeSelect = ({ navigation, onSelectMeme, onChangedTemplates }) => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-  searchContainer: {
-    padding: 10,
-  },
-  searchInput: {
-    height: 40,
-    borderColor: '#ddd',
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: 10,
-  },
-  resultCount: {
-    paddingHorizontal: 10,
-    paddingBottom: 5,
-    color: '#666',
-  },
-  content: {
-    flex: 1,
-  },
-  memeListContainer: {
-    width: "90%",
-    alignSelf: "center",
-  },
-});
 
 export default MemeSelect;

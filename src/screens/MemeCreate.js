@@ -249,13 +249,11 @@ const MemeCreate = ({ navigation, currentMeme }) => {
           selectedDecoration={selectedDecoration}
           initialPosition={dragableDecorationPosition}
           parentDimensions={{ width: width, height: height }}
-          limitDistance={100}
           style={[styles.draggableBox, { backgroundColor: initColor }]} />
         <DragableOption
           key={`dragable-text-option`}
           onArrangeEnd={(x, y, value) => onArrangeEnd("text", x, y, value)}
           initialPosition={dragableTextPosition}
-          limitDistance={100}
           style={[styles.draggableBox, { backgroundColor: initColor }]}>
           <MessageSquare stroke="black" fill="#fff" width={40} height={40} />
         </DragableOption>

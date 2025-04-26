@@ -6,11 +6,11 @@ import { rebootDecorations } from 'src/hooks/useDecorations';
 import AppInfo from 'src/components/AppInfoComponent/AppInfo';
 import LanguageSelector from 'src/components/LanguageSelectorComponent/LanguageSelector';
 import { useConfig } from 'src/contexts/ConfigContext';
+import { useMemo, memo } from 'react';
+import { Dropdown } from 'react-native-element-dropdown';
 import { Utils } from 'src/utils/Utils';
 
-import { Dropdown } from 'react-native-element-dropdown';
-
-const MemeOptions = ({ navigation, onChangedTemplates }) => {
+const MemeOptions = memo(({ navigation, onChangedTemplates }) => {
   const { t } = useTranslation();
   const { showConfirmation, setOnChangedDecorations } = useConfirmation();
   const { config, setConfig, initColor, initLightColor } = useConfig(); // Assuming useLanguage is imported from the correct path
@@ -44,6 +44,104 @@ const MemeOptions = ({ navigation, onChangedTemplates }) => {
       },
     });
   };
+
+
+  const styles = useMemo(() => StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: '#fff',
+      padding: 20,
+    },
+    scrollContainer: {
+      marginTop: 25,
+      paddingBottom: 20,
+    },
+    section: {
+      marginBottom: 30,
+    },
+    switchSection: {
+      marginBottom: 30,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+    },
+    selectInput: {
+      width: '100%',
+      height: 50,
+      borderWidth: 1,
+      borderColor: '#ddd',
+      borderRadius: 8,
+      paddingHorizontal: 10,
+      alignSelf: 'center',
+    },
+    searchContainer: {
+      padding: 10,
+    },
+    searchInput: {
+      height: 40,
+      borderColor: '#ddd',
+      borderWidth: 1,
+      borderRadius: 8,
+      paddingHorizontal: 10,
+    },
+    resultCount: {
+      paddingHorizontal: 10,
+      paddingBottom: 5,
+      color: '#666',
+    },
+    content: {
+      flex: 1,
+    },
+    memeListContainer: {
+      width: "90%",
+      alignSelf: "center",
+    },
+    button: {
+      width: '90%',
+      height: '50px',
+      padding: 15,
+      borderWidth: 1,
+      borderColor: '#007AFF',
+      borderRadius: 8,
+      backgroundColor: '#FFFFFF',
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.25,
+      shadowRadius: 3.84,
+      elevation: 5,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginHorizontal: '5%',
+    },
+    dangerButton: {
+      width: '90%',
+      height: '50px',
+      padding: 15,
+      borderWidth: 1,
+      borderColor: '#FF0000',
+      borderRadius: 8,
+      backgroundColor: '#FFB3A3',
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.25,
+      shadowRadius: 3.84,
+      elevation: 5,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginHorizontal: '5%',
+    },
+    buttonText: {
+      color: '#007AFF',
+      fontSize: 16,
+      fontWeight: '500',
+      width: '100%',
+    },
+    dangerButtonText: {
+      color: '#FF5733',
+      fontSize: 16,
+      fontWeight: '500',
+    },
+  }), []);
 
   return (
     <View style={styles.container}>
@@ -174,103 +272,7 @@ const MemeOptions = ({ navigation, onChangedTemplates }) => {
       </ScrollView>
     </View>
   );
-};
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    padding: 20,
-  },
-  scrollContainer: {
-    marginTop: 25,
-    paddingBottom: 20,
-  },
-  section: {
-    marginBottom: 30,
-  },
-  switchSection: {
-    marginBottom: 30,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  selectInput: {
-    width: '100%',
-    height: 50,
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    alignSelf: 'center',
-  },
-  searchContainer: {
-    padding: 10,
-  },
-  searchInput: {
-    height: 40,
-    borderColor: '#ddd',
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: 10,
-  },
-  resultCount: {
-    paddingHorizontal: 10,
-    paddingBottom: 5,
-    color: '#666',
-  },
-  content: {
-    flex: 1,
-  },
-  memeListContainer: {
-    width: "90%",
-    alignSelf: "center",
-  },
-  button: {
-    width: '90%',
-    height: '50px',
-    padding: 15,
-    borderWidth: 1,
-    borderColor: '#007AFF',
-    borderRadius: 8,
-    backgroundColor: '#FFFFFF',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginHorizontal: '5%',
-  },
-  dangerButton: {
-    width: '90%',
-    height: '50px',
-    padding: 15,
-    borderWidth: 1,
-    borderColor: '#FF0000',
-    borderRadius: 8,
-    backgroundColor: '#FFB3A3',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginHorizontal: '5%',
-  },
-  buttonText: {
-    color: '#007AFF',
-    fontSize: 16,
-    fontWeight: '500',
-    width: '100%',
-  },
-  dangerButtonText: {
-    color: '#FF5733',
-    fontSize: 16,
-    fontWeight: '500',
-  },
 });
+
 
 export default MemeOptions;

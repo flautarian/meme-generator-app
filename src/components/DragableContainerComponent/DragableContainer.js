@@ -6,6 +6,9 @@ import { useConfig } from 'src/contexts/ConfigContext';
 
 const DragableContainer = ({ x, y, height, width, rotation, resizeMode, index, selected, onSelect, onDelete, children }) => {
 
+    const FOUR_SQUARES = "4-squares";
+    const ONE_SQUARE = "1-square";
+
     const item = useMemo(() => {
         return {
             height: height || 100,
@@ -332,12 +335,12 @@ const DragableContainer = ({ x, y, height, width, rotation, resizeMode, index, s
                     </View>
                 }
                 {/* Resize 4 squares buttons */}
-                {selected && resizeMode === "4-squares" && <View {...resizeXFinalViewpanResponder.panHandlers} style={[{ disabled: !selected, visibility: selected ? 'visible' : 'hidden', opacity: selected ? 1 : 0, width: buttonsSize, height: buttonsSize }, styles.resizeHandle, styles.leftHandle]} />}
-                {selected && resizeMode === "4-squares" && <View {...resizeYViewpanResponder.panHandlers} style={[{ disabled: !selected, visibility: selected ? 'visible' : 'hidden', opacity: selected ? 1 : 0, width: buttonsSize, height: buttonsSize }, styles.resizeHandle, styles.bottomHandle]} />}
-                {selected && resizeMode === "4-squares" && <View {...resizeXViewpanResponder.panHandlers} style={[{ disabled: !selected, visibility: selected ? 'visible' : 'hidden', opacity: selected ? 1 : 0, width: buttonsSize, height: buttonsSize }, styles.resizeHandle, styles.rightHandle]} />}
-                {selected && resizeMode === "4-squares" && <View {...resizeYFinalViewpanResponder.panHandlers} style={[{ disabled: !selected, visibility: selected ? 'visible' : 'hidden', opacity: selected ? 1 : 0, width: buttonsSize, height: buttonsSize }, styles.resizeHandle, styles.topHandle]} />}
+                {selected && resizeMode === FOUR_SQUARES && <View {...resizeXFinalViewpanResponder.panHandlers} style={[{ disabled: !selected, visibility: selected ? 'visible' : 'hidden', opacity: selected ? 1 : 0, width: buttonsSize, height: buttonsSize }, styles.resizeHandle, styles.leftHandle]} />}
+                {selected && resizeMode === FOUR_SQUARES && <View {...resizeYViewpanResponder.panHandlers} style={[{ disabled: !selected, visibility: selected ? 'visible' : 'hidden', opacity: selected ? 1 : 0, width: buttonsSize, height: buttonsSize }, styles.resizeHandle, styles.bottomHandle]} />}
+                {selected && resizeMode === FOUR_SQUARES && <View {...resizeXViewpanResponder.panHandlers} style={[{ disabled: !selected, visibility: selected ? 'visible' : 'hidden', opacity: selected ? 1 : 0, width: buttonsSize, height: buttonsSize }, styles.resizeHandle, styles.rightHandle]} />}
+                {selected && resizeMode === FOUR_SQUARES && <View {...resizeYFinalViewpanResponder.panHandlers} style={[{ disabled: !selected, visibility: selected ? 'visible' : 'hidden', opacity: selected ? 1 : 0, width: buttonsSize, height: buttonsSize }, styles.resizeHandle, styles.topHandle]} />}
                 {/* Resize 1 square button */}
-                {selected && resizeMode === "1-square" && <View {...resizeXYFinalViewpanResponder.panHandlers} style={[{ disabled: !selected, visibility: selected ? 'visible' : 'hidden', opacity: selected ? 1 : 0, width: buttonsSize, height: buttonsSize }, styles.resizeHandle, styles.botRightHandle]} />}
+                {selected && resizeMode === ONE_SQUARE && <View {...resizeXYFinalViewpanResponder.panHandlers} style={[{ disabled: !selected, visibility: selected ? 'visible' : 'hidden', opacity: selected ? 1 : 0, width: buttonsSize, height: buttonsSize }, styles.resizeHandle, styles.botRightHandle]} />}
             </Pressable>
         </Animated.View>
     );
