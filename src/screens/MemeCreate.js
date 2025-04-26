@@ -295,6 +295,7 @@ const styles = StyleSheet.create({
     flex: 1,
     width: '100%',
     height: '100%',
+    cursor: 'default',
   },
   memeImage: {
     width: '100%',
@@ -312,6 +313,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 50,
+    cursor: 'pointer',
   },
   draggableRightBox: {
     transformOrigin: '-50% 0%',
@@ -324,6 +326,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderTopLeftRadius: 50,
     borderBottomLeftRadius: 50,
+    cursor: 'pointer',
   },
   draggableLeftBox: {
     transformOrigin: '-50% 0%',
@@ -336,6 +339,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderTopRightRadius: 50,
     borderBottomRightRadius: 50,
+    cursor: 'pointer',
   }
 });
 

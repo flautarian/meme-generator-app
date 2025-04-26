@@ -134,6 +134,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         maxWidth: "100%",
         maxHeight: "100%",
+        
+        cursor: 'pointer',
     },
     button: {
         borderRadius: 20,
