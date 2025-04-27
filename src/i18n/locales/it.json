@@ -28,6 +28,7 @@
     }
   },
   "memeCreate": {
+    "newTextLabel": "Nuovo testo",
     "newTextAdded": "Nuovo testo aggiunto",
     "newDecorationAdded": "Nuova decorazione aggiunta",
     "imageCopied": "Immagine copiata negli appunti",

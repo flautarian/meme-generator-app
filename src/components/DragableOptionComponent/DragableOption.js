@@ -1,5 +1,6 @@
 import { useRef, useEffect, useCallback } from 'react';
 import { PanResponder } from 'react-native';
+import { GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
 import Animated, {
     useSharedValue,
     useAnimatedStyle,
@@ -10,13 +11,15 @@ import Animated, {
 const DragableOption = ({
     onArrangeEnd = null,
     onArrangeInit = null,
+    gesture = null,
     initialPosition,
     children,
     canMove = true,
     blockDragX = false,
     blockDragY = false,
-    animateButton = true,
+    animateButton = false,
     limitDistance = 0,
+    minLimitDistance = 0,
     style = {},
 }) => {
 
@@ -78,7 +81,7 @@ const DragableOption = ({
         const { width, height } = dimensions.current;
         let result = { x: moveX - (width * scale.value) / 2, y: moveY - (height * scale.value) / 2 };
 
-        if (limitDistance) {
+        if (limitDistance !== 0) {
             // Calculate the distance from the initial position
             const distanceX = result.x - initialPositionRef.current.x;
             const distanceY = result.y - initialPositionRef.current.y;
@@ -113,18 +116,24 @@ const DragableOption = ({
     const onDragRelease = useCallback((gestureState) => {
         // send signal to create new object in panel
         const newPos = getNewPosition(gestureState);
-        const absInitialPosition = { x: Math.abs(initialPositionRef.current.x), y: Math.abs(initialPositionRef.current.y) };
-        const movedEnough = newPos.x !== 0 && newPos.y !== 0 &&
-            (limitDistance > 0 ||
-                (Math.abs(newPos.x - absInitialPosition.x) > limitDistance ||
-                    Math.abs(newPos.y - absInitialPosition.y) > limitDistance));
-        console.log("Moved enough", movedEnough, newPos.y, absInitialPosition.y, Math.abs(newPos.y - absInitialPosition.y));
+
+        let movedEnough = minLimitDistance == 0;
+
+        // Check if the new position is different enough from the initial position
+        if (minLimitDistance !== 0) {
+            // Calculate the distance from the initial position
+            const distanceX = Math.abs(position.x.value) - Math.abs(initialPositionRef.current.x);
+            const distanceY = Math.abs(position.y.value) - Math.abs(initialPositionRef.current.y);
+            // Limit the movement in the direction
+            // console.log("DistanceX", distanceX, "DistanceY", distanceY, "MinLimitDistance", minLimitDistance);
+            movedEnough = Math.abs(distanceX) > minLimitDistance || Math.abs(distanceY) > minLimitDistance;
+        }
+        //console.log("Moved enough", movedEnough, newPos.y, absInitialPosition.y, Math.abs(newPos.y - absInitialPosition.y));
         // if moved enough, call onArrangeEnd function
         if (!!onArrangeEnd && movedEnough)
-            onArrangeEnd(newPos.x, newPos.y, "Label");
+            onArrangeEnd(newPos.x, newPos.y);
 
         // Reset position
-        console.log("Reset position", initialPositionRef.current.x, initialPositionRef.current.y);
         position.x.value = withSpring(initialPositionRef.current.x, returnSpringConfig);
         position.y.value = withSpring(initialPositionRef.current.y, returnSpringConfig);
 
@@ -152,7 +161,18 @@ const DragableOption = ({
                 const { width, height } = event.nativeEvent.layout;
                 dimensions.current = { width, height };
             }}>
-            {children}
+            {/* tap gesture */}
+            {!!gesture && (
+                <GestureHandlerRootView>
+                    <GestureDetector
+                        gesture={gesture}
+                        style={[{ position: "absolute" }]}>
+                        {children}
+                    </GestureDetector>
+                </GestureHandlerRootView>
+            )}
+            {/* non tap gesture */}
+            {!gesture && children}
         </Animated.View>
     );
 };
