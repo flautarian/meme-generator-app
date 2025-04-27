@@ -4,20 +4,37 @@ import { Move, RotateCcw, Trash2 } from "react-native-feather";
 import Animated, { useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
 import { useConfig } from 'src/contexts/ConfigContext';
 
-const DragableContainer = ({ x, y, height, width, rotation, resizeMode, index, selected, onSelect, onDelete, children }) => {
+const DragableContainer = (
+    {
+        x,
+        y,
+        height,
+        minHeight,
+        maxHeight,
+        width,
+        minWidth,
+        maxWidth,
+        rotation,
+        resizeMode,
+        index,
+        selected,
+        onSelect,
+        onDelete,
+        children
+    }) => {
 
     const FOUR_SQUARES = "4-squares";
     const ONE_SQUARE = "1-square";
 
     const item = useMemo(() => {
         return {
-            height: height || 100,
-            width: width || 100,
+            height: height || minHeight || 100,
+            width: width || minWidth || 100,
             rotation: rotation || 0,
             x: x || 0,
             y: y || 0,
         };
-    }, [height, width, rotation]);
+    }, [height, minHeight, width, minWidth, rotation]);
 
     const position = {
         x: useSharedValue(-1000),
@@ -77,6 +94,10 @@ const DragableContainer = ({ x, y, height, width, rotation, resizeMode, index, s
     const handleResizeY = useCallback((gestureState, y0) => {
         let newValue = y0 ? gestureState.y0 - gestureState.moveY : gestureState.moveY - gestureState.y0;
         const newHeight = Math.max(newValue + initHeight.value, 25);
+
+        if (!!minHeight && newHeight < minHeight) return;
+        if (!!maxHeight && newHeight > maxHeight) return;
+
         contentView.height.value = newHeight;
         if (newHeight > 25 && y0)
             position.y.value = gestureState.moveY - (y0 ? -1 * buttonsSize / 2 : buttonsSize / 2);
@@ -112,6 +133,9 @@ const DragableContainer = ({ x, y, height, width, rotation, resizeMode, index, s
     const handleResizeX = useCallback((gestureState, x0) => {
         let newValue = x0 ? gestureState.x0 - gestureState.moveX : gestureState.moveX - gestureState.x0;
         const newWidth = Math.max(newValue + initWidth.value, 25);
+        if (!!minWidth && newWidth < minWidth) return;
+        if (!!maxWidth && newWidth > maxWidth) return;
+
         contentView.width.value = newWidth;
         if (newWidth > 25 && x0)
             position.x.value = gestureState.moveX - (x0 ? -1 * buttonsSize / 2 : buttonsSize / 2);

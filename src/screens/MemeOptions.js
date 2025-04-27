@@ -1,4 +1,4 @@
-import { View, StyleSheet, ScrollView, Pressable, Text, Switch } from 'react-native';
+import { View, StyleSheet, ScrollView, Pressable, Text, Switch, TextInput } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useConfirmation } from 'src/contexts/ConfirmationContext';
 import { rebootTemplates } from 'src/hooks/useTemplates';
@@ -64,14 +64,23 @@ const MemeOptions = memo(({ navigation, onChangedTemplates }) => {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
+      width: '100%',
     },
     selectInput: {
       width: '100%',
-      height: 50,
+      height: 40,
       borderWidth: 1,
       borderColor: '#ddd',
       borderRadius: 8,
       paddingHorizontal: 10,
+      alignSelf: 'center',
+    },
+    selectTextInput: {
+      width: '75%',
+      height: 40,
+      borderWidth: 1,
+      borderColor: '#ddd',
+      borderRadius: 8,
       alignSelf: 'center',
     },
     searchContainer: {
@@ -180,7 +189,7 @@ const MemeOptions = memo(({ navigation, onChangedTemplates }) => {
 
         {/* Static bottom drawer checkbox */}
         <View style={styles.switchSection}>
-          <Text style={styles.dangerButtonText}>{config.staticBDrawer ? t('memeOptions.staticBDrawerEnabled') : t('memeOptions.staticBDrawerDisabled')}</Text>
+          <Text style={styles.buttonText}>{config.staticBDrawer ? t('memeOptions.staticBDrawerEnabled') : t('memeOptions.staticBDrawerDisabled')}</Text>
           <Switch
             trackColor={{ false: initColor, true: initLightColor }}
             thumbColor={initColor}
@@ -251,7 +260,7 @@ const MemeOptions = memo(({ navigation, onChangedTemplates }) => {
 
         {/* Font size auto checkbox */}
         <View style={styles.switchSection}>
-          <Text style={styles.dangerButtonText}>{config?.fontAutoResize ? t('memeOptions.fontAutoResizeEnabled') : t('memeOptions.fontAutoResizeDisabled')}</Text>
+          <Text style={styles.buttonText}>{config?.fontAutoResize ? t('memeOptions.fontAutoResizeEnabled') : t('memeOptions.fontAutoResizeDisabled')}</Text>
           <Switch
             trackColor={{ false: initColor, true: initLightColor }}
             thumbColor={initColor}
@@ -263,6 +272,84 @@ const MemeOptions = memo(({ navigation, onChangedTemplates }) => {
             }}
             value={config?.fontAutoResize}
           />
+        </View>
+
+        <Text style={styles.buttonText}>{t('memeOptions.decorationDimensions')}</Text>
+
+        {/* Min/Max width input */}
+        <View style={[styles.switchSection, { alignItems: 'space-between' }]}>
+          <View style={{ width: '50%' }}>
+            <Text style={styles.buttonText}>{t('memeOptions.minWidth')}</Text>
+            <TextInput
+              style={[styles.selectTextInput]}
+              keyboardType="numeric"
+              value={config?.minWidth?.toString()}
+              onChangeText={(text) => {
+                const value = parseInt(text, 10);
+                if (!isNaN(value)) {
+                  setConfig((prev) => ({
+                    ...prev,
+                    minWidth: value,
+                  }));
+                }
+              }}
+            />
+          </View>
+          <View style={{ width: '50%' }}>
+            <Text style={styles.buttonText}>{t('memeOptions.maxWidth')}</Text>
+            <TextInput
+              style={[styles.selectTextInput]}
+              keyboardType="numeric"
+              value={config?.maxWidth?.toString()}
+              onChangeText={(text) => {
+                const value = parseInt(text, 10);
+                if (!isNaN(value)) {
+                  setConfig((prev) => ({
+                    ...prev,
+                    maxWidth: value,
+                  }));
+                }
+              }}
+            />
+          </View>
+        </View>
+
+        {/* Min/Max height input */}
+        <View style={[styles.switchSection, { flexDirection: 'row', alignItems: 'space-between' }]}>
+          <View style={{ width: '50%' }}>
+            <Text style={styles.buttonText}>{t('memeOptions.minHeight')}</Text>
+            <TextInput
+              style={[styles.selectTextInput]}
+              keyboardType="numeric"
+              value={config?.minHeight?.toString()}
+              onChangeText={(text) => {
+                const value = parseInt(text, 10);
+                if (!isNaN(value)) {
+                  setConfig((prev) => ({
+                    ...prev,
+                    minHeight: value,
+                  }));
+                }
+              }}
+            />
+          </View>
+          <View style={{ width: '50%' }}>
+            <Text style={styles.buttonText}>{t('memeOptions.maxHeight')}</Text>
+            <TextInput
+              style={[styles.selectTextInput]}
+              keyboardType="numeric"
+              value={config?.maxHeight?.toString()}
+              onChangeText={(text) => {
+                const value = parseInt(text, 10);
+                if (!isNaN(value)) {
+                  setConfig((prev) => ({
+                    ...prev,
+                    maxHeight: value,
+                  }));
+                }
+              }}
+            />
+          </View>
         </View>
 
         {/* App signature */}

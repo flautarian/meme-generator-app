@@ -13,6 +13,8 @@ const EditableText = ({ item, index }) => {
 
     const [value, setValue] = useState(item.value);
 
+    const { selectedTextIndex } = useConfig();
+
     const [isEditing, setIsEditing] = useState(false);
 
     const [fontSize, setFontSize] = useState(20);
@@ -157,11 +159,11 @@ const EditableText = ({ item, index }) => {
                 )}
             </TapGestureHandler>
 
-            {!config?.fontAutoResize && <Pressable onPress={() => alterFontSize(10)} style={[{ width: 30, height: 30 }, styles.button]}>
+            {!config?.fontAutoResize && index === selectedTextIndex && <Pressable onPress={() => alterFontSize(10)} style={[{ width: 30, height: 30, position: 'absolute', bottom: "10%", left: "65%" }, styles.button]}>
                 <Plus stroke="black" width={15} height={15} />
             </Pressable>}
 
-            {!config?.fontAutoResize && <Pressable onPress={() => alterFontSize(-10)} style={[{ width: 30, height: 30 }, styles.button]}>
+            {!config?.fontAutoResize && index === selectedTextIndex && <Pressable onPress={() => alterFontSize(-10)} style={[{ width: 30, height: 30, position: 'absolute', bottom: "10%", left: "25%" }, styles.button]}>
                 <Minus stroke="black" width={15} height={15} />
             </Pressable>}
         </Animated.View>

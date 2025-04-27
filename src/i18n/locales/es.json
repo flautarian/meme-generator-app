@@ -107,6 +107,11 @@
     "staticResizeMode": "Tipo de reescalado de detalles",
     "fontType": "Tipo de fuente",
     "fontAutoResizeEnabled": "Fuente redimensionada automáticamente",
-    "fontAutoResizeDisabled": "Fuente redimensionada manualmente"
+    "fontAutoResizeDisabled": "Fuente redimensionada manualmente",
+    "minHeight": "Altura mínima",
+    "minWidth": "Anchura mínima",
+    "maxHeight": "Altura máxima",
+    "maxWidth": "Anchura máxima",
+    "decorationDimensions": "Dimensiones de decoraciones"
   }
 }

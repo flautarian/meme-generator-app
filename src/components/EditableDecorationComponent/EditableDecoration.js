@@ -4,14 +4,17 @@ import { useTranslation } from 'react-i18next';
 import { useCallback, useMemo } from "react";
 import { ArrowLeft, ArrowUp } from "react-native-feather";
 import { Pressable } from "react-native";
+import { useConfig } from "src/contexts/ConfigContext";
 
-const EditableDecoration = ({ item, index, rotation }) => {
+const EditableDecoration = ({ item, index }) => {
     const { t } = useTranslation();
 
     const scale = {
         x: useSharedValue(1),
         y: useSharedValue(1)
     }
+
+    const { selectedTextIndex } = useConfig();
 
     const changeScale = useCallback((x, y) => {
         scale.x.value = withSpring(scale.x.value * x, { duration: 150 });
@@ -33,16 +36,6 @@ const EditableDecoration = ({ item, index, rotation }) => {
         return StyleSheet.create({
             container: {
                 flex: 1,
-                justifyContent: "center",
-                alignItems: "center",
-            },
-            imgWithButtonContainer: {
-                flex: 1,
-                width: "100%",
-                height: "100%",
-                flexDirection: "row",
-                justifyContent: "center",
-                alignItems: "center",
             },
             button: {
                 borderRadius: 20,
@@ -73,26 +66,24 @@ const EditableDecoration = ({ item, index, rotation }) => {
             accessibilityLabel={t('editableDecoration.ariaLabel')}
             selectable={false} draggable={false}
         >
-            <Pressable onPress={() => changeScale(1, -1)} style={[{ width: 30, height: 30 }, styles.button]}>
+            <Pressable onPress={() => changeScale(1, -1)} style={[{ width: 30, height: 30, visibility: selectedTextIndex === index ? "visible" : "hidden", position: 'absolute', top: "-50px", left: "50%" }, styles.button]}>
                 <ArrowUp stroke="black" width={15} height={15} />
             </Pressable>
-            <View style={[styles.imgWithButtonContainer]}>
-                <Pressable onPress={() => changeScale(-1, 1)} style={[{ width: 30, height: 30 }, styles.button]}>
-                    <ArrowLeft stroke="black" width={15} height={15} />
-                </Pressable>
-                <Animated.View
-                    style={[animationImageStyle]}
-                    accessible={false}
-                    accessibilityLabel={t('editableDecoration.ariaLabel')}>
-                    <Image
-                        source={item.value}
-                        style={styles.img}
-                        resizeMode='contain'
-                        accessible={true}
-                        accessibilityLabel={t('editableDecoration.ariaLabel')}
-                    />
-                </Animated.View>
-            </View>
+            <Pressable onPress={() => changeScale(-1, 1)} style={[{ width: 30, height: 30, visibility: selectedTextIndex === index ? "visible" : "hidden", position: 'absolute', left: "-50px", top: "50%" }, styles.button]}>
+                <ArrowLeft stroke="black" width={15} height={15} />
+            </Pressable>
+            <Animated.View
+                style={[animationImageStyle]}
+                accessible={false}
+                accessibilityLabel={t('editableDecoration.ariaLabel')}>
+                <Image
+                    source={item.value}
+                    style={styles.img}
+                    resizeMode='contain'
+                    accessible={true}
+                    accessibilityLabel={t('editableDecoration.ariaLabel')}
+                />
+            </Animated.View>
         </View >
     );
 };

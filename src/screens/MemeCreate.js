@@ -38,7 +38,6 @@ const MemeCreate = ({ navigation, currentMeme }) => {
   const BOTTOM_BUTTONS_Y_OFFSET = height * (Platform.OS === 'web' ? 0.17 : 0.14);
 
   const [decorations, setDecorations] = useState([]);
-  const [selectedTextIndex, setSelectedTextIndex] = useState(-1);
   const memeContainerRef = useRef(null);
 
 
@@ -57,7 +56,7 @@ const MemeCreate = ({ navigation, currentMeme }) => {
   const { handleOpenBottomDrawer, handleCloseBottomDrawer, addToast } = useConfirmation();
 
   // Options config
-  const { config, initColor, initLightColor, initDarkColor } = useConfig();
+  const { config, initColor, initLightColor, initDarkColor, selectedTextIndex, setSelectedTextIndex } = useConfig();
 
   const botBtnAnimatedStyle = useAnimatedStyle(() => ({
     position: 'absolute',
@@ -168,7 +167,7 @@ const MemeCreate = ({ navigation, currentMeme }) => {
           x: x - (x > width - 150 ? 150 : 75) + (x < 0 ? Math.abs(x) : 0),
           y: y - (y > height - 150 ? 150 : 50) + (y < 0 ? Math.abs(y) : 0),
           width: 150,
-          height: 50,
+          height: type === 'text' ? 100 : 150,
           rotation: 0
         };
         setSelectedTextIndex(prevTexts.length);
@@ -196,13 +195,19 @@ const MemeCreate = ({ navigation, currentMeme }) => {
         <ViewShot ref={memeContainerRef} style={styles.memeWrapper} draggable={false}>
           {/* Draggable Texts / decorations */}
           {decorations.map((item, index) => {
-            const child = item.type === "text" ? <EditableText item={{ value: item.value }} index={index} /> : <EditableDecoration item={item} index={index} />;
+            /* const child = item.type === "text" ?
+              <EditableText item={{ value: item.value }} index={index} selectedIndex={selectedTextIndex} /> :
+              <EditableDecoration item={item} index={index} selectedIndex={selectedTextIndex} />; */
             return <DraggableContainer
               key={`dragable-container-${index}-${index.type}-${item.x}-${item.y}`}
               x={item.x}
               y={item.y}
               width={item.width}
+              minWidth={config?.minWidth || 100}
+              maxWidth={config?.maxWidth || 300}
               height={item.height}
+              minHeight={config?.minHeight || 100}
+              maxHeight={config?.maxHeight || 300}
               rotation={item.rotation}
               index={index}
               selected={index === selectedTextIndex}
@@ -211,7 +216,8 @@ const MemeCreate = ({ navigation, currentMeme }) => {
               draggable={false}
               resizeMode={config?.dragableResizeMode}
             >
-              {child}
+              {item.type === "text" && <EditableText item={{ value: item.value }} index={index}/>}
+              {item.type !== "text" && <EditableDecoration item={item} index={index}/>}
             </DraggableContainer>
           })}
 
