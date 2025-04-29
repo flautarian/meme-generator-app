@@ -28,6 +28,7 @@
     }
   },
   "memeCreate": {
+    "newTextLabel": "New text",
     "newTextAdded": "New text added",
     "newDecorationAdded": "New decoration added",
     "imageCopied": "Image copied to clipboard",
@@ -107,6 +108,11 @@
     "staticResizeMode": "Details resize mode",
     "fontType": "Font type",
     "fontAutoResizeEnabled": "Font auto resized",
-    "fontAutoResizeDisabled": "Font manual resized"
+    "fontAutoResizeDisabled": "Font manual resized",
+    "minHeight": "Minimum height",
+    "minWidth": "Minimum width",
+    "maxHeight": "Maximum height",
+    "maxWidth": "Maximum width",
+    "decorationDimensions": "Decoration dimensions"
   }
 }

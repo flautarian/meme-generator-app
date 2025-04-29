@@ -28,6 +28,7 @@
     }
   },
   "memeCreate": {
+    "newTextLabel": "Nuovo testo",
     "newTextAdded": "Nuovo testo aggiunto",
     "newDecorationAdded": "Nuova decorazione aggiunta",
     "imageCopied": "Immagine copiata negli appunti",
@@ -106,6 +107,11 @@
     "staticResizeMode": "Tipo di ridimensionamento dei dettagli",
     "fontType": "Tipo di carattere",
     "fontAutoResizeEnabled": "Carattere ridimensionato automaticamente",
-    "fontAutoResizeDisabled": "Carattere ridimensionato manualmente"
+    "fontAutoResizeDisabled": "Carattere ridimensionato manualmente",
+    "minHeight": "Altezza minima",
+    "minWidth": "Larghezza minima",
+    "minWidthHint": "Larghezza minima",
+    "minHeightHint": "Altezza minima",
+    "decorationDimensions": "Dimensioni della decorazione"
   }
 }

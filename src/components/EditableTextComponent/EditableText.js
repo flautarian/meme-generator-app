@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { Pressable, StyleSheet, TextInput } from "react-native";
 import { TapGestureHandler } from "react-native-gesture-handler";
 import Animated, { useAnimatedStyle, useSharedValue } from "react-native-reanimated";
@@ -9,11 +9,11 @@ import { useConfig } from "src/contexts/ConfigContext";
 
 const EditableText = ({ item, index }) => {
 
-    console.log("EditableText", item, index);
-
     const { t } = useTranslation();
 
     const [value, setValue] = useState(item.value);
+
+    const { selectedTextIndex } = useConfig();
 
     const [isEditing, setIsEditing] = useState(false);
 
@@ -69,6 +69,57 @@ const EditableText = ({ item, index }) => {
         }
     }, [config?.fontType]);
 
+
+    const styles = useMemo(() => StyleSheet.create({
+        text: {
+            color: "white",
+            fontWeight: "bold",
+            textShadowColor: "black",
+            textShadowRadius: 2,
+            textShadowOffset: { width: 1, height: 1 },
+            width: "100%",
+            WebkitTextWrap: 'balance',
+            WebkitHyphens: 'auto',
+            textWrap: 'balance',
+            textAlign: 'center',
+            verticalAlign: 'center',
+            justifyContent: 'center',
+            alignItems: 'center',
+            maxWidth: "100%",
+            maxHeight: "100%",
+
+            cursor: 'pointer',
+        },
+        button: {
+            borderRadius: 20,
+            backgroundColor: '#fff',
+            justifyContent: 'center',
+            alignItems: 'center',
+            shadowColor: '#000',
+            shadowOffset: {
+                width: 0,
+                height: 2,
+            },
+            shadowOpacity: 0.25,
+            shadowRadius: 3.84,
+            elevation: 5,
+            zIndex: 20,
+        },
+        positionIconView: {
+            userSelect: "none",
+        },
+        font: {
+            textTransform: "uppercase",
+            fontColor: 'white',
+            color: 'white',
+            WebkitTextStroke: '2px black',
+            textShadowColor: 'black',
+            textShadowRadius: 4,
+            textShadowOffset: { width: 2, height: 2 },
+            overflow: 'hidden',
+        }
+    }), []);
+
     return (
         <Animated.View style={[resizeAnimationStyle]} selectable={false} draggable={false} key={`editable-text-${index}`} onLayout={onComponentLayout}>
             <TapGestureHandler
@@ -86,7 +137,7 @@ const EditableText = ({ item, index }) => {
                     <TextInput
                         aria-label={t('editableText.ariaLabel')}
                         style={[{ ...styles.font, ...getFontFamily(), textAlign: 'center', fontSize: config?.fontAutoResize ? Math.max((dimensions.height.get() + dimensions.width.get() / 2) / 4 - value.split(" ").length * 5, 10) : fontSize, color: 'white', backgroundColor: 'transparent' },
-                        
+
                         StyleSheet.absoluteFill]}
                         value={value}
                         onChangeText={updateValue}
@@ -108,63 +159,15 @@ const EditableText = ({ item, index }) => {
                 )}
             </TapGestureHandler>
 
-            {!config?.fontAutoResize && <Pressable onPress={() => alterFontSize(10)} style={[{ width: 30, height: 30 }, styles.button]}>
+            {!config?.fontAutoResize && index === selectedTextIndex && <Pressable onPress={() => alterFontSize(10)} style={[{ width: 30, height: 30, position: 'absolute', bottom: "10%", left: "65%" }, styles.button]}>
                 <Plus stroke="black" width={15} height={15} />
             </Pressable>}
 
-            {!config?.fontAutoResize && <Pressable onPress={() => alterFontSize(-10)} style={[{ width: 30, height: 30 }, styles.button]}>
+            {!config?.fontAutoResize && index === selectedTextIndex && <Pressable onPress={() => alterFontSize(-10)} style={[{ width: 30, height: 30, position: 'absolute', bottom: "10%", left: "25%" }, styles.button]}>
                 <Minus stroke="black" width={15} height={15} />
             </Pressable>}
         </Animated.View>
     );
 };
-
-const styles = StyleSheet.create({
-    text: {
-        color: "white",
-        fontWeight: "bold",
-        textShadowColor: "black",
-        textShadowRadius: 2,
-        textShadowOffset: { width: 1, height: 1 },
-        width: "100%",
-        WebkitTextWrap: 'balance',
-        WebkitHyphens: 'auto',
-        textWrap: 'balance',
-        textAlign: 'center',
-        verticalAlign: 'center',
-        justifyContent: 'center',
-        alignItems: 'center',
-        maxWidth: "100%",
-        maxHeight: "100%",
-    },
-    button: {
-        borderRadius: 20,
-        backgroundColor: '#fff',
-        justifyContent: 'center',
-        alignItems: 'center',
-        shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 2,
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 3.84,
-        elevation: 5,
-        zIndex: 20,
-    },
-    positionIconView: {
-        userSelect: "none",
-    },
-    font: {
-        textTransform: "uppercase",
-        fontColor: 'white',
-        color: 'white',
-        WebkitTextStroke: '2px black',
-        textShadowColor: 'black',
-        textShadowRadius: 4,
-        textShadowOffset: { width: 2, height: 2 },
-        overflow: 'hidden',
-    }
-});
 
 export default EditableText;

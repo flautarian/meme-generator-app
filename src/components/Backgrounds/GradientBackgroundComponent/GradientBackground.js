@@ -1,8 +1,8 @@
 // GradientComponent.js
 import React, { useEffect, useMemo } from 'react';
-import { View, StyleSheet, Animated, Easing } from 'react-native';
+import { StyleSheet, Animated, Easing } from 'react-native';
 
-const GradientBackground = ({ startColor, endColor }) => {
+const GradientBackground = ({ startColor, endColor, duration = 1500 }) => {
     const animatedValue = new Animated.Value(0);
 
 
@@ -23,13 +23,13 @@ const GradientBackground = ({ startColor, endColor }) => {
             Animated.sequence([
                 Animated.timing(animatedValue, {
                     toValue: 1,
-                    duration: 1500,
+                    duration: duration,
                     useNativeDriver: true,
                 })
                 ,
                 Animated.timing(animatedValue, {
                     toValue: 0,
-                    duration: 1500,
+                    duration: duration,
                     useNativeDriver: true,
                 })
             ])

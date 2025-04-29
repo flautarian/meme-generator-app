@@ -17,7 +17,9 @@ const BottomDrawer = ({ children, reference, snapPoints, callback = null }) => {
       ref={reference}
       onChange={handleSheetChanges}
       index={-1}
-      snapPoints={!!snapPoints ? snapPoints : ['75%']}
+      enableDynamicSizing={true}
+      enablePanDownToClose={true}
+      snapPoints={!!snapPoints ? snapPoints : ['50%']}
     >
       <BottomSheetView style={styles.contentContainer}>
         {children}

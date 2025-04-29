@@ -13,12 +13,10 @@ import ViewShot from "react-native-view-shot";
 import { Platform } from 'react-native';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring, withTiming } from 'react-native-reanimated';
 import { Camera, Edit, MessageSquare, Tool, ChevronUp } from 'react-native-feather';
+import { DraggableContainer } from 'react-native-draggable-container';
 import * as Sharing from 'expo-sharing';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import DraggableContainer from 'src/components/DragableContainerComponent/DragableContainer';
-import DragableDecoration from 'src/components/DragableTemplateComponent/DragableTemplate';
 import EditableDecoration from 'src/components/EditableDecorationComponent/EditableDecoration';
-import StaticOption from 'src/components/StaticOptionComponent/StaticOption';
 import { Utils } from 'src/utils/Utils';
 import memeSelectImages from 'src/utils/memeSelectImages';
 import DragableOption from 'src/components/DragableOptionComponent/DragableOption';
@@ -27,6 +25,9 @@ import LavaLampBackground from 'src/components/Backgrounds/LavaLampBackgroundCom
 import { useConfirmation } from 'src/contexts/ConfirmationContext';
 import { useConfig } from 'src/contexts/ConfigContext';
 import GradientBackground from 'src/components/Backgrounds/GradientBackgroundComponent/GradientBackground';
+import MemeDecorationsList from 'src/components/MemeDecorationsListComponent/MemeDecorationsList';
+import { Gesture } from 'react-native-gesture-handler';
+import { getRandomDecoration } from 'src/hooks/useDecorations';
 
 const MemeCreate = ({ navigation, currentMeme }) => {
 
@@ -36,24 +37,26 @@ const MemeCreate = ({ navigation, currentMeme }) => {
   const BOTTOM_BTN_HEIGHT = height * (Platform.OS === 'web' ? 0.15 : 0.12);
   const BOTTOM_BUTTONS_Y_OFFSET = height * (Platform.OS === 'web' ? 0.17 : 0.14);
 
-  const [texts, setTexts] = useState([]);
-  const [selectedTextIndex, setSelectedTextIndex] = useState(-1);
+  const [decorations, setDecorations] = useState([]);
   const memeContainerRef = useRef(null);
 
 
   // bottom drawer
-  const progress = useSharedValue(0);
   const [isBotDrawerOpened, setIsBotDrawerOpened] = useState(false);
-  const [selectedDecoration, setSelectedDecoration] = useState("");
+  const selectedDecoration = useRef("");
   const botBtnAnimation = useSharedValue(0);
   const botButtonsYOffset = useSharedValue(0);
 
+  const [capturePosition, setCapturePosition] = useState({ x: width - width * 0.25 - 25, y: height + 50 + botButtonsYOffset.get() });
+  const [dragableTextPosition, setDragableTextPosition] = useState({ x: width - width * 0.5 - 25, y: height + 50 + botButtonsYOffset.get() });
+  const [dragableDecorationPosition, setDragableDecorationPosition] = useState({ x: width - width * 0.75 - 25, y: height + 50 + botButtonsYOffset.get() });
+
 
   // decorations drawer / toasts
-  const { handleCloseBottomDrawer, addToast } = useConfirmation();
+  const { handleOpenBottomDrawer, handleCloseBottomDrawer, addToast } = useConfirmation();
 
   // Options config
-  const { config, initColor, initLightColor, initDarkColor } = useConfig();
+  const { config, initColor, initLightColor, initDarkColor, selectedTextIndex, setSelectedTextIndex } = useConfig();
 
   const botBtnAnimatedStyle = useAnimatedStyle(() => ({
     position: 'absolute',
@@ -75,19 +78,54 @@ const MemeCreate = ({ navigation, currentMeme }) => {
   };
 
   useEffect(() => {
-    botBtnAnimation.value = withSpring(isBotDrawerOpened || config?.staticBDrawer ? -BOTTOM_BTN_HEIGHT : 0, bottomDrawerSpringConfig);
-    botButtonsYOffset.value = withSpring(isBotDrawerOpened || config?.staticBDrawer ? -BOTTOM_BUTTONS_Y_OFFSET : 0, bottomDrawerSpringConfig);
+    // if true, we show the bottom drawer
+    botBtnAnimation.set(withSpring(isBotDrawerOpened || config?.staticBDrawer ? -BOTTOM_BTN_HEIGHT : 0, bottomDrawerSpringConfig));
+    botButtonsYOffset.set(isBotDrawerOpened || config?.staticBDrawer ? -BOTTOM_BUTTONS_Y_OFFSET : 0, bottomDrawerSpringConfig);
+
+    setCapturePosition((prev) => ({ ...prev, y: height + 50 + botButtonsYOffset.get() }));
+    setDragableTextPosition((prev) => ({ ...prev, y: height + 50 + botButtonsYOffset.get() }));
+    setDragableDecorationPosition((prev) => ({ ...prev, y: height + 50 + botButtonsYOffset.get() }));
+
   }, [isBotDrawerOpened, config?.staticBDrawer]);
 
+  useEffect(() => {
+    if (selectedDecoration.current === "") {
+      selectedDecoration.current = "calculating";
+      const initSelectDecoration = async () => {
+        const item = await getRandomDecoration();
+        selectedDecoration.current = item;
+      };
+      initSelectDecoration().catch(console.error);
+    }
+  }, [selectedDecoration]);
+
+  const memeDecorationComponent = useCallback(() => {
+    return (
+      <MemeDecorationsList
+        onSelectDecoration={(item) => {
+          selectedDecoration.current = item;
+          handleCloseBottomDrawer();
+        }}
+        onCloseMenu={handleCloseBottomDrawer} />
+    )
+  }, [t, handleCloseBottomDrawer]);
+
+
+  const tapGesture = Gesture.Tap()
+    .numberOfTaps(2)
+    .onStart(() => {
+      handleOpenBottomDrawer(memeDecorationComponent);
+    }).runOnJS(true);
+
   const deleteText = useCallback((index) => {
-    setTexts((prevTexts) => {
+    setDecorations((prevTexts) => {
       const newTexts = [...prevTexts];
       newTexts.splice(index, 1);
       return newTexts;
     });
     setSelectedTextIndex(-1);
     addToast(t('memeCreate.elementDeleted'), 3000);
-  }, [texts]);
+  }, [decorations]);
 
   // Handles the capture of the img meme to share it
   const handleCapture = async () => {
@@ -120,18 +158,16 @@ const MemeCreate = ({ navigation, currentMeme }) => {
 
   // Handles the arrangement of the text elements
   const onArrangeEnd = useCallback(
-    (type, x, y, value) => {
-      if (!value)
-        return;
+    (type, x, y) => {
       setIsBotDrawerOpened(false);
-      setTexts((prevTexts) => {
+      setDecorations((prevTexts) => {
         const newItem = {
-          value,
+          value: type === 'text' ? t('memeCreate.newTextLabel') : selectedDecoration?.current?.blob,
           type,
           x: x - (x > width - 150 ? 150 : 75) + (x < 0 ? Math.abs(x) : 0),
           y: y - (y > height - 150 ? 150 : 50) + (y < 0 ? Math.abs(y) : 0),
           width: 150,
-          height: 50,
+          height: type === 'text' ? 100 : 150,
           rotation: 0
         };
         setSelectedTextIndex(prevTexts.length);
@@ -145,32 +181,33 @@ const MemeCreate = ({ navigation, currentMeme }) => {
       );
       return true;
     },
-    [texts, t, isBotDrawerOpened],
+    [decorations, t, isBotDrawerOpened, selectedDecoration],
   );
-
-  // Trigger the gradient animation
-  useEffect(() => {
-    progress.value = withTiming(1, { duration: 3000 });
-  }, []);
 
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>
         {/* Gradient Background */}
         {config?.backgroundType === "lava" && <LavaLampBackground count={10} hue={initColor} />}
-        {config?.backgroundType === "gradient" && <GradientBackground startColor={initLightColor} endColor={initDarkColor} />}
+        {config?.backgroundType === "gradient" && <GradientBackground startColor={initLightColor} endColor={initDarkColor} duration={3000} />}
 
         {/* Meme image container */}
         <ViewShot ref={memeContainerRef} style={styles.memeWrapper} draggable={false}>
           {/* Draggable Texts / decorations */}
-          {texts.map((item, index) => {
-            const child = item.type === "text" ? <EditableText item={{ value: item.value }} index={index} /> : <EditableDecoration item={item} index={index} />;
+          {decorations.map((item, index) => {
+            /* const child = item.type === "text" ?
+              <EditableText item={{ value: item.value }} index={index} selectedIndex={selectedTextIndex} /> :
+              <EditableDecoration item={item} index={index} selectedIndex={selectedTextIndex} />; */
             return <DraggableContainer
-              key={`dragable-container-${index} - ${item.x} - ${item.y}`}
+              key={`dragable-container-${index}-${index.type}-${item.x}-${item.y}`}
               x={item.x}
               y={item.y}
               width={item.width}
+              minWidth={config?.minWidth || 100}
+              maxWidth={config?.maxWidth || 300}
               height={item.height}
+              minHeight={config?.minHeight || 100}
+              maxHeight={config?.maxHeight || 300}
               rotation={item.rotation}
               index={index}
               selected={index === selectedTextIndex}
@@ -179,7 +216,8 @@ const MemeCreate = ({ navigation, currentMeme }) => {
               draggable={false}
               resizeMode={config?.dragableResizeMode}
             >
-              {child}
+              {item.type === "text" && <EditableText item={{ value: item.value }} index={index} />}
+              {item.type !== "text" && <EditableDecoration item={item} index={index} />}
             </DraggableContainer>
           })}
 
@@ -239,30 +277,47 @@ const MemeCreate = ({ navigation, currentMeme }) => {
           </Pressable>
         </Animated.View>
 
-        <DragableDecoration
+        <DragableOption
           key={`dragable-decoration-option`}
-          onArrangeEnd={(x, y, value) => onArrangeEnd("decoration", x, y, value)}
-          selectedDecoration={selectedDecoration}
-          initialPosition={{ x: width - width * 0.75 - 25, y: height + 50 }}
+          gesture={tapGesture}
+          onArrangeEnd={(x, y) => onArrangeEnd("decoration", x, y)}
+          initialPosition={dragableDecorationPosition}
           parentDimensions={{ width: width, height: height }}
-          offsetYAzis={botButtonsYOffset}
-          style={[styles.draggableBox, { backgroundColor: initColor }]} />
+          animateButton={true}
+          style={[styles.draggableBox, { backgroundColor: initColor }]}
+          minLimitDistance={125}>
+          <View>
+            <Animated.View>
+              <Pressable maxPointers={1}>
+                <Image selectable={false} style={{ width: 50, height: 50 }} source={selectedDecoration.current?.blob} resizeMode='contain' />
+              </Pressable>
+            </Animated.View>
+            <Pressable maxPointers={1} style={styles.imageEditWrapper} onPressOut={() => {
+              handleOpenBottomDrawer(memeDecorationComponent);
+            }}>
+              <Edit stroke="black" width={20} height={20} />
+            </Pressable>
+          </View>
+        </DragableOption>
         <DragableOption
           key={`dragable-text-option`}
-          onArrangeEnd={(x, y, value) => onArrangeEnd("text", x, y, value)}
-          initialPosition={{ x: width - width * 0.5 - 25, y: height + 50 }}
-          offsetYAzis={botButtonsYOffset}
-          style={[styles.draggableBox, { backgroundColor: initColor }]}>
+          onArrangeEnd={(x, y) => onArrangeEnd("text", x, y)}
+          initialPosition={dragableTextPosition}
+          animateButton={true}
+          style={[styles.draggableBox, { backgroundColor: initColor }]}
+          minLimitDistance={125}>
           <MessageSquare stroke="black" fill="#fff" width={40} height={40} />
         </DragableOption>
-        <StaticOption
+        <DragableOption
           key={`capture-share-button`}
-          onPress={handleCapture}
-          initialPosition={{ x: width - width * 0.25 - 25, y: height + 50 }}
-          style={{ backgroundColor: initColor }}
-          offsetYAzis={botButtonsYOffset}>
+          onArrangeEnd={handleCapture}
+          initialPosition={capturePosition}
+          style={[styles.draggableBox, { backgroundColor: initColor }]}
+          blockDragY={true}
+          blockDragX={true}
+          animateButton={true}>
           <Camera stroke="black" fill="#fff" width={40} height={40} />
-        </StaticOption>
+        </DragableOption>
       </SafeAreaView>
     </SafeAreaProvider>
   );
@@ -292,6 +347,18 @@ const styles = StyleSheet.create({
     flex: 1,
     width: '100%',
     height: '100%',
+    cursor: 'default',
+  },
+  imageEditWrapper: {
+    position: 'absolute',
+    borderRadius: 20,
+    top: 0,
+    right: -10,
+    width: 30,
+    height: 30,
+    backgroundColor: 'white',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   memeImage: {
     width: '100%',
@@ -309,6 +376,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 50,
+    cursor: 'pointer',
   },
   draggableRightBox: {
     transformOrigin: '-50% 0%',
@@ -321,6 +389,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderTopLeftRadius: 50,
     borderBottomLeftRadius: 50,
+    cursor: 'pointer',
   },
   draggableLeftBox: {
     transformOrigin: '-50% 0%',
@@ -333,6 +402,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderTopRightRadius: 50,
     borderBottomRightRadius: 50,
+    cursor: 'pointer',
   }
 });
 
