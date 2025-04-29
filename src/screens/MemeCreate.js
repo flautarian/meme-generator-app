@@ -170,6 +170,8 @@ const MemeCreate = ({ navigation, currentMeme }) => {
           height: type === 'text' ? 100 : 150,
           rotation: 0
         };
+        if(type === 'decoration')
+          newItem.scale = { x: 1, y: 1 };
         setSelectedTextIndex(prevTexts.length);
         return [...prevTexts, newItem];
       });
@@ -213,7 +215,6 @@ const MemeCreate = ({ navigation, currentMeme }) => {
               selected={index === selectedTextIndex}
               onSelect={(i) => setSelectedTextIndex(i)}
               onDelete={() => deleteText(index)}
-              draggable={false}
               resizeMode={config?.dragableResizeMode}
             >
               {item.type === "text" && <EditableText item={{ value: item.value }} index={index} />}
