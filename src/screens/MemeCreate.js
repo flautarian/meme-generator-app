@@ -13,9 +13,9 @@ import ViewShot from "react-native-view-shot";
 import { Platform } from 'react-native';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring, withTiming } from 'react-native-reanimated';
 import { Camera, Edit, MessageSquare, Tool, ChevronUp } from 'react-native-feather';
+import { DraggableContainer } from 'react-native-draggable-container';
 import * as Sharing from 'expo-sharing';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import DraggableContainer from 'src/components/DragableContainerComponent/DragableContainer';
 import EditableDecoration from 'src/components/EditableDecorationComponent/EditableDecoration';
 import { Utils } from 'src/utils/Utils';
 import memeSelectImages from 'src/utils/memeSelectImages';
@@ -216,8 +216,8 @@ const MemeCreate = ({ navigation, currentMeme }) => {
               draggable={false}
               resizeMode={config?.dragableResizeMode}
             >
-              {item.type === "text" && <EditableText item={{ value: item.value }} index={index}/>}
-              {item.type !== "text" && <EditableDecoration item={item} index={index}/>}
+              {item.type === "text" && <EditableText item={{ value: item.value }} index={index} />}
+              {item.type !== "text" && <EditableDecoration item={item} index={index} />}
             </DraggableContainer>
           })}
 
