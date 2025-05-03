@@ -55,6 +55,7 @@ const MemeOptions = memo(({ navigation, onChangedTemplates }) => {
     scrollContainer: {
       marginTop: 25,
       paddingBottom: 20,
+      paddingHorizontal: 10,
     },
     section: {
       marginBottom: 30,
@@ -143,7 +144,7 @@ const MemeOptions = memo(({ navigation, onChangedTemplates }) => {
       color: '#007AFF',
       fontSize: 16,
       fontWeight: '500',
-      width: '100%',
+      width: 'auto',
     },
     dangerButtonText: {
       color: '#FF5733',

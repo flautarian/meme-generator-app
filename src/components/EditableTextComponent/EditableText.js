@@ -17,7 +17,9 @@ const EditableText = ({ item, index }) => {
 
     const [isEditing, setIsEditing] = useState(false);
 
-    const [fontSize, setFontSize] = useState(20);
+    const fontSizeRef = useRef(item.fontSize);
+
+    const fontSize = useSharedValue(fontSizeRef.current);
 
     const { config } = useConfig();
 
@@ -29,7 +31,7 @@ const EditableText = ({ item, index }) => {
         width: "100%",
         flexShrink: 1,
         backgroundColor: 'transparent',
-        fontSize: config?.fontAutoResize ? Math.max((dimensions.height.get() + dimensions.width.get() / 2) / 4 - value.split(" ").length * 5, 10) : fontSize,
+        fontSize: config?.fontAutoResize ? Math.max((dimensions.height.get() + dimensions.width.get() / 2) / 4 - value.split(" ").length * 5, 10) : fontSize.value,
         zIndex: 15,
     }));
 
@@ -39,12 +41,10 @@ const EditableText = ({ item, index }) => {
     }, [item]);
 
     const alterFontSize = useCallback((point) => {
-        setFontSize(prevFontSize => {
-            const newFontSize = prevFontSize + point;
-            if (newFontSize < 10) return prevFontSize; // prevent font size from going below 10
-            if (newFontSize > 100) return prevFontSize; // prevent font size from going above 100
-            return newFontSize;
-        });
+        const newFontSize = fontSize.value + point;
+        if (newFontSize < 10 || newFontSize > 100) return;
+        fontSize.value = newFontSize;
+        item.fontSize = newFontSize;
     }, [fontSize]);
 
 
@@ -136,7 +136,7 @@ const EditableText = ({ item, index }) => {
                 {isEditing ? (
                     <TextInput
                         aria-label={t('editableText.ariaLabel')}
-                        style={[{ ...styles.font, ...getFontFamily(), textAlign: 'center', fontSize: config?.fontAutoResize ? Math.max((dimensions.height.get() + dimensions.width.get() / 2) / 4 - value.split(" ").length * 5, 10) : fontSize, color: 'white', backgroundColor: 'transparent' },
+                        style={[{ ...styles.font, ...getFontFamily(), textAlign: 'center', fontSize: config?.fontAutoResize ? Math.max((dimensions.height.get() + dimensions.width.get() / 2) / 4 - value.split(" ").length * 5, 10) : fontSize.value, color: 'white', backgroundColor: 'transparent' },
 
                         StyleSheet.absoluteFill]}
                         value={value}
