@@ -289,7 +289,7 @@ const MemeCreate = ({ navigation, currentMeme }) => {
           parentDimensions={{ width: width, height: height }}
           animateButton={true}
           style={[styles.draggableBox, { backgroundColor: initColor }]}
-          minLimitDistance={125}>
+          minDistance={125}>
           <View>
             <Animated.View>
               <Pressable maxPointers={1}>
@@ -309,7 +309,7 @@ const MemeCreate = ({ navigation, currentMeme }) => {
           initialPosition={dragableTextPosition}
           animateButton={true}
           style={[styles.draggableBox, { backgroundColor: initColor }]}
-          minLimitDistance={125}>
+          minDistance={125}>
           <MessageSquare stroke="black" fill="#fff" width={40} height={40} />
         </DraggableButton>
         <DraggableButton

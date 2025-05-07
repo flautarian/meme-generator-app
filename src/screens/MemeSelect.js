@@ -1,6 +1,7 @@
 import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { Utils } from 'src/utils/Utils';
-import { View, StyleSheet, FlatList, TextInput, Text, Platform, ScrollView } from 'react-native';
+import { View, StyleSheet, TextInput, Text, Platform, ScrollView } from 'react-native';
+import { FlatList } from 'react-native-gesture-handler';
 import { addNewTemplate, deleteTemplate, fetchTemplates } from 'src/hooks/useTemplates';
 import * as ImagePicker from 'expo-image-picker';
 import { useTranslation } from 'react-i18next';
@@ -108,14 +109,15 @@ const MemeSelect = ({ navigation, onSelectMeme, onChangedTemplates }) => {
     resultCount: {
       paddingHorizontal: 10,
       paddingBottom: 5,
+      textAlign: 'center',
       color: '#666',
     },
     content: {
       flex: 1,
+      width: '100%'
     },
     memeListContainer: {
-      width: "90%",
-      padding: 5,
+      width: "100%",
     },
   }), []);
 
@@ -135,18 +137,18 @@ const MemeSelect = ({ navigation, onSelectMeme, onChangedTemplates }) => {
       <View style={styles.content}>
         {templateResults.length > 0 &&
           <FlatList
-            contentContainerStyle={{ alignItems: 'center', justifyContent: 'space-between' }}
+            contentContainerStyle={{ alignItems: 'center', justifyContent: 'space-between', width: "100%" }}
             showsVerticalScrollIndicator={true}
-            style={styles.memeListContainer}
             data={templateResults}
             keyExtractor={(item, index) => `${item.name}-${index}`}
-            numColumns={Platform.OS === "web" ? 2 : 4}
+            numColumns={1}
+            ItemSeparatorComponent={() => <View style={{height: "5dvh"}} />}
             renderItem={({ item, index }) => (
               <TemplateItem
                 template={item}
                 key={index}
                 index={index}
-                imgSize={Platform.OS === "web" ? 150 : 75}
+                imgSize={Platform.OS === "web" ? 250 : 250}
                 onSelect={(item) => selectMeme(item)}
                 onDelete={() => handleDeleteTemplate(item)}
               />

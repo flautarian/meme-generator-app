@@ -78,8 +78,7 @@ export const Utils = {
             console.error('Error requesting clipboard permission:', error);
             return false;
         }
-    }
-    ,
+    },
     getBrowserName: () => {
         const userAgent = navigator.userAgent;
         if (userAgent.includes("Firefox")) {

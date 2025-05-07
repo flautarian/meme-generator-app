@@ -106,9 +106,9 @@ const MemeDecorationsList = ({ onSelectDecoration, onCloseMenu }) => {
             {decorations.length > 0 && (
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '100%', height: '100%', padding: 10 }}>
                     <FlatList
-                        showsVerticalScrollIndicator={true}
                         style={styles.memeListContainer}
-                        contentContainerStyle={{ alignItems: 'center', justifyContent: 'center' }}
+                        showsHorizontalScrollIndicator={true}
+                        contentContainerStyle={{ alignItems: 'center', justifyContent: 'center', flexGrow: 1 }}
                         data={decorationsFiltered}
                         keyExtractor={(item, index) => `${item.name}-${index}`}
                         horizontal={true}
