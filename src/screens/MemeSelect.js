@@ -1,6 +1,5 @@
-import { memo, useCallback, useEffect, useMemo, useState } from 'react';
-import { Utils } from 'src/utils/Utils';
-import { View, StyleSheet, TextInput, Text, Platform, ScrollView } from 'react-native';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { View, StyleSheet, TextInput, Text, Platform } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import { addNewTemplate, deleteTemplate, fetchTemplates } from 'src/hooks/useTemplates';
 import * as ImagePicker from 'expo-image-picker';
@@ -100,11 +99,13 @@ const MemeSelect = ({ navigation, onSelectMeme, onChangedTemplates }) => {
       padding: 10,
     },
     searchInput: {
+      fontSize: 14,
+      width: '100%',
       height: 40,
-      borderColor: '#ddd',
-      borderWidth: 1,
-      borderRadius: 8,
-      paddingHorizontal: 10,
+      textAlign: 'center',
+      border: "2px solid #000",
+      borderRadius: 20,
+      borderWidth: 2,
     },
     resultCount: {
       paddingHorizontal: 10,

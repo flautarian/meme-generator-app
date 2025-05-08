@@ -27,9 +27,10 @@ const TemplateItem = ({ template, onSelect, imgSize, onDelete }) => {
         height: imgSize,
     }));
 
+    {/* <GestureDetector gesture={hover} style={{width: "100%"}}> </GestureDetector> */}
     return (
-        <GestureDetector gesture={hover} style={{width: "100%"}}>
-            <Pressable onPress={() => onSelect(template)} style={[styles.container]}>
+        <Pressable onPress={() => onSelect(template)} style={[styles.container]}>
+                {/* delete button */}
                 {name !== "/Upload a file" && (
                     <Pressable
                         onPress={() => onDelete(template)}
@@ -38,11 +39,12 @@ const TemplateItem = ({ template, onSelect, imgSize, onDelete }) => {
                         <XCircle stroke="red" fill="white" />
                     </Pressable>
                 )}
+                {/* icon */}
                 <Animated.View style={[styles.box, boxAnimatedStyle]}>
                     <Image
                         source={isFromUser && isMobile ? { uri: blob } : blob}
                         name={name}
-                        style={{ width: imgSize * 0.9, height: imgSize * 0.9, alignSelf: "center" }}
+                        style={{ width: "90%", height: "100%", alignSelf: "center" }}
                         resizeMode='contain'
                     />
                 </Animated.View>
@@ -50,7 +52,6 @@ const TemplateItem = ({ template, onSelect, imgSize, onDelete }) => {
                     {name}
                 </Text>
             </Pressable>
-        </GestureDetector>
     );
 };
 
@@ -60,7 +61,6 @@ const styles = StyleSheet.create({
         width: "min-content"
     },
     box: {
-        flex: 1,
         borderRadius: 20,
         width: "100%",
         height: "100%",

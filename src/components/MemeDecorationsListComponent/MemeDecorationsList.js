@@ -96,27 +96,24 @@ const MemeDecorationsList = ({ onSelectDecoration, onCloseMenu }) => {
                     onChangeText={setNameFilter}
                     value={nameFilter}
                 />
-                <Pressable style={[styles.closeBtn]} onPress={onCloseMenu}>
-                    <XCircle stroke="black" fill="#fff" width={40} height={40} />
-                </Pressable>
             </View>
             <Text>
                 {t('decorations.foundCount', { count: decorationsFiltered.length - 1 })}
             </Text>
             {decorations.length > 0 && (
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '100%', height: '100%', padding: 10 }}>
+                <View style={{ flex: 1, width: '100%', height: "100%" }}>
                     <FlatList
                         style={styles.memeListContainer}
+                        contentContainerStyle={{ flexGrow: 1, alignItems: 'center', justifyContent: 'space-between' }}
                         showsHorizontalScrollIndicator={true}
-                        contentContainerStyle={{ alignItems: 'center', justifyContent: 'center', flexGrow: 1 }}
                         data={decorationsFiltered}
-                        keyExtractor={(item, index) => `${item.name}-${index}`}
+                        keyExtractor={(item, index) => `${item.name}-decoration-${index}`}
                         horizontal={true}
                         renderItem={({ item, index }) => (
                             <TemplateItem
                                 template={item}
                                 onSelect={(item) => selectDecoration(item)}
-                                imgSize={Platform.OS === "web" ? 150 : 75}
+                                imgSize={Platform.OS === "web" ? 150 : 100}
                                 onDelete={() => onHandleDeleteDecoration(item)}
                             />
                         )}
@@ -134,10 +131,10 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     heading: {
-        width: '100%',
+        width: '70%',
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'flex-start',
+        justifyContent: 'center',
         maxHeight: 50,
         padding: 5
     },
@@ -153,8 +150,12 @@ const styles = StyleSheet.create({
     },
     textInput: {
         fontSize: 14,
-        width: '85%',
+        width: '100%',
         height: 40,
+        textAlign: 'center',
+        border: "2px solid #000",
+        borderRadius: 20,
+        borderWidth: 2,
     },
     closeBtn: {
         alignItems: 'center',

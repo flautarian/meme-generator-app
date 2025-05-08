@@ -83,6 +83,7 @@ const MemeOptions = memo(({ navigation, onChangedTemplates }) => {
       borderColor: '#ddd',
       borderRadius: 8,
       alignSelf: 'center',
+      textAlign: "center",
     },
     searchContainer: {
       padding: 10,
