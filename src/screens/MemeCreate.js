@@ -11,7 +11,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ViewShot from "react-native-view-shot";
 import { Platform } from 'react-native';
-import Animated, { useSharedValue, useAnimatedStyle, withSpring, withTiming } from 'react-native-reanimated';
+import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
 import { Camera, Edit, MessageSquare, Tool, ChevronUp } from 'react-native-feather';
 import { DraggableContainer } from 'react-native-draggable-container';
 import * as Sharing from 'expo-sharing';
@@ -61,13 +61,15 @@ const MemeCreate = ({ navigation, currentMeme }) => {
   const botBtnAnimatedStyle = useAnimatedStyle(() => ({
     position: 'absolute',
     top: height * (Platform.OS === 'web' ? 0.85 : 0.9),
-    left: 0,
+    alignSelf: 'center',
+    left: '50%',
     right: 0,
     zIndex: 5,
-    width: '100%',
-    height: Platform.OS === 'web' ? '15dvh' : height * 0.15,
+    width: 'min-content',
+    height: 'min-content',
     transform: [
-      { translateY: botBtnAnimation.value }
+      { translateY: botBtnAnimation.value },
+      { translateX: '-50%' }
     ],
   }));
 
@@ -141,7 +143,7 @@ const MemeCreate = ({ navigation, currentMeme }) => {
             // ask for browser permission
             const navAgent = Utils.getBrowserName();
             const permissionGranted = await Utils.requestClipboardPermission();
-            if(permissionGranted || navAgent === "Mozilla Firefox" || navAgent.indexOf("Edge")){
+            if (permissionGranted || navAgent === "Mozilla Firefox" || navAgent.indexOf("Edge")) {
               let uriFileFormat = await Utils.convertBase64ToImage(uri);
               await navigator.clipboard.write([uriFileFormat]);
               addToast(t('memeCreate.imageCopied'), 3000);
@@ -254,7 +256,7 @@ const MemeCreate = ({ navigation, currentMeme }) => {
           onArrangeEnd={() => navigation.openDrawer()}
           initialPosition={{ x: width - 75, y: height * 0.75 }}
           blockDragY={true}
-          limitDistance={40}
+          maxDistance={40}
           style={[styles.draggableRightBox, { backgroundColor: initColor }]}
           animateButton={false}>
           <Edit stroke="black" fill="#fff" width={40} height={40} />
@@ -266,7 +268,7 @@ const MemeCreate = ({ navigation, currentMeme }) => {
           onArrangeEnd={() => navigation.getParent().openDrawer()}
           initialPosition={{ x: -45, y: height * 0.75 }}
           blockDragY={true}
-          limitDistance={40}
+          maxDistance={40}
           style={[styles.draggableLeftBox, { backgroundColor: initColor }]}
           animateButton={false}>
           <Tool stroke="black" fill="#fff" width={40} height={40} />
