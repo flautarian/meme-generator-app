@@ -94,10 +94,9 @@ Contributions are welcome! Feel free to:
 ## 📬 Contact
 
 Have questions? Reach out to us:
-- 📧 Email: your.email@example.com
-- 🌐 Website: your-website.com
-- 🐦 Twitter: @your_handle
+- 🌐 Website: [My Portfolio](https://giacconi-dev-portfolio.vercel.app/)
+- 🐦 Twitter: @flautarian
 
 ---
 
-Made with ❤️ by Your Team
+Made with ❤️ by "my curiosity and will to make software 😁"
