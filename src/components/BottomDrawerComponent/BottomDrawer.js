@@ -1,12 +1,12 @@
 import React, { useCallback } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Platform } from 'react-native';
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
 
 const BottomDrawer = ({ children, reference, snapPoints, callback = null }) => {
 
   // callbacks
   const handleSheetChanges = useCallback((index) => {
-    if(!!callback)
+    if (!!callback)
       callback(index);
   }, []);
 
@@ -17,8 +17,11 @@ const BottomDrawer = ({ children, reference, snapPoints, callback = null }) => {
       ref={reference}
       onChange={handleSheetChanges}
       index={-1}
-      enableDynamicSizing={true}
       enablePanDownToClose={true}
+      enableContentPanningGesture={false}
+      enableHandlePanningGesture={Platform.OS !== "android"}
+      enableOverDrag={false}
+      enableDynamicSizing={true}
       snapPoints={!!snapPoints ? snapPoints : ['50%']}
     >
       <BottomSheetView style={styles.contentContainer}>

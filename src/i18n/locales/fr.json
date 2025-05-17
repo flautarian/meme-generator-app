@@ -36,7 +36,8 @@
     "sharingNotAvailable": "Le partage n'est pas disponible",
     "errorSavingMeme": "Erreur lors de l'enregistrement du mème",
     "imageCopied": "Image copiée dans le presse-papiers",
-    "shareError": "Erreur lors du partage de l'image"
+    "shareError": "Erreur lors du partage de l'image",
+    "permissionClipboardDenied": "Autorisation de copier des ordinateurs portables désactivés, acceptez l'autorisation de copier l'image ou le déplacement du navigateur"
   },
   "editableText": {
     "placeholder": "Double-tapez pour modifier",

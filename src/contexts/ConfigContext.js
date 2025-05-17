@@ -68,7 +68,7 @@ export const ConfigProvider = ({ children }) => {
 
   useEffect(() => {
     // Call the function to update settings
-    console.log("Config updated", config);
+    // console.log("Config updated", config);
     handleSettingsUpdate();
   }, [config]);
 

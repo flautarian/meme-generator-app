@@ -36,7 +36,8 @@
     "sharingNotAvailable": "Compartir no está disponible",
     "errorSavingMeme": "Error al guardar el meme",
     "imageCopied": "Imagen copiada al portapapeles",
-    "shareError": "Error al compartir la imagen"
+    "shareError": "Error al compartir la imagen",
+    "permissionClipboardDenied": "Permiso para copiar al portapapeles denegado, acepte el permiso para copiar la imagen o cambie de navegador"
   },
   "editableText": {
     "placeholder": "Doble toque para editar",

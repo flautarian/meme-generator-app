@@ -36,7 +36,8 @@
     "elementDeleted": "Elemento eliminato con successo",
     "memeSaved": "Meme salvato con successo",
     "sharingNotAvailable": "Condivisione non disponibile",
-    "errorSavingMeme": "Errore durante il salvataggio del meme"
+    "errorSavingMeme": "Errore durante il salvataggio del meme",
+    "permissionClipboardDenied": "Autorizzazione per copiare i documenti rifiutati, accettare l'autorizzazione per copiare l'immagine o cambiare il navigatore"
   },
   "editableText": {
     "placeholder": "Doppio tocco per modificare",

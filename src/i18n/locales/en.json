@@ -36,7 +36,8 @@
     "elementDeleted": "Element deleted successfully",
     "memeSaved": "Meme saved successfully",
     "sharingNotAvailable": "Sharing is not available",
-    "errorSavingMeme": "Error saving meme"
+    "errorSavingMeme": "Error saving meme",
+    "permissionClipboardDenied": "Permission to copy to clipboard denied, accept permission to copy image or change browser"
   },
   "editableText": {
     "placeholder": "Double tap to edit",

@@ -5,13 +5,16 @@ import { useCallback, useMemo } from "react";
 import { ArrowLeft, ArrowUp } from "react-native-feather";
 import { Pressable } from "react-native";
 import { useConfig } from "src/contexts/ConfigContext";
+import { useRef } from "react";
 
 const EditableDecoration = ({ item, index }) => {
     const { t } = useTranslation();
 
+    const initialScaleRef = useRef({ x: item.scale.x, y: item.scale.y });
+
     const scale = {
-        x: useSharedValue(1),
-        y: useSharedValue(1)
+        x: useSharedValue(initialScaleRef.current.x),
+        y: useSharedValue(initialScaleRef.current.y)
     }
 
     const { selectedTextIndex } = useConfig();
@@ -19,6 +22,8 @@ const EditableDecoration = ({ item, index }) => {
     const changeScale = useCallback((x, y) => {
         scale.x.value = withSpring(scale.x.value * x, { duration: 150 });
         scale.y.value = withSpring(scale.y.value * y, { duration: 150 });
+        item.scale.x = scale.x.value * x;
+        item.scale.y = scale.y.value * y;
     }, [scale]);
 
     // animated size style for the inner component shown
