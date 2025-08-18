@@ -23,7 +23,7 @@ const MemeSelect = ({ navigation, onSelectMeme, onChangedTemplates }) => {
   const refreshTemplates = useCallback(async () => {
     const templateResults = await fetchTemplates(nameFilter);
     setTemplates(templateResults);
-    setTemplatesFiltered([...templateResults, documentUploadOption]);
+    setTemplatesFiltered([documentUploadOption, ...templates]);
   }, [nameFilter]);
 
   useEffect(() => {
@@ -32,11 +32,10 @@ const MemeSelect = ({ navigation, onSelectMeme, onChangedTemplates }) => {
 
   useEffect(() => {
     const debounce = setTimeout(() => {
-      setTemplatesFiltered(
-        [...templates.filter((item) =>
-          item.name?.toLowerCase().includes(nameFilter.toLowerCase())
-        ), documentUploadOption]
-      );
+      const filteredTemplates = [documentUploadOption, ...templates.filter((item) =>
+        item.name?.toLowerCase().includes(nameFilter.toLowerCase())
+      )]
+      setTemplatesFiltered(filteredTemplates);
     }, 300);
     return () => clearTimeout(debounce);
   }, [nameFilter, templates]);
@@ -143,7 +142,7 @@ const MemeSelect = ({ navigation, onSelectMeme, onChangedTemplates }) => {
             data={templateResults}
             keyExtractor={(item, index) => `${item.name}-${index}`}
             numColumns={1}
-            ItemSeparatorComponent={() => <View style={{height: "5dvh"}} />}
+            ItemSeparatorComponent={() => <View style={{ height: "5dvh" }} />}
             renderItem={({ item, index }) => (
               <TemplateItem
                 template={item}
