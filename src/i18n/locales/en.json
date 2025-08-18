@@ -110,8 +110,12 @@
     "fontType": "Font type",
     "fontAutoResizeEnabled": "Font auto resized",
     "fontAutoResizeDisabled": "Font manual resized",
+    "limitWidthEnabled": "Limit width enabled",
+    "limitWidthDisabled": "Limit width disabled",
     "minHeight": "Minimum height",
     "minWidth": "Minimum width",
+    "limitHeightEnabled": "Limit height enabled",
+    "limitHeightDisabled": "Limit height disabled",
     "maxHeight": "Maximum height",
     "maxWidth": "Maximum width",
     "decorationDimensions": "Decoration dimensions"

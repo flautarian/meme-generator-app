@@ -13,7 +13,7 @@ const SQLiteDecorationsService = {
   getAllDecorations() {
     return new Promise((resolve, reject) => {
       const results = db.getAllSync(
-        'SELECT * FROM decorations;');
+        'SELECT * FROM decorations ORDER BY id DESC;');
       resolve(results);
     });
   },

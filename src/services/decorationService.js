@@ -7,7 +7,7 @@ const DecorationsService = {
   },
 
   async getAllDecorations() {
-    return await db.decorations.toArray();
+    return await db.decorations.toArray().reverse();
   },
 
   async getDecorationById(id) {
