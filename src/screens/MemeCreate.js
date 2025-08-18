@@ -58,6 +58,9 @@ const MemeCreate = ({ navigation, currentMeme }) => {
   // Options config
   const { config, initColor, initLightColor, initDarkColor, selectedTextIndex, setSelectedTextIndex } = useConfig();
 
+  const configRef = useRef(config);
+  configRef.current = config;
+
   const botBtnAnimatedStyle = useAnimatedStyle(() => ({
     position: 'absolute',
     top: height * (Platform.OS === 'web' ? 0.85 : 0.9),
@@ -78,6 +81,16 @@ const MemeCreate = ({ navigation, currentMeme }) => {
     dampingRatio: 2,
     stiffness: 100,
   };
+
+
+  useEffect(() => {
+    // re write height and width limits of each element of decoration list to force re-render
+    console.log("Rewriting decoration dimensions based on config ", config?.limitHeight, config?.limitWidth);
+    if (decorations.length > 0) {
+      // clean decorations
+      setDecorations([]);
+    }
+  }, [config?.limitHeight, config?.limitWidth, config?.minHeight, config?.minWidth, config?.maxHeight, config?.maxWidth]);
 
   useEffect(() => {
     // if true, we show the bottom drawer
@@ -169,13 +182,18 @@ const MemeCreate = ({ navigation, currentMeme }) => {
     (type, x, y) => {
       setIsBotDrawerOpened(false);
       setDecorations((prevTexts) => {
+        const currentConfig = configRef.current;
         const newItem = {
           value: type === 'text' ? t('memeCreate.newTextLabel') : selectedDecoration?.current?.blob,
           type,
           x: x - (x > width - 150 ? 150 : 75) + (x < 0 ? Math.abs(x) : 0),
           y: y - (y > height - 150 ? 150 : 50) + (y < 0 ? Math.abs(y) : 0),
           width: 150,
+          minWidth: (currentConfig.limitWidth ? (currentConfig.minWidth || 50) : 1),
+          maxWidth: (currentConfig.limitWidth ? (currentConfig.maxWidth || 300) : 999999),
           height: type === 'text' ? 100 : 150,
+          minHeight: (currentConfig.limitHeight ? (currentConfig.minHeight || 100) : 1),
+          maxHeight: (currentConfig.limitHeight ? (currentConfig.maxHeight || 300) : 999999),
           fontSize: 20, // fontSize for label
           scale: { x: 1, y: 1 }, // scale for decoration
           rotation: 0
@@ -191,7 +209,7 @@ const MemeCreate = ({ navigation, currentMeme }) => {
       );
       return true;
     },
-    [decorations, t, isBotDrawerOpened, selectedDecoration, selectedTextIndex],
+    [decorations, t, isBotDrawerOpened, selectedDecoration, selectedTextIndex, config],
   );
 
   return (
@@ -206,15 +224,15 @@ const MemeCreate = ({ navigation, currentMeme }) => {
           {/* Draggable Texts / decorations */}
           {decorations.map((item, index) => {
             return <DraggableContainer
-              key={`dragable-container-${index}-${index.type}-${item.x}-${item.y}`}
+              key={`dragable-container-${index}-${item.type}-${item.x}-${item.y}-${item.minWidth}-${item.minHeight}-${item.maxWidth}-${item.maxHeight}`}
               x={item.x}
               y={item.y}
               width={item.width}
-              minWidth={config?.minWidth || 100}
-              maxWidth={config?.maxWidth || 300}
+              minWidth={item.minWidth}
+              maxWidth={item.maxWidth}
               height={item.height}
-              minHeight={config?.minHeight || 100}
-              maxHeight={config?.maxHeight || 300}
+              minHeight={item.minHeight}
+              maxHeight={item.maxHeight}
               rotation={item.rotation}
               index={index}
               selected={index === selectedTextIndex}

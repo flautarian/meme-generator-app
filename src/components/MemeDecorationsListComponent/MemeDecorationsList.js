@@ -2,7 +2,6 @@ import { useCallback, useEffect, useState } from 'react';
 import { View, StyleSheet, Dimensions, FlatList, Text, TextInput, Pressable, Platform } from 'react-native';
 import { fetchDecorations } from 'src/hooks/useDecorations';
 import TemplateItem from 'src/components/TemplateItemComponent/TemplateItem';
-import { XCircle } from 'react-native-feather';
 import { SafeAreaView } from 'react-native';
 import documentUploadOption from 'src/utils/documentUploadOption';
 import { deleteDecoration, addNewDecoration } from 'src/hooks/useDecorations';
@@ -26,16 +25,15 @@ const MemeDecorationsList = ({ onSelectDecoration, onCloseMenu }) => {
     const refreshDecorations = useCallback(async () => {
         const decorationResults = await fetchDecorations(nameFilter);
         setDecorations(decorationResults);
-        setDecorationsFiltered([...decorationResults, documentUploadOption]);
+        setDecorationsFiltered([documentUploadOption, ...decorationResults]);
     }, [nameFilter]);
 
     useEffect(() => {
         const debounce = setTimeout(() => {
-            setDecorationsFiltered(
-                [...decorations.filter((item) =>
-                    item.name?.toLowerCase().includes(nameFilter.toLowerCase())
-                ), documentUploadOption]
-            );
+            const dFiltered = [documentUploadOption, ...decorations.filter((item) =>
+                item.name?.toLowerCase().includes(nameFilter.toLowerCase())
+            )]
+            setDecorationsFiltered(dFiltered);
         }, 300);
         return () => clearTimeout(debounce);
     }, [nameFilter, decorations]);

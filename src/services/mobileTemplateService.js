@@ -13,7 +13,7 @@ const SQLiteTemplatesService = {
   getAllTemplates() {
     return new Promise((resolve, reject) => {
       const results = db.getAllSync(
-        'SELECT * FROM templates;');
+        'SELECT * FROM templates ORDER BY id DESC;');
       resolve(results);
     });
   },

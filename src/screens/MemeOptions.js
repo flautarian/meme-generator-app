@@ -67,6 +67,14 @@ const MemeOptions = memo(({ navigation, onChangedTemplates }) => {
       justifyContent: 'space-between',
       width: '100%',
     },
+    miniSwitchSection: {
+      marginBottom: 10,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      width: '100%',
+      fontSize: 10,
+    },
     selectInput: {
       width: '100%',
       height: 40,
@@ -145,6 +153,12 @@ const MemeOptions = memo(({ navigation, onChangedTemplates }) => {
       color: '#007AFF',
       fontSize: 16,
       fontWeight: '500',
+      width: 'auto',
+    },
+    miniButtonText: {
+      color: '#007AFF',
+      fontSize: 13,
+      fontWeight: '300',
       width: 'auto',
     },
     dangerButtonText: {
@@ -242,6 +256,13 @@ const MemeOptions = memo(({ navigation, onChangedTemplates }) => {
           />
         </View>
 
+        <View
+          style={{
+            borderBottomColor: '#007bff8c',
+            borderBottomWidth: StyleSheet.hairlineWidth,
+          }}
+        />
+
         {/* Font type */}
         <View style={[styles.switchSection, { flexDirection: 'column', alignItems: 'flex-start' }]}>
           <Text style={styles.buttonText}>{t('memeOptions.fontType')}</Text>
@@ -261,9 +282,10 @@ const MemeOptions = memo(({ navigation, onChangedTemplates }) => {
         </View>
 
         {/* Font size auto checkbox */}
-        <View style={styles.switchSection}>
-          <Text style={styles.buttonText}>{config?.fontAutoResize ? t('memeOptions.fontAutoResizeEnabled') : t('memeOptions.fontAutoResizeDisabled')}</Text>
+        <View style={styles.miniSwitchSection}>
+          <Text style={styles.miniButtonText}>{config?.fontAutoResize ? t('memeOptions.fontAutoResizeEnabled') : t('memeOptions.fontAutoResizeDisabled')}</Text>
           <Switch
+            style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }] }}
             trackColor={{ false: initColor, true: initLightColor }}
             thumbColor={initColor}
             onValueChange={() => {
@@ -276,83 +298,133 @@ const MemeOptions = memo(({ navigation, onChangedTemplates }) => {
           />
         </View>
 
-        <Text style={styles.buttonText}>{t('memeOptions.decorationDimensions')}</Text>
+        <View
+          style={{
+            borderBottomColor: '#007bff8c',
+            borderBottomWidth: StyleSheet.hairlineWidth,
+          }}
+        />
+
+        {/* Width switch */}
+        <View style={styles.miniSwitchSection}>
+          <Text style={styles.miniButtonText}>{config?.limitWidth ? t('memeOptions.limitWidthEnabled') : t('memeOptions.limitWidthDisabled')}</Text>
+          <Switch
+            style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }] }}
+            trackColor={{ false: initColor, true: initLightColor }}
+            thumbColor={initColor}
+
+            onValueChange={() => {
+              setConfig((prev) => ({
+                ...prev,
+                limitWidth: !prev?.limitWidth,
+              }));
+            }}
+            value={config?.limitWidth}
+          />
+        </View>
 
         {/* Min/Max width input */}
-        <View style={[styles.switchSection, { alignItems: 'space-between' }]}>
-          <View style={{ width: '50%' }}>
-            <Text style={styles.buttonText}>{t('memeOptions.minWidth')}</Text>
-            <TextInput
-              style={[styles.selectTextInput]}
-              keyboardType="numeric"
-              value={config?.minWidth?.toString()}
-              onChangeText={(text) => {
-                const value = parseInt(text, 10);
-                if (!isNaN(value)) {
-                  setConfig((prev) => ({
-                    ...prev,
-                    minWidth: value,
-                  }));
-                }
-              }}
-            />
+        {config?.limitWidth && (
+          <View style={[styles.switchSection, { alignItems: 'space-between' }]}>
+            <View style={{ width: '50%' }}>
+              <Text style={styles.buttonText}>{t('memeOptions.minWidth')}</Text>
+              <TextInput
+                style={[styles.selectTextInput, {}]}
+                keyboardType="numeric"
+                value={config?.minWidth?.toString()}
+                editable={config?.limitWidth}
+                onChangeText={(text) => {
+                  const value = parseInt(text, 10);
+                  if (!isNaN(value)) {
+                    setConfig((prev) => ({
+                      ...prev,
+                      minWidth: value,
+                    }));
+                  }
+                }}
+              />
+            </View>
+            <View style={{ width: '50%' }}>
+              <Text style={styles.buttonText}>{t('memeOptions.maxWidth')}</Text>
+              <TextInput
+                style={[styles.selectTextInput]}
+                keyboardType="numeric"
+                value={config?.maxWidth?.toString()}
+                editable={config?.limitWidth}
+                onChangeText={(text) => {
+                  const value = parseInt(text, 10);
+                  if (!isNaN(value)) {
+                    setConfig((prev) => ({
+                      ...prev,
+                      maxWidth: value,
+                    }));
+                  }
+                }}
+              />
+            </View>
           </View>
-          <View style={{ width: '50%' }}>
-            <Text style={styles.buttonText}>{t('memeOptions.maxWidth')}</Text>
-            <TextInput
-              style={[styles.selectTextInput]}
-              keyboardType="numeric"
-              value={config?.maxWidth?.toString()}
-              onChangeText={(text) => {
-                const value = parseInt(text, 10);
-                if (!isNaN(value)) {
-                  setConfig((prev) => ({
-                    ...prev,
-                    maxWidth: value,
-                  }));
-                }
-              }}
-            />
-          </View>
+        )}
+
+
+        {/* Height switch */}
+        <View style={styles.miniSwitchSection}>
+          <Text style={styles.miniButtonText}>{config?.limitHeight ? t('memeOptions.limitHeightEnabled') : t('memeOptions.limitHeightDisabled')}</Text>
+          <Switch
+            style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }] }}
+            trackColor={{ false: initColor, true: initLightColor }}
+            thumbColor={initColor}
+
+            onValueChange={() => {
+              setConfig((prev) => ({
+                ...prev,
+                limitHeight: !prev?.limitHeight,
+              }));
+            }}
+            value={config?.limitHeight}
+          />
         </View>
 
         {/* Min/Max height input */}
-        <View style={[styles.switchSection, { flexDirection: 'row', alignItems: 'space-between' }]}>
-          <View style={{ width: '50%' }}>
-            <Text style={styles.buttonText}>{t('memeOptions.minHeight')}</Text>
-            <TextInput
-              style={[styles.selectTextInput]}
-              keyboardType="numeric"
-              value={config?.minHeight?.toString()}
-              onChangeText={(text) => {
-                const value = parseInt(text, 10);
-                if (!isNaN(value)) {
-                  setConfig((prev) => ({
-                    ...prev,
-                    minHeight: value,
-                  }));
-                }
-              }}
-            />
+        {config?.limitHeight && (
+          <View style={[styles.switchSection, { flexDirection: 'row', alignItems: 'space-between' }]}>
+            <View style={{ width: '50%' }}>
+              <Text style={styles.buttonText}>{t('memeOptions.minHeight')}</Text>
+              <TextInput
+                style={[styles.selectTextInput]}
+                keyboardType="numeric"
+                value={config?.minHeight?.toString()}
+                editable={config?.limitHeight}
+                onChangeText={(text) => {
+                  const value = parseInt(text, 10);
+                  if (!isNaN(value)) {
+                    setConfig((prev) => ({
+                      ...prev,
+                      minHeight: value,
+                    }));
+                  }
+                }}
+              />
+            </View>
+            <View style={{ width: '50%' }}>
+              <Text style={styles.buttonText}>{t('memeOptions.maxHeight')}</Text>
+              <TextInput
+                style={[styles.selectTextInput]}
+                keyboardType="numeric"
+                value={config?.maxHeight?.toString()}
+                editable={config?.limitHeight}
+                onChangeText={(text) => {
+                  const value = parseInt(text, 10);
+                  if (!isNaN(value)) {
+                    setConfig((prev) => ({
+                      ...prev,
+                      maxHeight: value,
+                    }));
+                  }
+                }}
+              />
+            </View>
           </View>
-          <View style={{ width: '50%' }}>
-            <Text style={styles.buttonText}>{t('memeOptions.maxHeight')}</Text>
-            <TextInput
-              style={[styles.selectTextInput]}
-              keyboardType="numeric"
-              value={config?.maxHeight?.toString()}
-              onChangeText={(text) => {
-                const value = parseInt(text, 10);
-                if (!isNaN(value)) {
-                  setConfig((prev) => ({
-                    ...prev,
-                    maxHeight: value,
-                  }));
-                }
-              }}
-            />
-          </View>
-        </View>
+        )}
 
         {/* App signature */}
         <View style={styles.section}>

@@ -7,7 +7,7 @@ const TemplatesService = {
   },
 
   async getAllTemplates() {
-    return await db.templates.toArray();
+    return await db.templates.toArray().reverse();
   },
 
   async getTemplateById(id) {
