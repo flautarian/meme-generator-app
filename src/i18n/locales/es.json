@@ -81,11 +81,15 @@
     "searchPlaceholder": "Buscar plantillas...",
     "foundCount": "Plantillas encontradas: {{count}}",
     "errorUploading": "Error al subir la plantilla",
-    "uploadSuccess": "Plantilla subida correctamente"
+    "uploadSuccess": "Plantilla subida correctamente",
+    "dropHere": "Añade plantilla aqui",
+    "dragDropHint": "Puedes arrastrar una imagen o puedes pegarla del portapapeles para agregarla"
   },
   "decorations": {
     "searchPlaceholder": "Buscar decoraciones...",
-    "foundCount": "Decoraciones encontradas: {{count}}"
+    "foundCount": "Decoraciones encontradas: {{count}}",
+    "dropHere": "Añade decoración aqui",
+    "dragDropHint": "Puedes arrastrar una imagen o puedes pegarla del portapapeles para agregarla"
   },
   "toast": {
     "success": "¡Éxito!",

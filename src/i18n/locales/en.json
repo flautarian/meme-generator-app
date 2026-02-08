@@ -76,17 +76,20 @@
       "title": "Pro Tips",
       "list": "• Use the Impact font for classic meme style\n• Position text at top and bottom\n• Keep text short and punchy\n• Use contrasting colors"
     }
-    
   },
   "templates": {
     "searchPlaceholder": "Search templates...",
     "foundCount": "Templates found: {{count}}",
     "errorUploading": "Error uploading template",
-    "uploadSuccess": "Template uploaded successfully"
+    "uploadSuccess": "Template uploaded successfully",
+    "dropHere": "Add template",
+    "dragDropHint": "You can drag an image or paste it from the clipboard to add it"
   },
   "decorations": {
     "searchPlaceholder": "Search decorations...",
-    "foundCount": "Decorations found: {{count}}"
+    "foundCount": "Decorations found: {{count}}",
+    "dropHere": "Add decoration",
+    "dragDropHint": "You can drag an image or paste it from the clipboard to add it"
   },
   "toast": {
     "success": "Success!",

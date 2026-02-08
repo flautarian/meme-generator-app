@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
 import { View, StyleSheet, TextInput, Text, Platform } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import { addNewTemplate, deleteTemplate, fetchTemplates } from 'src/hooks/useTemplates';
@@ -20,10 +20,16 @@ const MemeSelect = ({ navigation, onSelectMeme, onChangedTemplates }) => {
 
   const [nameFilter, setNameFilter] = useState("");
 
+  const [isDragging, setIsDragging] = useState(false);
+
+  const dragCounter = useRef(0);
+
   const refreshTemplates = useCallback(async () => {
     const templateResults = await fetchTemplates(nameFilter);
     setTemplates(templateResults);
-    setTemplatesFiltered([documentUploadOption, ...templates]);
+    if (Platform.OS !== 'web')
+      templateResults.unshift(documentUploadOption);
+    setTemplatesFiltered(templateResults);
   }, [nameFilter]);
 
   useEffect(() => {
@@ -32,13 +38,107 @@ const MemeSelect = ({ navigation, onSelectMeme, onChangedTemplates }) => {
 
   useEffect(() => {
     const debounce = setTimeout(() => {
-      const filteredTemplates = [documentUploadOption, ...templates.filter((item) =>
+      const filteredTemplates = [...templates.filter((item) =>
         item.name?.toLowerCase().includes(nameFilter.toLowerCase())
       )]
+      if (Platform.OS !== 'web')
+        filteredTemplates.unshift(documentUploadOption);
       setTemplatesFiltered(filteredTemplates);
     }, 300);
     return () => clearTimeout(debounce);
   }, [nameFilter, templates]);
+
+  // Process image file and add as template
+  const processImageFile = useCallback(async (file) => {
+    try {
+      if (!file.type.startsWith('image/')) {
+        console.log('File is not an image');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const base64Image = e.target.result;
+        const template = {
+          name: file.name,
+          blob: base64Image,
+        };
+        await addNewTemplate(template);
+        await refreshTemplates();
+      };
+      reader.readAsDataURL(file);
+    } catch (error) {
+      console.log("Error processing file:", error);
+    }
+  }, [refreshTemplates]);
+
+  // Drag and drop handlers for web
+  useEffect(() => {
+    if (Platform.OS !== 'web') return;
+
+    const handleDragEnter = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      dragCounter.current++;
+      if (e.dataTransfer.items && e.dataTransfer.items.length > 0) {
+        setIsDragging(true);
+      }
+    };
+
+    const handleDragLeave = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      dragCounter.current--;
+      if (dragCounter.current === 0) {
+        setIsDragging(false);
+      }
+    };
+
+    const handleDragOver = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+    };
+
+    const handleDrop = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      setIsDragging(false);
+      dragCounter.current = 0;
+
+      const files = e.dataTransfer.files;
+      if (files && files.length > 0) {
+        processImageFile(files[0]);
+      }
+    };
+
+    const handlePaste = (e) => {
+      const items = e.clipboardData?.items;
+      if (items) {
+        for (let i = 0; i < items.length; i++) {
+          if (items[i].type.indexOf('image') !== -1) {
+            const blob = items[i].getAsFile();
+            if (blob) {
+              processImageFile(blob);
+            }
+          }
+        }
+      }
+    };
+
+    document.addEventListener('dragenter', handleDragEnter);
+    document.addEventListener('dragleave', handleDragLeave);
+    document.addEventListener('dragover', handleDragOver);
+    document.addEventListener('drop', handleDrop);
+    document.addEventListener('paste', handlePaste);
+
+    return () => {
+      document.removeEventListener('dragenter', handleDragEnter);
+      document.removeEventListener('dragleave', handleDragLeave);
+      document.removeEventListener('dragover', handleDragOver);
+      document.removeEventListener('drop', handleDrop);
+      document.removeEventListener('paste', handlePaste);
+    };
+  }, [processImageFile]);
 
   const handleDeleteTemplate = useCallback(async (template) => {
     showConfirmation({
@@ -52,7 +152,7 @@ const MemeSelect = ({ navigation, onSelectMeme, onChangedTemplates }) => {
       type: 'template',
       itemId: template.id
     });
-  }, [t, refreshTemplates]);
+  }, [t, refreshTemplates, showConfirmation]);
 
   const closeDrawer = () => {
     navigation.closeDrawer();
@@ -86,7 +186,7 @@ const MemeSelect = ({ navigation, onSelectMeme, onChangedTemplates }) => {
       onSelectMeme(item);
       closeDrawer();
     }
-  }, [refreshTemplates]);
+  }, [refreshTemplates, onSelectMeme, navigation]);
 
 
   const styles = useMemo(() => StyleSheet.create({
@@ -119,10 +219,38 @@ const MemeSelect = ({ navigation, onSelectMeme, onChangedTemplates }) => {
     memeListContainer: {
       width: "100%",
     },
+    dragOverlay: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'rgba(0, 0, 0, 0.7)',
+      justifyContent: 'center',
+      alignItems: 'center',
+      zIndex: 1000,
+    },
+    dragText: {
+      color: 'white',
+      fontSize: 24,
+      fontWeight: 'bold',
+    },
+    hintText: {
+      fontSize: 12,
+      color: '#666',
+      textAlign: 'center',
+      fontStyle: 'italic',
+      paddingHorizontal: 10,
+    },
   }), []);
 
   return (
     <View style={styles.container}>
+      {isDragging && Platform.OS === 'web' && (
+        <View style={styles.dragOverlay}>
+          <Text style={styles.dragText}>{t('templates.dropHere') || 'Drop image here'}</Text>
+        </View>
+      )}
       <View style={styles.searchContainer}>
         <TextInput
           style={styles.searchInput}
@@ -132,8 +260,13 @@ const MemeSelect = ({ navigation, onSelectMeme, onChangedTemplates }) => {
         />
       </View>
       <Text style={styles.resultCount}>
-        {t('templates.foundCount', { count: templateResults.length - 1 })}
+        {t('templates.foundCount', { count: templateResults.length })}
       </Text>
+      {Platform.OS === 'web' && (
+        <Text style={styles.hintText}>
+          {t('templates.dragDropHint') || 'Drag & drop images or paste from clipboard'}
+        </Text>
+      )}
       <View style={styles.content}>
         {templateResults.length > 0 &&
           <FlatList
@@ -159,5 +292,4 @@ const MemeSelect = ({ navigation, onSelectMeme, onChangedTemplates }) => {
     </View>
   );
 };
-
 export default MemeSelect;

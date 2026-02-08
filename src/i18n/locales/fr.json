@@ -81,11 +81,15 @@
     "searchPlaceholder": "Rechercher des modèles...",
     "foundCount": "Modèles trouvés : {{count}}",
     "errorUploading": "Erreur lors du téléchargement du modèle",
-    "uploadSuccess": "Modèle téléchargé avec succès"
+    "uploadSuccess": "Modèle téléchargé avec succès",
+    "dropHere": "Ajouter le modèle ici",
+    "dragDropHint": "Vous pouvez glisser-déposer une image ou la coller depuis le presse-papiers pour l'ajouter."
   },
   "decorations": {
     "searchPlaceholder": "Rechercher des décorations...",
-    "foundCount": "Décorations trouvées : {{count}}"
+    "foundCount": "Décorations trouvées : {{count}}",
+    "dropHere": "Ajoutez une décoration ici",
+    "dragDropHint": "Vous pouvez glisser-déposer une image ou la coller depuis le presse-papiers pour l'ajouter."
   },
   "toast": {
     "success": "Succès !",

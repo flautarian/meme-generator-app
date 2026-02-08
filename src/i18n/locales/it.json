@@ -81,11 +81,15 @@
     "searchPlaceholder": "Cerca template...",
     "foundCount": "Template trovati: {{count}}",
     "errorUploading": "Errore durante il caricamento del template",
-    "uploadSuccess": "Template caricato con successo"
+    "uploadSuccess": "Template caricato con successo",
+    "dropHere": "Aggiungi modello qui",
+    "dragDropHint": "Puoi trascinare un'immagine o incollarla dagli appunti per aggiungerla"
   },
   "decorations": {
     "searchPlaceholder": "Cerca decorazioni...",
-    "foundCount": "Decorazioni trovate: {{count}}"
+    "foundCount": "Decorazioni trovate: {{count}}",
+    "dropHere": "Aggiungi decorazione qui",
+    "dragDropHint": "Puoi trascinare un'immagine o incollarla dagli appunti per aggiungerla"
   },
   "toast": {
     "success": "Successo!",
