@@ -5,6 +5,7 @@ import { addNewTemplate, deleteTemplate, fetchTemplates } from 'src/hooks/useTem
 import * as ImagePicker from 'expo-image-picker';
 import { useTranslation } from 'react-i18next';
 import { useConfirmation } from 'src/contexts/ConfirmationContext';
+import { useDrawerStatus } from '@react-navigation/drawer';
 import documentUploadOption from 'src/utils/documentUploadOption';
 import TemplateItem from 'src/components/TemplateItemComponent/TemplateItem';
 
@@ -13,6 +14,8 @@ const MemeSelect = ({ navigation, onSelectMeme, onChangedTemplates }) => {
   const { t } = useTranslation();
 
   const { showConfirmation } = useConfirmation();
+
+  const isDrawerOpen = useDrawerStatus() === 'open';
 
   const [templates, setTemplates] = useState([]);
 
@@ -79,6 +82,7 @@ const MemeSelect = ({ navigation, onSelectMeme, onChangedTemplates }) => {
     const handleDragEnter = (e) => {
       e.preventDefault();
       e.stopPropagation();
+      if (!isDrawerOpen) return;
       dragCounter.current++;
       if (e.dataTransfer.items && e.dataTransfer.items.length > 0) {
         setIsDragging(true);
@@ -105,6 +109,8 @@ const MemeSelect = ({ navigation, onSelectMeme, onChangedTemplates }) => {
       setIsDragging(false);
       dragCounter.current = 0;
 
+      if (!isDrawerOpen) return;
+
       const files = e.dataTransfer.files;
       if (files && files.length > 0) {
         processImageFile(files[0]);
@@ -112,6 +118,7 @@ const MemeSelect = ({ navigation, onSelectMeme, onChangedTemplates }) => {
     };
 
     const handlePaste = (e) => {
+      if (!isDrawerOpen) return;
       const items = e.clipboardData?.items;
       if (items) {
         for (let i = 0; i < items.length; i++) {
@@ -138,7 +145,7 @@ const MemeSelect = ({ navigation, onSelectMeme, onChangedTemplates }) => {
       document.removeEventListener('drop', handleDrop);
       document.removeEventListener('paste', handlePaste);
     };
-  }, [processImageFile]);
+  }, [processImageFile, isDrawerOpen]);
 
   const handleDeleteTemplate = useCallback(async (template) => {
     showConfirmation({

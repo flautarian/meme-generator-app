@@ -9,7 +9,7 @@ import { createDrawerNavigator } from '@react-navigation/drawer';
 import * as NavigationBar from 'expo-navigation-bar';
 
 const AppRouterBase = () => {
-    const Drawer = createDrawerNavigator();
+    const RightDrawer = createDrawerNavigator();
     const LeftDrawer = createDrawerNavigator();
 
     const [currentMeme, setCurrentMeme] = useState(null);
@@ -36,7 +36,7 @@ const AppRouterBase = () => {
             >
                 <LeftDrawer.Screen name="Main" options={{ headerShown: false }}>
                     {(props) => (
-                        <Drawer.Navigator
+                        <RightDrawer.Navigator
                             drawerContent={(props) =>
                                 <MemeSelect
                                     {...props}
@@ -48,10 +48,10 @@ const AppRouterBase = () => {
                                 swipeEnabled: false,
                             }}
                         >
-                            <Drawer.Screen name="MemeCreate" options={{ headerShown: false }}>
+                            <RightDrawer.Screen name="MemeCreate" options={{ headerShown: false }}>
                                 {(props) => <MemeCreate {...props} currentMeme={currentMeme} />}
-                            </Drawer.Screen>
-                        </Drawer.Navigator>
+                            </RightDrawer.Screen>
+                        </RightDrawer.Navigator>
                     )}
                 </LeftDrawer.Screen>
             </LeftDrawer.Navigator>
